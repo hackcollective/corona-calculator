@@ -11,6 +11,8 @@ import models
 class sidebar():
     number_cases_confirmed = st.sidebar.number_input('Confirmed cases in your area', min_value=1, step=10)
 
+    num_days_for_prediction = st.sidebar.slider(label='Number of days for prediction', min_value=5, max_value=100, value=50)
+
     # Don't know if we want to present doubling time here or R or something else
     estimated_doubling_time = st.sidebar.slider(label='Estimated time (days) for number of '
                                                       'infected people to double', min_value=1, max_value=10, value=5)
@@ -39,10 +41,11 @@ class sidebar():
 def run_app():
     st.title('Corona Calculator')
     sidebar()
-    df = models.case_prediction_df(sidebar.number_cases_confirmed,
-                                   sidebar.estimated_doubling_time,
-                                   sidebar.symptom_delay,
-                                   sidebar.diagnostic_delay)
+    df = models.case_prediction_df(current_cases=sidebar.number_cases_confirmed,
+                                   doubling_time=sidebar.estimated_doubling_time,
+                                   symptom_delay=sidebar.symptom_delay,
+                                   diagnostic_delay=sidebar.diagnostic_delay,
+                                   max_days=sidebar.num_days_for_prediction)
 
     figure = graphing.infection_graph(df)
     st.write(figure)
