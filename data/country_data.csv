@@ -1,51 +1,16 @@
-Country,confirmed_cases,new_cases,total_deaths,new_deaths,transmission_classification,days_since_last_reported_case
-Republic of Korea,7979,110,66,0,Local transmission,0
-Japan,675,55,19,4,Local transmission,0
-Singapore,187,9,0,0,Local transmission,0
-Australia,140,18,3,0,Local transmission,0
-Italy,15113,2651,1016,189,Local transmission,0
-Spain,2965,825,84,36,Local transmission,0
-France,2860,591,61,13,Local transmission,0
-Germany,2369,802,6,3,Local transmission,0
-Switzerland,858,213,6,2,Local transmission,0
-Denmark,674,59,0,0,Local transmission,0
-Sweden,620,159,0,0,Local transmission,0
-Netherlands,614,111,5,0,Local transmission,0
-United Kingdom,594,134,8,2,Local transmission,0
-Austria,361,59,1,1,Local transmission,0
-Belgium,314,0,0,0,Local transmission,1
-Norway,489,0,0,0,Local transmission,1
-Finland,109,69,0,0,Local transmission,0
-Greece,98,0,1,0,Local transmission,1
-Israel,75,0,0,0,Local transmission,2
-Ireland,70,27,1,0,Local transmission,0
-Iceland,61,0,0,0,Local transmission,3
-Slovenia,57,0,0,0,Local transmission,1
-Poland,49,5,1,1,Local transmission,0
-Romania,48,0,0,0,Local transmission,1
-Portugal,41,0,0,0,Local transmission,2
-Russia,34,14,0,0,Imported cases only,0
-Thailand,75,5,1,0,Local transmission,0
-India,74,1,1,1,Local transmission,0
-Indonesia,34,0,1,0,Local transmission,1
-Bangladesh,3,0,0,0,Local transmission,4
-Iran,10075,1075,429,75,Local transmission,0
-Qatar,262,0,0,0,Imported cases only,1
-United Arab Emirates,85,11,0,0,Local transmission,0
-Kuwait,80,0,0,0,Imported cases only,1
-Iraq,70,0,7,0,Local transmission,1
-Egypt,67,0,1,0,Local transmission,1
-Lebanon,66,0,3,0,Local transmission,1
-Saudi Arabia,21,0,0,0,Imported cases only,1
-Pakistan,20,1,0,0,Local transmission,0
-Afghanistan,7,0,0,0,Imported cases only,1
-United States of America,1264,277,36,7,Local transmission,0
-Canada,138,45,1,0,Local transmission,0
-Brazil,77,25,0,0,Local transmission,0
-Argentina,31,12,1,0,Imported cases only,0
-Mexico,12,1,0,0,Imported cases only,0
-Colombia,9,0,0,0,Imported cases only,1
-South Africa,17,4,0,0,Imported cases only,0
-Subtotal for all  regions,51071,7488,1768,335,,
-International  conveyance  (Diamond Princess),696,0,7,0,Local transmission,5
-Grand total,51767,7488,1775,335,,
+Country,confirmed_cases,new_cases,total_deaths,new_deaths,transmission_classification,days_since_last_reported_case,population
+Bangladesh,3,0,0,0,Local transmission,4,164000000
+Brazil,77,25,0,0,Local transmission,0,212000000
+Canada,138,45,1,0,Local transmission,0,37000000
+France,2860,591,61,13,Local transmission,0,65000000
+Germany,2369,802,6,3,Local transmission,0,83000000
+Iran,10075,1075,429,75,Local transmission,0,84000000
+Italy,15113,2651,1016,189,Local transmission,0,60000000
+Japan,675,55,19,4,Local transmission,0,126000000
+Mexico,12,1,0,0,Imported cases only,0,129000000
+Republic of Korea,7979,110,66,0,Local transmission,0,51000000
+Russia,34,14,0,0,Imported cases only,0,146000000
+Singapore,187,9,0,0,Local transmission,0,6000000
+Spain,2965,825,84,36,Local transmission,0,47000000
+United Kingdom,594,134,8,2,Local transmission,0,68000000
+United States of America,1264,277,36,7,Local transmission,0,331000000

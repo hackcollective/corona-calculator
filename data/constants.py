@@ -5,6 +5,15 @@ and https://www.mdpi.com/2077-0383/9/2/462/htm
 Parameter bounds were subjectively chosen from positively peer-reviewed estimates.
 """
 
+import pandas as pd
+
+
+class Countries:
+    data = pd.read_csv("data/country_data.csv", index_col="Country").to_dict(
+        orient="index"
+    )
+    countries = list(data.keys())
+
 
 """
 SIR model constants
