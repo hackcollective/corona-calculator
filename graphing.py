@@ -8,8 +8,7 @@ def example_graph():
 
 
 def infection_graph(df):
-    fig = px.scatter(df, x='Days', y='Cases')
-    # fig.add_scatter(df, x='Days', y='Actual Cases')
+    fig = px.area(df, x='Days', y='Cases', color='Estimate')
     # fig.add_scatter(df, x='Days', y='Patients in Hospital')
     # fig.add_scatter(df, x='Days', y='Deaths')
 
