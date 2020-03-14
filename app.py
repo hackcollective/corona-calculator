@@ -11,11 +11,8 @@ from data import constants
 
 @dataclass
 class sidebar:
-    area_population = st.sidebar.number_input(
-        "Population in your area (million)", min_value=1, step=1
-    )
-    number_cases_confirmed = st.sidebar.number_input(
-        "Confirmed cases in your area", min_value=1, step=10
+    country = st.sidebar.selectbox(
+        "What country do you live in?", options=constants.Countries.countries
     )
     transmission_probability = st.sidebar.slider(
         label="Probability of a sick person infecting a susceptible person upon contact",
@@ -49,6 +46,10 @@ class sidebar:
 def run_app():
     st.title("Corona Calculator")
     sidebar()
+    country = sidebar.country
+    number_cases_confirmed = constants.Countries.data[country]["confirmed_cases"]
+    population = constants.Countries.data[country]["population"]
+
     sir_model = models.SIRModel(
         sidebar.transmission_probability,
         sidebar.contact_rate,
@@ -62,8 +63,8 @@ def run_app():
         true_cases_estimator,
         sir_model,
         death_toll_model,
-        sidebar.number_cases_confirmed,
-        sidebar.area_population * 1000000,
+        number_cases_confirmed,
+        population,
         sidebar.num_days_for_prediction,
     )
 
