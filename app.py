@@ -30,7 +30,9 @@ class sidebar:
         value=constants.AverageDailyContacts.default,
     )
 
-    num_days_for_prediction = st.sidebar.slider(label='Number of days for prediction', min_value=50, max_value=365, value=100)
+    num_days_for_prediction = st.sidebar.slider(
+        label="Number of days for prediction", min_value=50, max_value=365, value=100
+    )
 
     # Don't know if we want to present doubling time here or R or something else
     # estimated_doubling_time = st.sidebar.slider(label='Estimated time (days) for number of infected people to double', min_value=1, max_value=10, value=5)
@@ -48,15 +50,21 @@ def run_app():
     st.title("Corona Calculator")
     sidebar()
     sir_model = models.SIRModel(
-        sidebar.transmission_probability, sidebar.contact_rate, constants.RemovalRate.default
+        sidebar.transmission_probability,
+        sidebar.contact_rate,
+        constants.RemovalRate.default,
     )
-    true_cases_estimator = models.TrueInfectedCasesEstimator(constants.AscertainmentRate.default)
+    true_cases_estimator = models.TrueInfectedCasesModel(
+        constants.AscertainmentRate.default
+    )
+    death_toll_model = models.DeathTollModel(constants.MortalityRate.default)
     df = models.get_predictions(
         true_cases_estimator,
         sir_model,
+        death_toll_model,
         sidebar.number_cases_confirmed,
         sidebar.area_population * 1000000,
-        sidebar.num_days_for_prediction
+        sidebar.num_days_for_prediction,
     )
 
     figure = graphing.infection_graph(df)

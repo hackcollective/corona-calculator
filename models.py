@@ -1,7 +1,15 @@
+import numpy as np
 import pandas as pd
 
 
-def get_predictions(cases_estimator, sir_model, num_diagnosed, area_population, max_days):
+def get_predictions(
+    cases_estimator,
+    sir_model,
+    death_toll_model,
+    num_diagnosed,
+    area_population,
+    max_days,
+):
 
     true_cases = cases_estimator.predict(num_diagnosed)
 
@@ -13,22 +21,24 @@ def get_predictions(cases_estimator, sir_model, num_diagnosed, area_population, 
         time_steps=max_days,
     )
     S, I, R = predictions.values()
+    deaths = death_toll_model.predict(I)
 
     num_entries = max_days + 1
     # Have to use the long format to make plotly express happy
     df = pd.DataFrame(
         {
-            "Days": list(range(num_entries)) * 3,
-            "Forecast": S + I + R,
+            "Days": list(range(num_entries)) * 4,
+            "Forecast": S + I + R + deaths,
             "Status": ["Susceptible"] * num_entries
             + ["Infected"] * num_entries
-            + ["Removed"] * num_entries,
+            + ["Removed"] * num_entries
+            + ["Deaths"] * num_entries,
         }
     )
     return df
 
 
-class TrueInfectedCasesEstimator:
+class TrueInfectedCasesModel:
     """
     Used to estimate total number of true infected persons based on either number of diagnosed cases or number of deaths.
     """
@@ -41,6 +51,26 @@ class TrueInfectedCasesEstimator:
 
     def predict(self, diagnosed_cases):
         return diagnosed_cases / self._ascertainment_rate
+
+
+class DeathTollModel:
+    """
+    Given a list of points in time representing the infected persons in a population and the mortality rate
+    of the disease, compute the cumulative death toll.
+    """
+
+    def __init__(self, mortality_rate):
+        self._mortality_rate = mortality_rate
+
+    def predict(self, num_infected_cases):
+        """
+        :param num_infected_cases: List of ints representing number of infected cases over time.
+        :return: Cumulative death toll over time.
+        """
+        deaths = [
+            np.random.binomial(n, self._mortality_rate) for n in num_infected_cases
+        ]
+        return np.cumsum(deaths).tolist()
 
 
 class SIRModel:
@@ -64,9 +94,9 @@ class SIRModel:
         """
         population = susceptible + infected + removed
 
-        S = [susceptible]
-        I = [infected]
-        R = [removed]
+        S = [round(susceptible)]
+        I = [round(infected)]
+        R = [round(removed)]
 
         for t in range(time_steps):
             s_t = S[-1] - self._infection_rate * I[-1] * S[-1] / population
@@ -77,9 +107,9 @@ class SIRModel:
             )
             r_t = R[-1] + self._removal_rate * I[-1]
 
-            S.append(s_t)
-            I.append(i_t)
-            R.append(r_t)
+            S.append(round(s_t))
+            I.append(round(i_t))
+            R.append(round(r_t))
 
         return {"S": S, "I": I, "R": R}
 
