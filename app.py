@@ -33,8 +33,8 @@ class Sidebar:
         label="Number of days for prediction", min_value=50, max_value=365, value=100
     )
 
-    number_of_beds = 5000
-    number_of_ventilators = 1000
+    number_of_beds = st.sidebar.slider(label='Number of hospital beds available', min_value=100, max_value=1000000, value=100000)
+    number_of_ventilators = st.sidebar.slider(label='Number of ventilators available', min_value=100, max_value=1000000, value=100000)
 
     # Don't know if we want to present doubling time here or R or something else
     # estimated_doubling_time = st.sidebar.slider(label='Estimated time (days) for number of infected people to double', min_value=1, max_value=10, value=5)
@@ -82,6 +82,13 @@ def run_app():
                                                     Sidebar.number_of_ventilators)
     st.write(hospital_graph)
 
+    peak_occupancy = df.loc[df.Status=='Hospitalized']['Forecast'].max()
+    percent_beds_at_peak =  min(100 * Sidebar.number_of_beds / peak_occupancy, 100)
 
+    peak_ventilation = df.loc[df.Status == 'Ventilated']['Forecast'].max()
+    percent_ventilators_at_peak = min(100 * Sidebar.number_of_ventilators / peak_ventilation, 100)
+
+    st.write(f"At peak, {percent_beds_at_peak:.1f} % of people who need a bed in hospital have one")
+    st.write(f"At peak, {percent_ventilators_at_peak:.1f} % of people who need a ventilator have one")
 if __name__ == "__main__":
     run_app()

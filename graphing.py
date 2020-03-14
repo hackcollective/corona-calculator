@@ -29,7 +29,7 @@ def hospitalization_graph(df, number_of_beds, number_of_ventilators):
                            'Forecast': [number_of_ventilators] * n_days,
                            'Status': ['Number of Ventilators'] * n_days})
 
-    fig = px.area(df, x="Days", y="Forecast", color="Status")
-    fig.add_scatter(x=bed_df.Days, y=bed_df.Forecast, name='Number of Beds')
-    fig.add_scatter(x=ventilator_df.Days, y=ventilator_df.Forecast, name='Number of Ventilators')
+    fig = px.line(df, x="Days", y="Forecast", color="Status")
+    fig.add_scatter(x=bed_df.Days, y=bed_df.Forecast, name='Number of Beds', fill='tozeroy')
+    fig.add_scatter(x=ventilator_df.Days, y=ventilator_df.Forecast, name='Number of Ventilators', fill='tozeroy')
     return fig
