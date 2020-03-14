@@ -15,10 +15,15 @@ class sidebar():
     estimated_doubling_time = st.sidebar.slider(label='Estimated time (days) for number of '
                                                       'infected people to double', min_value=1, max_value=10, value=5)
 
-    presentation_delay =  st.sidebar.slider(label='Time between infection and '
+    symptom_delay =  st.sidebar.slider(label='Time between infection and '
                                                   'symptoms being displayed', min_value=1, max_value=10, value=5)
 
-    testing_delay = st.sidebar.slider(label='Time between being tested and receiving a diagnosis', min_value=1, max_value=10, value=3)
+    diagnostic_delay = st.sidebar.slider(label='Time between being tested and receiving a diagnosis', min_value=1,
+                                         max_value=10, value=3)
+
+    # https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30195-X/fulltext
+    mortality_rate = st.sidebar.slider(label='% mortality rate', min_value=0., step=.1,
+                                         max_value=50., value=5.)
 
     hospitalization_rate = st.sidebar.slider(label='% of cases requiring hospitalization',
                                              min_value=0., max_value=100., step=.5, value=5.)
@@ -30,11 +35,14 @@ class sidebar():
 
     stay_in_hospital = st.sidebar.slider(label='How many days people stay in hospital', min_value=3, max_value=20, value=12)
 
+
 def run_app():
     st.title('Corona Calculator')
     sidebar()
     df = models.case_prediction_df(sidebar.number_cases_confirmed,
-                                   sidebar.estimated_doubling_time)
+                                   sidebar.estimated_doubling_time,
+                                   sidebar.symptom_delay,
+                                   sidebar.diagnostic_delay)
 
     figure = graphing.infection_graph(df)
     st.write(figure)
