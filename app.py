@@ -9,8 +9,7 @@ from data import constants
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
 
 
-@dataclass
-class sidebar:
+class Sidebar:
     area_population = st.sidebar.number_input(
         "Population in your area (million)", min_value=1, step=1
     )
@@ -34,6 +33,9 @@ class sidebar:
         label="Number of days for prediction", min_value=50, max_value=365, value=100
     )
 
+    number_of_beds = 5000
+    number_of_ventilators = 1000
+
     # Don't know if we want to present doubling time here or R or something else
     # estimated_doubling_time = st.sidebar.slider(label='Estimated time (days) for number of infected people to double', min_value=1, max_value=10, value=5)
     # symptom_delay =  st.sidebar.slider(label='Time between infection and symptoms being displayed', min_value=1, max_value=10, value=5)
@@ -48,27 +50,37 @@ class sidebar:
 
 def run_app():
     st.title("Corona Calculator")
-    sidebar()
+    Sidebar()
     sir_model = models.SIRModel(
-        sidebar.transmission_probability,
-        sidebar.contact_rate,
+        Sidebar.transmission_probability,
+        Sidebar.contact_rate,
         constants.RemovalRate.default,
     )
     true_cases_estimator = models.TrueInfectedCasesModel(
         constants.AscertainmentRate.default
     )
     death_toll_model = models.DeathTollModel(constants.MortalityRate.default)
+    hospitalization_model = models.HospitalizationModel(constants.HospitalizationRate.default,
+                                                        constants.VentilationRate.default)
     df = models.get_predictions(
         true_cases_estimator,
         sir_model,
         death_toll_model,
-        sidebar.number_cases_confirmed,
-        sidebar.area_population * 1000000,
-        sidebar.num_days_for_prediction,
+        hospitalization_model,
+        Sidebar.number_cases_confirmed,
+        Sidebar.area_population * 1000000,
+        Sidebar.num_days_for_prediction,
     )
 
-    figure = graphing.infection_graph(df)
-    st.write(figure)
+    # Split df into hospital and non-hospital stats
+    df_base = df[~df.Status.isin(['Hospitalized', 'Ventilated'])]
+    base_graph = graphing.infection_graph(df_base)
+    st.write(base_graph)
+
+    hospital_graph = graphing.hospitalization_graph(df[df.Status.isin(['Infected', 'Hospitalized', 'Ventilated'])],
+                                                    Sidebar.number_of_beds,
+                                                    Sidebar.number_of_ventilators)
+    st.write(hospital_graph)
 
 
 if __name__ == "__main__":
