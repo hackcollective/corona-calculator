@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 import streamlit as st
 import graphing
+import models
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
 
@@ -25,17 +26,17 @@ class sidebar():
     ventilator_rate = st.sidebar.slider(label='% of cases requiring a ventilator',
                                              min_value=0., max_value=100., step=.5, value=1.)
 
-    num_beds = st.sidebar.slider(label='Number of hospital beds available'  
-                                'in your country', min_value=100, max_value=1000000, value=100000)
+    num_beds = st.sidebar.slider(label='Number of hospital beds available', min_value=100, max_value=1000000, value=100000)
 
     stay_in_hospital = st.sidebar.slider(label='How many days people stay in hospital', min_value=3, max_value=20, value=12)
-
-
 
 def run_app():
     st.title('Corona Calculator')
     sidebar()
-    figure = graphing.example_graph()
+    df = models.case_prediction_df(sidebar.number_cases_confirmed,
+                                   sidebar.estimated_doubling_time)
+
+    figure = graphing.infection_graph(df)
     st.write(figure)
 
 
