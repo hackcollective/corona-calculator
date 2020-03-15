@@ -25,7 +25,7 @@ def get_predictions(
         removed=0,
         time_steps=max_days,
     )
-    predictions["Deaths"] = death_toll_model.predict(predictions["Infected"])
+    predictions["Deaths"] = death_toll_model.predict(predictions["Removed"])
     predictions["Need Hospitalization"], predictions[
         "Need Ventilation"
     ] = hospitalization_model.predict(predictions["Infected"])
@@ -74,15 +74,15 @@ class DeathTollModel:
     def __init__(self, mortality_rate):
         self._mortality_rate = mortality_rate
 
-    def predict(self, num_infected_cases):
+    def predict(self, num_removed_cases):
         """
         :param num_infected_cases: List of ints representing number of infected cases over time.
         :return: Cumulative death toll over time.
         """
         deaths = [
-            np.random.binomial(n, self._mortality_rate) for n in num_infected_cases
+            np.random.binomial(n, self._mortality_rate) for n in num_removed_cases
         ]
-        return np.cumsum(deaths).tolist()
+        return deaths
 
 
 class HospitalizationModel:
@@ -96,7 +96,6 @@ class HospitalizationModel:
 
     def predict(self, num_infected_cases):
         """
-
         :param num_infected_cases: List of ints representing number of infected cases over time.
         :return: tuple of hospitalized and ventilated patients over time
         """
