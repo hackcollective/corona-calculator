@@ -9,6 +9,7 @@ from utils import COLOR_MAP, generate_html
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
 
+NOTION_MODELLING_DOC = "https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc"
 
 class Sidebar:
     country = st.sidebar.selectbox(
@@ -81,8 +82,27 @@ def run_app():
     )
     st.markdown(
         body=generate_html(
+            tag="h4",
             text="The goal of this data viz is to help you visualize what is the impact "
-            "of having infected people entering in contact with other people<hr>",
+            "of having infected people entering in contact with other people.<br>"  
+        ),
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        body=generate_html(
+            tag="h4",
+            text=f"<a href=\"{NOTION_MODELLING_DOC}\" target=\"_blank\" style=color:{COLOR_MAP['purple']};>"
+            "Read up on our methodology here</a>"  
+        ),
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        body=generate_html(
+            text="<strong>Disclaimer:</strong> <em>The creators of this application are not healthcare professionals. "
+            "The illustrations provided were estimated using best available data but might not accurately reflect reality.</em>"
+            "<hr>", 
             tag="h4",
         ),
         unsafe_allow_html=True,

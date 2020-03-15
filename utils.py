@@ -1,4 +1,4 @@
-COLOR_MAP = {"default": "#262730", "pink": "#E22A5B"}
+COLOR_MAP = {"default": "#262730", "pink": "#E22A5B", "purple": "#985FFF"}
 
 
 def generate_html(
