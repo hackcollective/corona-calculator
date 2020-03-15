@@ -18,9 +18,9 @@ class Sidebar:
     )
 
     if country:
-        country_data = constants.Countries.data[country]
-        st.sidebar.markdown(f'As of **{data_last_fetched}**, there are **{country_data["confirmed_cases"]}** confirmed cases in {country} and '
-                            f'the population is **{country_data["population"]:,}**')
+        country_data = constants.Countries.country_data[country]
+        st.sidebar.markdown(f'As of **{data_last_fetched}**, there are **{country_data["Confirmed"]}** confirmed cases in {country} and '
+                            f'the population is **{country_data["Population"]:,}**')
 
     transmission_probability = st.sidebar.slider(
         label="Probability of a sick person infecting a susceptible person upon contact",
@@ -60,8 +60,8 @@ def run_app():
              "This has a dramatic effect upon the dynamics of the disease.")
     Sidebar()
     country = Sidebar.country
-    number_cases_confirmed = constants.Countries.data[country]["confirmed_cases"]
-    population = constants.Countries.data[country]["population"]
+    number_cases_confirmed = constants.Countries.country_data[country]["Confirmed"]
+    population = constants.Countries.country_data[country]["Population"]
 
     sir_model = models.SIRModel(
         Sidebar.transmission_probability,
