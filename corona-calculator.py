@@ -5,8 +5,8 @@ import streamlit as st
 import graphing
 import models
 from data import constants
-from fetch_live_data import DATESTRING_FORMAT, LOG_PATH
-from utils import generate_html, COLOR_MAP
+from fetch_live_data import DATESTRING_FORMAT
+from utils import COLOR_MAP, generate_html
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
 
@@ -23,7 +23,7 @@ class Sidebar:
     transmission_probability = constants.TransmissionRatePerContact.default
     if country:
         country_data = constants.Countries.country_data[country]
-        with open(LOG_PATH) as f:
+        with open("data/latest_fetch.log") as f:
             date_last_fetched = f.read()
             date_last_fetched = datetime.datetime.strptime(
                 date_last_fetched, DATESTRING_FORMAT
@@ -152,8 +152,7 @@ def run_app():
     # st.write('Note how the speed of spread affects both the *peak number of cases* and the *total number of deaths*.')
 
     hospital_graph = graphing.hospitalization_graph(
-        df[df.Status.isin(["Infected", "Need Hospitalization"])],
-        num_hospital_beds,
+        df[df.Status.isin(["Infected", "Need Hospitalization"])], num_hospital_beds
     )
 
     st.title("How will this affect my healthcare system?")

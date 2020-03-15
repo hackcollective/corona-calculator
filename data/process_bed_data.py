@@ -1,6 +1,7 @@
-import pandas as pd
 from pathlib import Path
+
 import numpy as np
+import pandas as pd
 
 _BED_DATA_PATH = Path(__file__).parent / "world_bank_bed_data.csv"
 

@@ -6,12 +6,12 @@ from typing import List, Tuple
 
 import pandas as pd
 
+from s3_utils import upload_file
+
 GITHUB_REPO = "https://github.com/CSSEGISandData/COVID-19.git"
 REPO_DIRPATH = "COVID-19"
 DAILY_REPORTS_DIRPATH = "COVID-19/csse_covid_19_data/csse_covid_19_daily_reports"
 
-OUTPUT_PATH = "data/latest_disease_data.csv"
-LOG_PATH = "data/latest_fetch.log"
 DATESTRING_FORMAT = "%Y%m%d%H%M"
 
 
@@ -54,28 +54,14 @@ if __name__ == "__main__":
         {"Confirmed": "sum", "Deaths": "sum", "Recovered": "sum"}
     )
 
-    # Drop countries for which we have no demographic data
-    country_stats_df.drop(
-        [
-            "Brunei",
-            "Cruise Ship",
-            "French Guiana",
-            "Guadeloupe",
-            "Holy See",
-            "Martinique",
-            "North Macedonia",
-            "Reunion",
-        ],
-        inplace=True,
-    )
+    data = country_stats_df.to_csv().encode()
 
-    # CSV file has 4 columns: Country/Region, Confirmed, Deaths, Recovered
-    print(f"Saving data to {OUTPUT_PATH}")
-    country_stats_df.to_csv(OUTPUT_PATH, index=True)
-    with open(LOG_PATH, "w") as f:
-        f.write(datetime.datetime.now().strftime(DATESTRING_FORMAT))
+    success = upload_file(data, "latest_disease_data.csv")
 
-    print(f"Results saved to {LOG_PATH}.")
+    if success:
+        print(f"Results pushed to S3.")
+    else:
+        print("Push to S3 failed")
 
     # # Remove GitHub repo directory
     shutil.rmtree(REPO_DIRPATH)
