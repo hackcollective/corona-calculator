@@ -91,19 +91,25 @@ def run_app():
         Sidebar.num_days_for_prediction,
     )
 
-    st.write("The number of reported cases radically underestimates the true cases. The extent depends upon"
+    st.write("The number of reported cases radically underestimates the true cases. The extent depends upon "
              "your country's testing strategy. Using numbers from Japan, we estimate the true number of cases "
-             "is:")
+             "looks something like:")
 
     fig = graphing.plot_true_versus_confirmed(number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed))
     st.write(fig)
     st.write(
         "The critical factor for controlling spread is how many others infected people interact with each day. "
-        "This has a dramatic effect upon the dynamics of the disease."
+        "This has a dramatic effect upon the dynamics of the disease. "
     )
+    st.write('**Play with the slider to the left to see how this changes the dynamics of disease spread**')
+
     df_base = df[~df.Status.isin(["Need Hospitalization", "Need Ventilation"])]
     base_graph = graphing.infection_graph(df_base)
     st.write(base_graph)
+
+    # TODO: psteeves can you confirm total number of deaths should change? Not clear to me why this would be
+    # apart from herd immunity?
+    # st.write('Note how the speed of spread affects both the *peak number of cases* and the *total number of deaths*.')
 
     hospital_graph = graphing.hospitalization_graph(
         df[df.Status.isin(["Infected", "Need Hospitalization"])],
@@ -118,8 +124,10 @@ def run_app():
     )
 
     # Do some rounding to avoid beds sounding too precise!
-    st.write(f'Your country has around **{round(num_hospital_beds / 100) * 100}** beds. Bear in mind that most of these '
+    st.write(f'Your country has around **{round(num_hospital_beds / 100) * 100:,}** beds. Bear in mind that most of these '
              'are probably already in use for people sick for other reasons.')
+    st.write("It's hard to know how many ventilators are present per country, but there will certainly be a worldwide"
+             "shortage. Many countries are scrambling to buy them [(source)](https://www.reuters.com/article/us-health-coronavirus-draegerwerk-ventil/germany-italy-rush-to-buy-life-saving-ventilators-as-manufacturers-warn-of-shortages-idUSKBN210362).")
 
     st.write(hospital_graph)
     peak_occupancy = df.loc[df.Status == "Need Hospitalization"]["Forecast"].max()
@@ -132,7 +140,8 @@ def run_app():
 
     st.markdown(
         f"At peak, **{peak_occupancy:,}** people will need hospital beds. ** {percent_beds_at_peak:.1f} % ** of people "
-        f"who need a bed in hospital will have access to one given current resources."
+        f"who need a bed in hospital will have access to one given your country's historical resources. This does "
+        f"not take into account any special measures that may have been taken in the last few months."
     )
     # st.markdown(
     #     f"At peak, ** {percent_ventilators_at_peak:.1f} % ** of people who need a ventilator have one"
