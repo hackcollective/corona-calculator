@@ -69,10 +69,7 @@ class Sidebar:
 
 def run_app():
     st.title("Corona Calculator")
-    st.write(
-        "The critical factor for controlling spread is how many others infected people interact with each day. "
-        "This has a dramatic effect upon the dynamics of the disease."
-    )
+
     Sidebar()
     country = Sidebar.country
     number_cases_confirmed = constants.Countries.country_data[country]["Confirmed"]
@@ -101,7 +98,16 @@ def run_app():
         Sidebar.num_days_for_prediction,
     )
 
-    # Split df into hospital and non-hospital stats
+    st.write("The number of reported cases radically underestimates the true cases. The extent depends upon"
+             "your country's testing strategy. Using numbers from Japan, we estimate the true number of cases "
+             "is:")
+
+    fig = graphing.plot_true_versus_confirmed(number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed))
+    st.write(fig)
+    st.write(
+        "The critical factor for controlling spread is how many others infected people interact with each day. "
+        "This has a dramatic effect upon the dynamics of the disease."
+    )
     df_base = df[~df.Status.isin(["Hospitalized", "Ventilated"])]
     base_graph = graphing.infection_graph(df_base)
     st.write(base_graph)

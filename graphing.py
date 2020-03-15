@@ -2,6 +2,16 @@ import pandas as pd
 import plotly.express as px
 
 
+def plot_true_versus_confirmed(confirmed, predicted):
+    df = pd.DataFrame({'Status': ['Confirmed', 'Predicted'],
+                       'Cases': [confirmed, predicted],
+                      'Color': ['b', 'r']})
+    fig = px.bar(df, x='Status', y='Cases', color='Color')
+    fig.layout.update(showlegend=False)
+
+    return fig
+
+
 def example_graph():
     df = px.data.iris()
     fig = px.scatter(df, x="sepal_width", y="sepal_length")
