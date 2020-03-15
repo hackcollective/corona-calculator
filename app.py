@@ -10,7 +10,8 @@ from utils import generate_html, COLOR_MAP
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
 
-DATESTRING_FORMAT_READABLE = "%A %d %B %Y" # 'Sunday 30 November 2014'
+DATESTRING_FORMAT_READABLE = "%A %d %B %Y, %H:%M"  # 'Sunday 30 November 2014'
+
 
 class Sidebar:
     country = st.sidebar.selectbox(
@@ -27,24 +28,31 @@ class Sidebar:
             ).strftime(DATESTRING_FORMAT_READABLE)
 
         st.sidebar.markdown(
-            body=generate_html(text=f"Current date and stats", line_height=0, font_family="Arial",),
-            unsafe_allow_html=True
+            body=generate_html(
+                text=f"Latest statistics from ", line_height=0, font_family="Arial"
+            ),
+            unsafe_allow_html=True,
         )
 
         st.sidebar.markdown(
-            body=generate_html(text=f"{date_last_fetched}", bold=True, color=COLOR_MAP["pink"], line_height=0,),
-            unsafe_allow_html=True
+            body=generate_html(
+                text=f"{date_last_fetched}",
+                bold=True,
+                color=COLOR_MAP["pink"],
+                line_height=0,
+            ),
+            unsafe_allow_html=True,
         )
 
         st.sidebar.markdown(
-            body=generate_html( 
+            body=generate_html(
                 text=f'Population: {int(country_data["Population"]):,}<br>Infected: {country_data["Confirmed"]}<br>Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
                 line_height=0,
                 font_family="Arial",
                 font_size="0.9rem",
                 tag="p",
             ),
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
         # Horizontal divider line
         st.sidebar.markdown("-------")
@@ -56,12 +64,12 @@ class Sidebar:
         value=constants.AverageDailyContacts.default,
     )
 
-    horizon = {'3  months': 90,
-               '6 months': 180,
-               '12  months': 365}
-    _num_days_for_prediction = st.sidebar.radio(label="What period of time would you like to predict for?",
-                                                options=list(horizon.keys()),
-                                                index=0)
+    horizon = {"3  months": 90, "6 months": 180, "12  months": 365, "24 months": 730}
+    _num_days_for_prediction = st.sidebar.radio(
+        label="What period of time would you like to predict for?",
+        options=list(horizon.keys()),
+        index=0,
+    )
 
     num_days_for_prediction = horizon[_num_days_for_prediction]
 
@@ -106,17 +114,23 @@ def run_app():
         Sidebar.num_days_for_prediction,
     )
 
-    st.write("The number of reported cases radically underestimates the true cases. The extent depends upon "
-             "your country's testing strategy. Using numbers from Japan, we estimate the true number of cases "
-             "looks something like:")
+    st.write(
+        "The number of reported cases radically underestimates the true cases. The extent depends upon "
+        "your country's testing strategy. Using numbers from Japan, we estimate the true number of cases "
+        "looks something like:"
+    )
 
-    fig = graphing.plot_true_versus_confirmed(number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed))
+    fig = graphing.plot_true_versus_confirmed(
+        number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed)
+    )
     st.write(fig)
     st.write(
         "The critical factor for controlling spread is how many others infected people interact with each day. "
         "This has a dramatic effect upon the dynamics of the disease. "
     )
-    st.write('**Play with the slider to the left to see how this changes the dynamics of disease spread**')
+    st.write(
+        "**Play with the slider to the left to see how this changes the dynamics of disease spread**"
+    )
 
     df_base = df[~df.Status.isin(["Need Hospitalization", "Need Ventilation"])]
     base_graph = graphing.infection_graph(df_base)
@@ -129,7 +143,7 @@ def run_app():
     hospital_graph = graphing.hospitalization_graph(
         df[df.Status.isin(["Infected", "Need Hospitalization"])],
         num_hospital_beds,
-        None
+        None,
     )
 
     st.title("How will this affect my healthcare system?")
@@ -139,10 +153,14 @@ def run_app():
     )
 
     # Do some rounding to avoid beds sounding too precise!
-    st.write(f'Your country has around **{round(num_hospital_beds / 100) * 100:,}** beds. Bear in mind that most of these '
-             'are probably already in use for people sick for other reasons.')
-    st.write("It's hard to know how many ventilators are present per country, but there will certainly be a worldwide"
-             "shortage. Many countries are scrambling to buy them [(source)](https://www.reuters.com/article/us-health-coronavirus-draegerwerk-ventil/germany-italy-rush-to-buy-life-saving-ventilators-as-manufacturers-warn-of-shortages-idUSKBN210362).")
+    st.write(
+        f"Your country has around **{round(num_hospital_beds / 100) * 100:,}** beds. Bear in mind that most of these "
+        "are probably already in use for people sick for other reasons."
+    )
+    st.write(
+        "It's hard to know how many ventilators are present per country, but there will certainly be a worldwide"
+        "shortage. Many countries are scrambling to buy them [(source)](https://www.reuters.com/article/us-health-coronavirus-draegerwerk-ventil/germany-italy-rush-to-buy-life-saving-ventilators-as-manufacturers-warn-of-shortages-idUSKBN210362)."
+    )
 
     st.write(hospital_graph)
     peak_occupancy = df.loc[df.Status == "Need Hospitalization"]["Forecast"].max()
