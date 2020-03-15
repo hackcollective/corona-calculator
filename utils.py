@@ -21,3 +21,6 @@ def generate_html(
         css_style += f"line-height:{line_height};"
 
     return f"<{tag} style={css_style}>{text}</{tag}>"
+
+
+graph_warning = 'Please be aware the scale of this graph changes!'
