@@ -5,7 +5,6 @@ and https://www.mdpi.com/2077-0383/9/2/462/htm
 Parameter bounds were subjectively chosen from positively peer-reviewed estimates.
 """
 
-import datetime
 from io import StringIO
 from pathlib import Path
 
@@ -22,11 +21,10 @@ BED_DATA = preprocess_bed_data(_BED_DATA_PATH)
 
 
 def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
-    disease_data_bytes = download_file("latest_disease_data.csv")
+    disease_data_bytes, last_modified = download_file("latest_disease_data.csv")
     disease_data = pd.read_csv(
         StringIO(disease_data_bytes.decode()), index_col="Country/Region"
     )
-    print(disease_data.index)
     # Rename name "US" to "United States" in disease and demographics data to match bed data
     disease_data = disease_data.rename(index={"US": "United States"})
     demographic_data = demographic_data.rename(index={"US": "United States"})
@@ -44,16 +42,19 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
     country_data = country_data.merge(
         bed_data[["Num Hospital Beds"]], on="Country/Region"
     )
-    return country_data
+    return country_data, last_modified
 
 
-COUNTRY_DATA = build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA)
+COUNTRY_DATA, LAST_MODIFIED = build_country_data(
+    demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA
+)
 
 
 class Countries:
     country_data = COUNTRY_DATA.to_dict(orient="index")
     countries = list(country_data.keys())
     default_selection = countries.index("United States")
+    last_modified = LAST_MODIFIED
 
 
 """

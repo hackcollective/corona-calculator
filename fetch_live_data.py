@@ -12,8 +12,6 @@ GITHUB_REPO = "https://github.com/CSSEGISandData/COVID-19.git"
 REPO_DIRPATH = "COVID-19"
 DAILY_REPORTS_DIRPATH = "COVID-19/csse_covid_19_data/csse_covid_19_daily_reports"
 
-DATESTRING_FORMAT = "%Y%m%d%H%M"
-
 
 def execute_shell_command(command: List[str]):
     return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
