@@ -25,12 +25,8 @@ class Sidebar:
             f'the population is **{int(country_data["Population"]):,}**'
         )
 
-    transmission_probability = st.sidebar.slider(
-        label="Probability of a sick person infecting a susceptible person upon contact",
-        min_value=constants.TransmissionRatePerContact.min,
-        max_value=constants.TransmissionRatePerContact.max,
-        value=constants.TransmissionRatePerContact.default,
-    )
+    transmission_probability = constants.TransmissionRatePerContact.default
+
     contact_rate = st.sidebar.slider(
         label="Number of people infected people come into contact with daily",
         min_value=constants.AverageDailyContacts.min,
