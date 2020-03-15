@@ -6,9 +6,11 @@ import graphing
 import models
 from data import constants
 from fetch_live_data import DATESTRING_FORMAT, LOG_PATH
+from utils import generate_html, COLOR_MAP
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
 
+DATESTRING_FORMAT_READABLE = "%A %d %B %Y" # 'Sunday 30 November 2014'
 
 class Sidebar:
     country = st.sidebar.selectbox(
@@ -16,19 +18,33 @@ class Sidebar:
     )
 
     if country:
-
-
         transmission_probability = constants.TransmissionRatePerContact.default
         country_data = constants.Countries.country_data[country]
         with open(LOG_PATH) as f:
             date_last_fetched = f.read()
             date_last_fetched = datetime.datetime.strptime(
                 date_last_fetched, DATESTRING_FORMAT
-            )
+            ).strftime(DATESTRING_FORMAT_READABLE)
+
+        st.sidebar.markdown(f"Current date and stats")
+
         st.sidebar.markdown(
-            f'As of **{date_last_fetched}**, there are **{country_data["Confirmed"]}** confirmed cases in {country}.'
+            body=generate_html(text=f"{date_last_fetched}", bold=True, color=COLOR_MAP["pink"]),
+            unsafe_allow_html=True
         )
-        st.sidebar.markdown(f'The population of {country} is **{int(country_data["Population"]):,}**'
+
+        st.sidebar.markdown(
+            body=generate_html( 
+                text=f'{country_data["Confirmed"]} infected<br>{country_data["Recovered"]} recovered<br>{country_data["Deaths"]} deaths',
+                line_height=0,
+                font_family="Arial",
+                font_size="0.9rem",
+                tag="p",
+            ),
+            unsafe_allow_html=True
+        )
+
+        st.sidebar.markdown(f'\n\nThe population of {country} is **{int(country_data["Population"]):,}**'
                             )
 
     contact_rate = st.sidebar.slider(
