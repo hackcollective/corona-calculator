@@ -23,6 +23,9 @@ BED_DATA = preprocess_bed_data(_BED_DATA_PATH)
 def join_source_data(
     demographic_data=DEMOGRAPHIC_DATA, disease_data=DISEASE_DATA, bed_data=BED_DATA
 ):
+    # Rename name "US" to "United States" in disease and demographics data to match bed data
+    disease_data = disease_data.rename(index={"US": "United States"})
+    demographic_data = demographic_data.rename(index={"US": "United States"})
 
     country_data = disease_data.merge(demographic_data, on="Country/Region")
 
@@ -48,6 +51,7 @@ COUNTRY_DATA = join_source_data(
 class Countries:
     country_data = COUNTRY_DATA.to_dict(orient="index")
     countries = list(country_data.keys())
+    default_selection = countries.index("United States")
 
 
 """
