@@ -1,12 +1,15 @@
 from dataclasses import dataclass
 
 import streamlit as st
-
+import datetime
 import graphing
 import models
 from data import constants
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
+
+#TODO make this accurate
+data_last_fetched = datetime.datetime.today().date()
 
 
 @dataclass
@@ -14,6 +17,12 @@ class sidebar:
     country = st.sidebar.selectbox(
         "What country do you live in?", options=constants.Countries.countries
     )
+
+    if country:
+        country_data = constants.Countries.data[country]
+        st.sidebar.markdown(f'As of **{data_last_fetched}**, there are **{country_data["confirmed_cases"]}** confirmed cases in {country} and '
+                            f'the population is **{country_data["population"]:,}**')
+
     transmission_probability = st.sidebar.slider(
         label="Probability of a sick person infecting a susceptible person upon contact",
         min_value=constants.TransmissionRatePerContact.min,
