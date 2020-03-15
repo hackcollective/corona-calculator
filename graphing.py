@@ -55,6 +55,7 @@ def hospitalization_graph(df, number_of_beds, number_of_ventilators):
         fill="tozeroy",
         opacity=0.1,
         fillcolor="rgba(255,0,0,.1)",
+        line={'color': "rgba(255,0,0,.5)"}
     )
     # fig.add_scatter(
     #     x=ventilator_df.Days,

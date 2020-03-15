@@ -34,23 +34,16 @@ class Sidebar:
         value=constants.AverageDailyContacts.default,
     )
 
-    num_days_for_prediction = st.sidebar.slider(
-        label="Number of days for prediction", min_value=50, max_value=365, value=100
-    )
+    horizon = {'3  months': 90,
+               '6 months': 180,
+               '12  months': 365}
+    _num_days_for_prediction = st.sidebar.radio(label="What period of time would you like to predict for?",
+                                                options=list(horizon.keys()),
+                                                index=0)
 
-    number_of_beds = st.sidebar.slider(
-        label="Number of hospital beds available",
-        min_value=100,
-        max_value=1_000_000,
-        value=100_000,
-    )
-    number_of_ventilators = st.sidebar.slider(
-        label="Number of ventilators available",
-        min_value=100,
-        max_value=1_000_000,
-        value=100_000,
-    )
+    num_days_for_prediction = horizon[_num_days_for_prediction]
 
+    #
     # Don't know if we want to present doubling time here or R or something else
     # estimated_doubling_time = st.sidebar.slider(label='Estimated time (days) for number of infected people to double', min_value=1, max_value=10, value=5)
     # symptom_delay =  st.sidebar.slider(label='Time between infection and symptoms being displayed', min_value=1, max_value=10, value=5)
@@ -113,9 +106,9 @@ def run_app():
     st.write(base_graph)
 
     hospital_graph = graphing.hospitalization_graph(
-        df[df.Status.isin(["Infected", "Need Hospitalization", "Need Ventilation"])],
-        Sidebar.number_of_beds,
-        Sidebar.number_of_ventilators,
+        df[df.Status.isin(["Infected", "Need Hospitalization"])],
+        num_hospital_beds,
+        None
     )
 
     st.title("How will this affect my healthcare system?")
