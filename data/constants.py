@@ -48,6 +48,7 @@ COUNTRY_DATA = join_source_data(
 class Countries:
     country_data = COUNTRY_DATA.to_dict(orient="index")
     countries = list(country_data.keys())
+    default_selection = countries.index("Canada")
 
 
 """

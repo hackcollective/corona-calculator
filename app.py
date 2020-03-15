@@ -15,7 +15,8 @@ DATESTRING_FORMAT_READABLE = "%A %d %B %Y, %H:%M"  # 'Sunday 30 November 2014'
 
 class Sidebar:
     country = st.sidebar.selectbox(
-        "What country do you live in?", options=constants.Countries.countries
+        "What country do you live in?", options=constants.Countries.countries, 
+        index=constants.Countries.default_selection
     )
 
     if country:
@@ -46,7 +47,8 @@ class Sidebar:
 
         st.sidebar.markdown(
             body=generate_html(
-                text=f'Population: {int(country_data["Population"]):,}<br>Infected: {country_data["Confirmed"]}<br>Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
+                text=f'Population: {int(country_data["Population"]):,}<br>Infected: {country_data["Confirmed"]}<br>'
+                     f'Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
                 line_height=0,
                 font_family="Arial",
                 font_size="0.9rem",
@@ -85,7 +87,8 @@ def run_app():
     )
     st.markdown(
         body=generate_html( 
-            text=f'The goal of this data viz is to help you visualize what is the impact of having infected people entering in contact with other people<hr>',
+            text="The goal of this data viz is to help you visualize what is the impact "
+                 "of having infected people entering in contact with other people<hr>",
             tag="h4",
         ),
         unsafe_allow_html=True
@@ -167,7 +170,7 @@ def run_app():
         "are probably already in use for people sick for other reasons."
     )
     st.write(
-        "It's hard to know how many ventilators are present per country, but there will certainly be a worldwide"
+        "It's hard to know how many ventilators are present per country, but there will certainly be a worldwide "
         "shortage. Many countries are scrambling to buy them [(source)](https://www.reuters.com/article/us-health-coronavirus-draegerwerk-ventil/germany-italy-rush-to-buy-life-saving-ventilators-as-manufacturers-warn-of-shortages-idUSKBN210362)."
     )
 
