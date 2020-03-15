@@ -72,6 +72,9 @@ def run_app():
         constants.AscertainmentRate.default
     )
     death_toll_model = models.DeathTollModel(constants.MortalityRate.default)
+    hospitalization_model = models.HospitalizationModel(constants.HospitalizationRate.default,
+                                                        constants.VentilationRate.default)
+
     df = models.get_predictions(
         true_cases_estimator,
         sir_model,
@@ -79,7 +82,7 @@ def run_app():
         hospitalization_model,
         number_cases_confirmed,
         population,
-        sidebar.num_days_for_prediction,
+        Sidebar.num_days_for_prediction,
     )
 
     # Split df into hospital and non-hospital stats
@@ -96,7 +99,7 @@ def run_app():
              ' and ventilation at any one time')
     st.write(hospital_graph)
     peak_occupancy = df.loc[df.Status=='Hospitalized']['Forecast'].max()
-    percent_beds_at_peak =  min(100 * Sidebar.number_of_beds / peak_occupancy, 100)
+    percent_beds_at_peak = min(100 * Sidebar.number_of_beds / peak_occupancy, 100)
 
     peak_ventilation = df.loc[df.Status == 'Ventilated']['Forecast'].max()
     percent_ventilators_at_peak = min(100 * Sidebar.number_of_ventilators / peak_ventilation, 100)
