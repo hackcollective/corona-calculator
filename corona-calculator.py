@@ -6,6 +6,7 @@ import graphing
 import models
 from data import constants
 from fetch_live_data import DATESTRING_FORMAT, LOG_PATH
+from interface.elements import reported_vs_true_cases
 from utils import generate_html, COLOR_MAP
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
@@ -125,16 +126,16 @@ def run_app():
         Sidebar.num_days_for_prediction,
     )
 
+    reported_vs_true_cases(number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed))
+
     st.write(
-        "The number of reported cases radically underestimates the true cases. The extent depends upon "
-        "your country's testing strategy. Using numbers from Japan, we estimate the true number of cases "
-        "looks something like:"
+        "The number of reported cases radically underestimates the true cases, because people do not show symptoms for "
+        "several days, not everybody gets tested, and the tests take a few days to  return results. "
+        "The extent depends upon your country's testing strategy."
+        " We estimated the above using numbers from Japan ([source](https://www.ncbi.nlm.nih.gov/pubmed/32033064))."
     )
 
-    fig = graphing.plot_true_versus_confirmed(
-        number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed)
-    )
-    st.write(fig)
+    st.subheader("How will the disease spread?")
     st.write(
         "The critical factor for controlling spread is how many others infected people interact with each day. "
         "This has a dramatic effect upon the dynamics of the disease. "
@@ -156,7 +157,7 @@ def run_app():
         num_hospital_beds,
     )
 
-    st.title("How will this affect my healthcare system?")
+    st.subheader("How will this affect my healthcare system?")
     st.write(
         "The important variable for hospitals is the peak number of people who require hospitalization"
         " and ventilation at any one time."
