@@ -1,3 +1,4 @@
+import datetime
 import os
 from io import BytesIO
 
@@ -7,6 +8,8 @@ from botocore.exceptions import ClientError
 _S3_ACCESS_KEY = os.environ["AWSAccessKeyId"].replace("\r", "")
 _S3_SECRET_KEY = os.environ["AWSSecretKey"].replace("\r", "")
 _S3_BUCKET_NAME = "coronavirus-calculator-data"
+
+DATESTRING_FORMAT_READABLE = "%A %d %B %Y, %H:%M"  # 'Sunday 30 November 2014'
 
 
 def _configure_client():
@@ -36,14 +39,16 @@ def upload_file(data: bytes, object_name: str):
     return True
 
 
-def download_file(object_name: str) -> bytes:
+def download_file(object_name: str):
     """
     Download a file from S3 bucket.
     :param object_name: Name of object to download.
-    :return: Object bytes.
+    :return: Object bytes and date last modified.
     """
     s3_client = _configure_client()
-    buf = BytesIO()
-    s3_client.download_fileobj(Bucket=_S3_BUCKET_NAME, Key=object_name, Fileobj=buf)
-    buf.seek(0)
-    return buf.read()
+    object = s3_client.get_object(Key=object_name, Bucket=_S3_BUCKET_NAME)
+    content = object["Body"].read()
+    last_modified = object["LastModified"]
+    last_modified = last_modified.replace(tzinfo=datetime.timezone.utc).astimezone(None)
+    last_modified = last_modified.strftime(DATESTRING_FORMAT_READABLE)
+    return content, last_modified

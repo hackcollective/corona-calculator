@@ -6,12 +6,9 @@ import graphing
 import models
 from data import constants
 from interface.elements import reported_vs_true_cases
-from fetch_live_data import DATESTRING_FORMAT
 from utils import COLOR_MAP, generate_html
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
-
-DATESTRING_FORMAT_READABLE = "%A %d %B %Y, %H:%M"  # 'Sunday 30 November 2014'
 
 
 class Sidebar:
@@ -24,11 +21,7 @@ class Sidebar:
     transmission_probability = constants.TransmissionRatePerContact.default
     if country:
         country_data = constants.Countries.country_data[country]
-        with open("data/latest_fetch.log") as f:
-            date_last_fetched = f.read()
-            date_last_fetched = datetime.datetime.strptime(
-                date_last_fetched, DATESTRING_FORMAT
-            ).strftime(DATESTRING_FORMAT_READABLE)
+        date_last_fetched = constants.Countries.last_modified
 
         st.sidebar.markdown(
             body=generate_html(
@@ -50,7 +43,7 @@ class Sidebar:
         st.sidebar.markdown(
             body=generate_html(
                 text=f'Population: {int(country_data["Population"]):,}<br>Infected: {country_data["Confirmed"]}<br>'
-                     f'Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
+                f'Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
                 line_height=0,
                 font_family="Arial",
                 font_size="0.9rem",
@@ -61,7 +54,9 @@ class Sidebar:
         # Horizontal divider line
         st.sidebar.markdown("-------")
 
-    st.sidebar.markdown(f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%")
+    st.sidebar.markdown(
+        f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%"
+    )
 
     contact_rate = st.sidebar.slider(
         label="Number of people infected people come into contact with daily",
