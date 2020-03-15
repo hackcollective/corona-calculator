@@ -19,7 +19,7 @@ def execute_shell_command(command: List[str]):
     return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
 
-def get_latest_filepath(csv_filepaths: List[str]) -> Tuple[str, int, int, int]:
+def get_latest_filepath(csv_filepaths: List[Path]) -> Tuple[Path, int, int, int]:
     """
     Returns the file info for the latest CSV file report.
     Example filename: 03-13-2020.csv
@@ -43,10 +43,9 @@ if __name__ == "__main__":
     execute_shell_command(cmd)
 
     # Go to daily reports directory and fetch all CSV files
-    csv_filepaths = Path(DAILY_REPORTS_DIRPATH).glob("*.csv")
+    csv_filepaths = list(Path(DAILY_REPORTS_DIRPATH).glob("*.csv"))
     # Get the filepath for latest report
     latest_filepath, year, month, day = get_latest_filepath(csv_filepaths)
-    print(year, month, day, latest_filepath)
 
     # Read the report into a pandas df
     df = pd.read_csv(latest_filepath)
@@ -70,12 +69,14 @@ if __name__ == "__main__":
         inplace=True,
     )
 
-    # Write out the country stats to output path
-    # The CSV file contains 4 columns:
-    ## 1) Country/Region, 2) Confirmed, 3)	Deaths, 4) Recovered
+    # CSV file has 4 columns: Country/Region, Confirmed, Deaths, Recovered
+    print(f"Saving data to {OUTPUT_PATH}")
     country_stats_df.to_csv(OUTPUT_PATH, index=True)
     with open(LOG_PATH, "w") as f:
         f.write(datetime.datetime.now().strftime(DATESTRING_FORMAT))
 
+    print(f"Results saved to {LOG_PATH}.")
+
     # # Remove GitHub repo directory
     shutil.rmtree(REPO_DIRPATH)
+    print("Clean up done.")
