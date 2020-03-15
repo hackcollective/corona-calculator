@@ -75,7 +75,7 @@ class Sidebar:
         _num_days_for_prediction = st.sidebar.radio(
             label="What period of time would you like to predict for?",
             options=list(horizon.keys()),
-            index=3,
+            index=1,
         )
 
         self.num_days_for_prediction = horizon[_num_days_for_prediction]
@@ -160,7 +160,8 @@ def run_app():
     )
 
     df_base = df[~df.Status.isin(["Need Hospitalization", "Need Ventilation"])]
-    base_graph = graphing.infection_graph(df_base, population)
+    base_graph = graphing.infection_graph(df_base,
+                                          max(0.5*population, df.Forecast.max()))
     st.write(base_graph)
 
     # TODO: psteeves can you confirm total number of deaths should change? Not clear to me why this would be
@@ -169,7 +170,7 @@ def run_app():
 
     hospital_graph = graphing.hospitalization_graph(
         df[df.Status.isin(["Infected", "Need Hospitalization"])], num_hospital_beds,
-        population
+        max(0.5*population, df.Forecast.max())
     )
 
     st.subheader("How will this affect my healthcare system?")
