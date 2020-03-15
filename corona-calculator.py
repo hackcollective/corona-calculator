@@ -5,6 +5,7 @@ import streamlit as st
 import graphing
 import models
 from data import constants
+from interface.elements import reported_vs_true_cases
 from utils import COLOR_MAP, generate_html
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
@@ -12,20 +13,21 @@ from utils import COLOR_MAP, generate_html
 NOTION_MODELLING_DOC = "https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc"
 
 class Sidebar:
-    country = st.sidebar.selectbox(
-        "What country do you live in?",
-        options=constants.Countries.countries,
-        index=constants.Countries.default_selection,
-    )
+    def __init__(self, countries):
+        country = st.sidebar.selectbox(
+            "What country do you live in?",
+            options=countries.countries,
+            index=countries.default_selection,
+        )
+        self.country = country
 
-    transmission_probability = constants.TransmissionRatePerContact.default
-    if country:
-        country_data = constants.Countries.country_data[country]
-        date_last_fetched = constants.Countries.last_modified
+        transmission_probability = constants.TransmissionRatePerContact.default
+        country_data = countries.country_data[country]
+        date_last_fetched = countries.last_modified
 
         st.sidebar.markdown(
             body=generate_html(
-                text=f"Latest statistics from ", line_height=0, font_family="Arial"
+                text=f"Statistics refreshed as of ", line_height=0, font_family="Arial"
             ),
             unsafe_allow_html=True,
         )
@@ -54,28 +56,46 @@ class Sidebar:
         # Horizontal divider line
         st.sidebar.markdown("-------")
 
-    st.sidebar.markdown(
-        f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%"
-    )
+        st.sidebar.markdown(
+            f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%"
+        )
 
-    contact_rate = st.sidebar.slider(
-        label="Number of people infected people come into contact with daily",
-        min_value=constants.AverageDailyContacts.min,
-        max_value=constants.AverageDailyContacts.max,
-        value=constants.AverageDailyContacts.default,
-    )
+        self.contact_rate = st.sidebar.slider(
+            label="Number of people infected people come into contact with daily",
+            min_value=constants.AverageDailyContacts.min,
+            max_value=constants.AverageDailyContacts.max,
+            value=constants.AverageDailyContacts.default,
+        )
 
-    horizon = {"3  months": 90, "6 months": 180, "12  months": 365, "24 months": 730}
-    _num_days_for_prediction = st.sidebar.radio(
-        label="What period of time would you like to predict for?",
-        options=list(horizon.keys()),
-        index=3,
-    )
+        horizon = {
+            "3  months": 90,
+            "6 months": 180,
+            "12  months": 365,
+            "24 months": 730,
+        }
+        _num_days_for_prediction = st.sidebar.radio(
+            label="What period of time would you like to predict for?",
+            options=list(horizon.keys()),
+            index=3,
+        )
 
-    num_days_for_prediction = horizon[_num_days_for_prediction]
+        self.num_days_for_prediction = horizon[_num_days_for_prediction]
+
+
+@st.cache
+def _fetch_country_data():
+    timestamp = datetime.datetime.utcnow()
+    return constants.Countries(timestamp=timestamp)
 
 
 def run_app():
+    # Get cached country data
+    countries = _fetch_country_data()
+
+    if countries.stale:
+        st.caching.clear_cache()
+        countries = _fetch_country_data()
+
     st.markdown(
         body=generate_html(text=f"Corona Calculator", bold=True, tag="h2"),
         unsafe_allow_html=True,
@@ -108,18 +128,19 @@ def run_app():
         unsafe_allow_html=True,
     )
 
-    Sidebar()
-    country = Sidebar.country
-    number_cases_confirmed = constants.Countries.country_data[country]["Confirmed"]
-    population = constants.Countries.country_data[country]["Population"]
-    num_hospital_beds = constants.Countries.country_data[country]["Num Hospital Beds"]
+    sidebar = Sidebar(countries)
+    country = sidebar.country
+    country_data = countries.country_data[country]
+    number_cases_confirmed = country_data["Confirmed"]
+    population = country_data["Population"]
+    num_hospital_beds = country_data["Num Hospital Beds"]
 
     # We don't have this for now
     # num_ventilators = constants.Countries.country_data[country]["Num Ventilators"]
 
     sir_model = models.SIRModel(
         constants.TransmissionRatePerContact.default,
-        Sidebar.contact_rate,
+        sidebar.contact_rate,
         constants.RemovalRate.default,
     )
     true_cases_estimator = models.TrueInfectedCasesModel(
@@ -137,19 +158,19 @@ def run_app():
         hospitalization_model,
         number_cases_confirmed,
         population,
-        Sidebar.num_days_for_prediction,
+        sidebar.num_days_for_prediction,
     )
+
+    reported_vs_true_cases(number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed))
 
     st.write(
-        "The number of reported cases radically underestimates the true cases. The extent depends upon "
-        "your country's testing strategy. Using numbers from Japan, we estimate the true number of cases "
-        "looks something like:"
+        "The number of reported cases radically underestimates the true cases, because people do not show symptoms for "
+        "several days, not everybody gets tested, and the tests take a few days to  return results. "
+        "The extent depends upon your country's testing strategy."
+        " We estimated the above using numbers from Japan ([source](https://www.ncbi.nlm.nih.gov/pubmed/32033064))."
     )
 
-    fig = graphing.plot_true_versus_confirmed(
-        number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed)
-    )
-    st.write(fig)
+    st.subheader("How will the disease spread?")
     st.write(
         "The critical factor for controlling spread is how many others infected people interact with each day. "
         "This has a dramatic effect upon the dynamics of the disease. "
@@ -159,7 +180,7 @@ def run_app():
     )
 
     df_base = df[~df.Status.isin(["Need Hospitalization", "Need Ventilation"])]
-    base_graph = graphing.infection_graph(df_base)
+    base_graph = graphing.infection_graph(df_base, population)
     st.write(base_graph)
 
     # TODO: psteeves can you confirm total number of deaths should change? Not clear to me why this would be
@@ -167,10 +188,11 @@ def run_app():
     # st.write('Note how the speed of spread affects both the *peak number of cases* and the *total number of deaths*.')
 
     hospital_graph = graphing.hospitalization_graph(
-        df[df.Status.isin(["Infected", "Need Hospitalization"])], num_hospital_beds
+        df[df.Status.isin(["Infected", "Need Hospitalization"])], num_hospital_beds,
+        population
     )
 
-    st.title("How will this affect my healthcare system?")
+    st.subheader("How will this affect my healthcare system?")
     st.write(
         "The important variable for hospitals is the peak number of people who require hospitalization"
         " and ventilation at any one time."
