@@ -15,10 +15,10 @@ def _get_latest_bed_estimate(row):
 
 def preprocess_bed_data(path=_BED_DATA_PATH):
     df = pd.read_csv(path, header=2)
-    df.rename({'Country Name': 'Country/Region'}, axis=1, inplace=True)
-    df.drop(['Country Code', 'Indicator Name', 'Indicator Code'], axis=1, inplace=True)
-    df.set_index('Country/Region', inplace=True)
-    df['Latest Bed Estimate'] = df.apply(_get_latest_bed_estimate, axis=1)
+    df.rename({"Country Name": "Country/Region"}, axis=1, inplace=True)
+    df.drop(["Country Code", "Indicator Name", "Indicator Code"], axis=1, inplace=True)
+    df.set_index("Country/Region", inplace=True)
+    df["Latest Bed Estimate"] = df.apply(_get_latest_bed_estimate, axis=1)
 
     return df
 

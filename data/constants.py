@@ -20,25 +20,29 @@ DISEASE_DATA = pd.read_csv(_DISEASE_DATA_PATH, index_col="Country/Region")
 BED_DATA = preprocess_bed_data(_BED_DATA_PATH)
 
 
-def join_source_data(demographic_data=DEMOGRAPHIC_DATA,
-                     disease_data=DISEASE_DATA,
-                     bed_data=BED_DATA):
+def join_source_data(
+    demographic_data=DEMOGRAPHIC_DATA, disease_data=DISEASE_DATA, bed_data=BED_DATA
+):
 
     country_data = disease_data.merge(demographic_data, on="Country/Region")
 
     # Beds are per 1000 people so we need to calculate absolute
 
-    bed_data = bed_data.merge(demographic_data, on='Country/Region')
+    bed_data = bed_data.merge(demographic_data, on="Country/Region")
 
-    bed_data['Num Hospital Beds'] = bed_data['Latest Bed Estimate'] * bed_data['Population'] / 1000
+    bed_data["Num Hospital Beds"] = (
+        bed_data["Latest Bed Estimate"] * bed_data["Population"] / 1000
+    )
 
-    country_data = country_data.merge(bed_data[['Num Hospital Beds']], on='Country/Region')
+    country_data = country_data.merge(
+        bed_data[["Num Hospital Beds"]], on="Country/Region"
+    )
     return country_data
 
 
-COUNTRY_DATA = join_source_data(demographic_data=DEMOGRAPHIC_DATA,
-                                disease_data=DISEASE_DATA,
-                                bed_data=BED_DATA)
+COUNTRY_DATA = join_source_data(
+    demographic_data=DEMOGRAPHIC_DATA, disease_data=DISEASE_DATA, bed_data=BED_DATA
+)
 
 
 class Countries:
@@ -104,5 +108,6 @@ class VentilationRate:
     max = 0.02
     default = 0.015
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     df = join_source_data()
