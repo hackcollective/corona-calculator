@@ -6,7 +6,8 @@ import graphing
 import models
 from data import constants
 from interface.elements import reported_vs_true_cases
-from utils import COLOR_MAP, generate_html
+from utils import COLOR_MAP, generate_html, graph_warning
+
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
 
@@ -86,7 +87,6 @@ def _fetch_country_data():
     timestamp = datetime.datetime.utcnow()
     return constants.Countries(timestamp=timestamp)
 
-
 def run_app():
     # Get cached country data
     countries = _fetch_country_data()
@@ -162,6 +162,7 @@ def run_app():
     df_base = df[~df.Status.isin(["Need Hospitalization", "Need Ventilation"])]
     base_graph = graphing.infection_graph(df_base,
                                           max(0.5*population, df.Forecast.max()))
+    st.warning(graph_warning)
     st.write(base_graph)
 
     # TODO: psteeves can you confirm total number of deaths should change? Not clear to me why this would be
@@ -189,6 +190,7 @@ def run_app():
         "shortage. Many countries are scrambling to buy them [(source)](https://www.reuters.com/article/us-health-coronavirus-draegerwerk-ventil/germany-italy-rush-to-buy-life-saving-ventilators-as-manufacturers-warn-of-shortages-idUSKBN210362)."
     )
 
+    st.warning(graph_warning)
     st.write(hospital_graph)
     peak_occupancy = df.loc[df.Status == "Need Hospitalization"]["Forecast"].max()
     percent_beds_at_peak = min(100 * num_hospital_beds / peak_occupancy, 100)
