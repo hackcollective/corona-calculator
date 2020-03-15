@@ -8,16 +8,41 @@ Parameter bounds were subjectively chosen from positively peer-reviewed estimate
 from pathlib import Path
 
 import pandas as pd
+from  data.process_bed_data import preprocess_bed_data
+
 
 _DEMOGRAPHICS_DATA_PATH = Path(__file__).parent / "demographics.csv"
 _DISEASE_DATA_PATH = Path(__file__).parent / "latest_disease_data.csv"
-_DEMOGRAPHIC_DATA = pd.read_csv(_DEMOGRAPHICS_DATA_PATH, index_col="Country/Region")
-_DISEASE_DATA = pd.read_csv(_DISEASE_DATA_PATH, index_col="Country/Region")
-_COUNTRY_DATA = _DISEASE_DATA.merge(_DEMOGRAPHIC_DATA, on="Country/Region")
+_BED_DATA_PATH = Path(__file__).parent / "world_bank_bed_data.csv"
+
+DEMOGRAPHIC_DATA = pd.read_csv(_DEMOGRAPHICS_DATA_PATH, index_col="Country/Region")
+DISEASE_DATA = pd.read_csv(_DISEASE_DATA_PATH, index_col="Country/Region")
+BED_DATA = preprocess_bed_data(_BED_DATA_PATH)
+
+
+def join_source_data(demographic_data=DEMOGRAPHIC_DATA,
+                     disease_data=DISEASE_DATA,
+                     bed_data=BED_DATA):
+
+    country_data = disease_data.merge(demographic_data, on="Country/Region")
+
+    # Beds are per 1000 people so we need to calculate absolute
+
+    bed_data = bed_data.merge(demographic_data, on='Country/Region')
+
+    bed_data['Num Hospital Beds'] = bed_data['Latest Bed Estimate'] * bed_data['Population'] / 1000
+
+    country_data = country_data.merge(bed_data[['Num Hospital Beds']], on='Country/Region')
+    return country_data
+
+
+COUNTRY_DATA = join_source_data(demographic_data=DEMOGRAPHIC_DATA,
+                                disease_data=DISEASE_DATA,
+                                bed_data=BED_DATA)
 
 
 class Countries:
-    country_data = _COUNTRY_DATA.to_dict(orient="index")
+    country_data = COUNTRY_DATA.to_dict(orient="index")
     countries = list(country_data.keys())
 
 
@@ -78,3 +103,6 @@ class VentilationRate:
     min = 0.01
     max = 0.02
     default = 0.015
+
+if __name__ == '__main__':
+    df = join_source_data()

@@ -74,6 +74,8 @@ def run_app():
     country = Sidebar.country
     number_cases_confirmed = constants.Countries.country_data[country]["Confirmed"]
     population = constants.Countries.country_data[country]["Population"]
+    num_hospital_beds = constants.Countries.country_data[country]["Num Hospital Beds"]
+    num_ventilators = constants.Countries.country_data[country]["Num Ventilators"]
 
     sir_model = models.SIRModel(
         Sidebar.transmission_probability,
@@ -108,12 +110,12 @@ def run_app():
         "The critical factor for controlling spread is how many others infected people interact with each day. "
         "This has a dramatic effect upon the dynamics of the disease."
     )
-    df_base = df[~df.Status.isin(["Hospitalized", "Ventilated"])]
+    df_base = df[~df.Status.isin(["Need Hospitalization", "Need Ventilation"])]
     base_graph = graphing.infection_graph(df_base)
     st.write(base_graph)
 
     hospital_graph = graphing.hospitalization_graph(
-        df[df.Status.isin(["Infected", "Hospitalized", "Ventilated"])],
+        df[df.Status.isin(["Infected", "Need Hospitalization", "Need Ventilation"])],
         Sidebar.number_of_beds,
         Sidebar.number_of_ventilators,
     )
@@ -121,8 +123,12 @@ def run_app():
     st.title("How will this affect my healthcare system?")
     st.write(
         "The important variable for hospitals is the peak number of people who require hospitalization"
-        " and ventilation at any one time"
+        " and ventilation at any one time."
     )
+
+    st.write(f'Your country has around {num_hospital_beds} and {num_ventilators}. Bear in mind that most of these '
+             'are probably already in use for people sick for other reasons.')
+
     st.write(hospital_graph)
     peak_occupancy = df.loc[df.Status == "Hospitalized"]["Forecast"].max()
     percent_beds_at_peak = min(100 * Sidebar.number_of_beds / peak_occupancy, 100)
