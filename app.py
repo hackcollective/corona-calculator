@@ -38,7 +38,7 @@ class Sidebar:
 
         st.sidebar.markdown(
             body=generate_html( 
-                text=f'{country_data["Confirmed"]} infected<br>{country_data["Recovered"]} recovered<br>{country_data["Deaths"]} deaths',
+                text=f'Population: {int(country_data["Population"]):,}<br>Infected: {country_data["Confirmed"]}<br>Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
                 line_height=0,
                 font_family="Arial",
                 font_size="0.9rem",
@@ -46,9 +46,8 @@ class Sidebar:
             ),
             unsafe_allow_html=True
         )
-
-        st.sidebar.markdown(f'\n\nThe population of {country} is **{int(country_data["Population"]):,}**'
-                            )
+        # Horizontal divider line
+        st.sidebar.markdown("-------")
 
     contact_rate = st.sidebar.slider(
         label="Number of people infected people come into contact with daily",
@@ -69,6 +68,11 @@ class Sidebar:
 
 def run_app():
     st.title("Corona Calculator")
+    st.subheader('This is a subheader')
+    st.sidebar.markdown(
+            body=generate_html(text=f"<hr>"),
+            unsafe_allow_html=True
+        )
 
     Sidebar()
     country = Sidebar.country
