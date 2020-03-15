@@ -165,7 +165,6 @@ def run_app():
     hospital_graph = graphing.hospitalization_graph(
         df[df.Status.isin(["Infected", "Need Hospitalization"])],
         num_hospital_beds,
-        None,
     )
 
     st.title("How will this affect my healthcare system?")
