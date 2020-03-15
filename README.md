@@ -1,6 +1,8 @@
 # corona-calculator
 Visualize the prevalence and predicted spread of corona virus near you.
 
+Go to https://corona-calculator.herokuapp.com to see the app (which is continuously deployed from `Master`).
+
 ## Setup venv
 ```
 python3 -m venv .venv
