@@ -78,6 +78,19 @@ class Sidebar:
 
 
 def run_app():
+    # Add this snippet for Google Analytics
+    st.markdown(body="""
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-160736041-1"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-160736041-1');
+        </script>
+    """, unsafe_allow_html=True)
+
     st.markdown(
         body=generate_html(text=f"Corona Calculator", bold=True, tag="h2"),
         unsafe_allow_html=True,
