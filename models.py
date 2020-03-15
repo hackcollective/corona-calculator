@@ -133,9 +133,9 @@ class SIRModel:
         """
         population = susceptible + infected + removed
 
-        S = [round(susceptible)]
-        I = [round(infected)]
-        R = [round(removed)]
+        S = [int(susceptible)]
+        I = [int(infected)]
+        R = [int(removed)]
 
         for t in range(time_steps):
             s_t = S[-1] - self._infection_rate * I[-1] * S[-1] / population
@@ -146,8 +146,8 @@ class SIRModel:
             )
             r_t = R[-1] + self._removal_rate * I[-1]
 
-            S.append(round(s_t))
-            I.append(round(i_t))
-            R.append(round(r_t))
+            S.append(int(s_t))
+            I.append(int(i_t))
+            R.append(int(r_t))
 
         return {"Susceptible": S, "Infected": I, "Removed": R}
