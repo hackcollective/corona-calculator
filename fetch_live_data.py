@@ -8,11 +8,12 @@ GITHUB_REPO = "https://github.com/CSSEGISandData/COVID-19.git"
 REPO_DIRPATH = "COVID-19"
 DAILY_REPORTS_DIRPATH = "COVID-19/csse_covid_19_data/csse_covid_19_daily_reports"
 
-OUTPUT_PATH = "data/latest_daily_country_data.csv"
+OUTPUT_PATH = "data/latest_disease_data.csv"
 
 
 def execute_shell_command(command: List[str]):
     return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode('utf-8')
+
 
 def get_latest_filepath(csv_filepaths: List[str]) -> Tuple[str, int, int, int]:
     """
@@ -48,6 +49,9 @@ df = pd.read_csv(latest_filepath)
 country_stats_df = df.groupby('Country/Region').agg( 
         {'Confirmed': 'sum', 'Deaths': 'sum', 'Recovered': 'sum'}
     )
+
+# Drop countries for which we have no demographic data
+country_stats_df.drop(["Brunei", "Cruise Ship", "French Guiana", "Guadeloupe", "Holy See", "Martinique", "North Macedonia", "Reunion"], inplace=True)
 
 # Write out the country stats to output path
 # The CSV file contains 4 columns:

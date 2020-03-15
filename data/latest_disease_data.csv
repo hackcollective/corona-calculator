@@ -1,0 +1,136 @@
+Country/Region,Confirmed,Deaths,Recovered
+Afghanistan,11,0,0
+Albania,38,1,0
+Algeria,37,3,12
+Andorra,1,0,1
+Antigua and Barbuda,1,0,0
+Argentina,34,2,1
+Armenia,18,0,0
+Aruba,2,0,0
+Australia,250,3,23
+Austria,655,1,6
+Azerbaijan,15,1,3
+Bahrain,210,0,44
+Bangladesh,3,0,0
+Belarus,27,0,3
+Belgium,689,4,1
+Bhutan,1,0,0
+Bolivia,10,0,0
+Bosnia and Herzegovina,18,0,0
+Brazil,151,0,0
+Bulgaria,41,2,0
+Burkina Faso,2,0,0
+Cambodia,7,0,1
+Cameroon,2,0,0
+Canada,196,1,8
+Cayman Islands,1,0,0
+Chile,61,0,0
+China,80977,3193,65660
+Colombia,22,0,0
+Congo (Kinshasa),2,0,0
+Costa Rica,26,0,0
+Cote d'Ivoire,1,0,0
+Croatia,38,0,1
+Cuba,4,0,0
+Curacao,1,0,0
+Cyprus,26,0,0
+Czechia,189,0,0
+Denmark,836,1,1
+Dominican Republic,11,0,0
+Ecuador,28,2,0
+Egypt,109,2,27
+Estonia,115,0,0
+Eswatini,1,0,0
+Ethiopia,1,0,0
+Finland,225,0,1
+France,4480,91,12
+Gabon,1,0,0
+Georgia,30,0,0
+Germany,4585,9,46
+Ghana,3,0,0
+Greece,228,3,8
+Guatemala,1,0,0
+Guernsey,1,0,0
+Guinea,1,0,0
+Guyana,1,1,0
+Honduras,2,0,0
+Hungary,30,0,1
+Iceland,156,0,1
+India,102,2,4
+Indonesia,96,5,8
+Iran,12729,611,2959
+Iraq,110,10,26
+Ireland,129,2,0
+Israel,193,0,4
+Italy,21157,1441,1966
+Jamaica,8,0,0
+Japan,773,22,118
+Jersey,2,0,0
+Jordan,1,0,1
+Kazakhstan,6,0,0
+Kenya,1,0,0
+"Korea, South",8086,72,510
+Kuwait,104,0,5
+Latvia,26,0,1
+Lebanon,93,3,1
+Liechtenstein,4,0,0
+Lithuania,8,0,0
+Luxembourg,51,1,0
+Malaysia,238,0,35
+Maldives,10,0,0
+Malta,18,0,1
+Mauritania,1,0,0
+Mexico,26,0,4
+Moldova,12,0,0
+Monaco,2,0,0
+Mongolia,1,0,0
+Morocco,17,1,1
+Namibia,2,0,0
+Nepal,1,0,1
+Netherlands,959,12,2
+New Zealand,6,0,0
+Nigeria,2,0,0
+Norway,1090,3,1
+Oman,19,0,9
+Pakistan,31,0,2
+Panama,36,1,0
+Paraguay,6,0,0
+Peru,38,0,0
+Philippines,111,8,2
+Poland,103,3,0
+Portugal,169,0,2
+Qatar,337,0,4
+Romania,123,0,9
+Russia,59,0,8
+Rwanda,1,0,0
+Saint Lucia,1,0,0
+Saint Vincent and the Grenadines,1,0,0
+San Marino,80,5,4
+Saudi Arabia,103,0,1
+Senegal,10,0,1
+Serbia,46,0,0
+Seychelles,2,0,0
+Singapore,212,0,105
+Slovakia,44,0,0
+Slovenia,181,1,0
+South Africa,38,0,0
+Spain,6391,195,517
+Sri Lanka,10,0,1
+Sudan,1,1,0
+Suriname,1,0,0
+Sweden,961,2,1
+Switzerland,1359,13,4
+Taiwan*,53,1,20
+Thailand,82,1,35
+Togo,1,0,0
+Trinidad and Tobago,2,0,0
+Tunisia,18,0,0
+Turkey,5,0,0
+US,2726,54,12
+Ukraine,3,1,0
+United Arab Emirates,85,0,17
+United Kingdom,1143,21,19
+Uruguay,4,0,0
+Venezuela,2,0,0
+Vietnam,53,0,16
+occupied Palestinian territory,0,0,0

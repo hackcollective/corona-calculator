@@ -6,13 +6,21 @@ Parameter bounds were subjectively chosen from positively peer-reviewed estimate
 """
 
 import pandas as pd
+from pathlib import Path
+
+
+_DEMOGRAPHICS_DATA_PATH = Path(__file__).parent / "demographics.csv"
+_DISEASE_DATA_PATH = Path(__file__).parent / "latest_disease_data.csv"
+_DEMOGRAPHIC_DATA = pd.read_csv(_DEMOGRAPHICS_DATA_PATH, index_col="Country/Region")
+_DISEASE_DATA = pd.read_csv(_DISEASE_DATA_PATH, index_col="Country/Region")
+_COUNTRY_DATA = _DISEASE_DATA.merge(_DEMOGRAPHIC_DATA, on="Country/Region")
 
 
 class Countries:
-    data = pd.read_csv("data/country_data.csv", index_col="Country").to_dict(
-        orient="index"
-    )
-    countries = list(data.keys())
+    country_data = _COUNTRY_DATA.to_dict(
+            orient="index"
+        )
+    countries = list(country_data.keys())
 
 
 """
