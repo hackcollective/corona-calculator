@@ -5,6 +5,7 @@ and https://www.mdpi.com/2077-0383/9/2/462/htm
 Parameter bounds were subjectively chosen from positively peer-reviewed estimates.
 """
 
+import datetime
 from io import StringIO
 from pathlib import Path
 
@@ -42,19 +43,20 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
     country_data = country_data.merge(
         bed_data[["Num Hospital Beds"]], on="Country/Region"
     )
-    return country_data, last_modified
-
-
-COUNTRY_DATA, LAST_MODIFIED = build_country_data(
-    demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA
-)
+    return country_data.to_dict(orient="index"), last_modified
 
 
 class Countries:
-    country_data = COUNTRY_DATA.to_dict(orient="index")
-    countries = list(country_data.keys())
-    default_selection = countries.index("United States")
-    last_modified = LAST_MODIFIED
+    def __init__(self, timestamp):
+        self.country_data, self.last_modified = build_country_data()
+        self.countries = list(self.country_data.keys())
+        self.default_selection = self.countries.index("United States")
+        self.timestamp = timestamp
+
+    @property
+    def stale(self):
+        delta = datetime.datetime.utcnow() - self.timestamp
+        return delta > datetime.timedelta(hours=1)
 
 
 """
