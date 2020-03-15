@@ -1,8 +1,9 @@
-import pandas as pd
 import shutil
 import subprocess
 from pathlib import Path
 from typing import List, Tuple
+
+import pandas as pd
 
 GITHUB_REPO = "https://github.com/CSSEGISandData/COVID-19.git"
 REPO_DIRPATH = "COVID-19"
@@ -12,7 +13,7 @@ OUTPUT_PATH = "data/latest_disease_data.csv"
 
 
 def execute_shell_command(command: List[str]):
-    return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode('utf-8')
+    return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
 
 def get_latest_filepath(csv_filepaths: List[str]) -> Tuple[str, int, int, int]:
@@ -29,7 +30,7 @@ def get_latest_filepath(csv_filepaths: List[str]) -> Tuple[str, int, int, int]:
         year = int(stem_split[2])
         file_infos.append((fpath, year, month, day))
     # Sort the file info list
-    file_infos = sorted(file_infos, key=lambda t: (t[1],t[2],t[3]))
+    file_infos = sorted(file_infos, key=lambda t: (t[1], t[2], t[3]))
     return file_infos[-1]
 
 
@@ -46,12 +47,24 @@ print(year, month, day, latest_filepath)
 # Read the report into a pandas df
 df = pd.read_csv(latest_filepath)
 # Aggregate the country stats
-country_stats_df = df.groupby('Country/Region').agg( 
-        {'Confirmed': 'sum', 'Deaths': 'sum', 'Recovered': 'sum'}
-    )
+country_stats_df = df.groupby("Country/Region").agg(
+    {"Confirmed": "sum", "Deaths": "sum", "Recovered": "sum"}
+)
 
 # Drop countries for which we have no demographic data
-country_stats_df.drop(["Brunei", "Cruise Ship", "French Guiana", "Guadeloupe", "Holy See", "Martinique", "North Macedonia", "Reunion"], inplace=True)
+country_stats_df.drop(
+    [
+        "Brunei",
+        "Cruise Ship",
+        "French Guiana",
+        "Guadeloupe",
+        "Holy See",
+        "Martinique",
+        "North Macedonia",
+        "Reunion",
+    ],
+    inplace=True,
+)
 
 # Write out the country stats to output path
 # The CSV file contains 4 columns:
