@@ -70,7 +70,7 @@ class Sidebar:
     _num_days_for_prediction = st.sidebar.radio(
         label="What period of time would you like to predict for?",
         options=list(horizon.keys()),
-        index=-1,
+        index=3,
     )
 
     num_days_for_prediction = horizon[_num_days_for_prediction]
