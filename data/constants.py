@@ -5,24 +5,28 @@ and https://www.mdpi.com/2077-0383/9/2/462/htm
 Parameter bounds were subjectively chosen from positively peer-reviewed estimates.
 """
 
+import datetime
+from io import StringIO
 from pathlib import Path
 
 import pandas as pd
-from data.process_bed_data import preprocess_bed_data
 
+from data.process_bed_data import preprocess_bed_data
+from s3_utils import download_file
 
 _DEMOGRAPHICS_DATA_PATH = Path(__file__).parent / "demographics.csv"
-_DISEASE_DATA_PATH = Path(__file__).parent / "latest_disease_data.csv"
 _BED_DATA_PATH = Path(__file__).parent / "world_bank_bed_data.csv"
 
 DEMOGRAPHIC_DATA = pd.read_csv(_DEMOGRAPHICS_DATA_PATH, index_col="Country/Region")
-DISEASE_DATA = pd.read_csv(_DISEASE_DATA_PATH, index_col="Country/Region")
 BED_DATA = preprocess_bed_data(_BED_DATA_PATH)
 
 
-def join_source_data(
-    demographic_data=DEMOGRAPHIC_DATA, disease_data=DISEASE_DATA, bed_data=BED_DATA
-):
+def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
+    disease_data_bytes = download_file("latest_disease_data.csv")
+    disease_data = pd.read_csv(
+        StringIO(disease_data_bytes.decode()), index_col="Country/Region"
+    )
+    print(disease_data.index)
     # Rename name "US" to "United States" in disease and demographics data to match bed data
     disease_data = disease_data.rename(index={"US": "United States"})
     demographic_data = demographic_data.rename(index={"US": "United States"})
@@ -43,9 +47,7 @@ def join_source_data(
     return country_data
 
 
-COUNTRY_DATA = join_source_data(
-    demographic_data=DEMOGRAPHIC_DATA, disease_data=DISEASE_DATA, bed_data=BED_DATA
-)
+COUNTRY_DATA = build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA)
 
 
 class Countries:
