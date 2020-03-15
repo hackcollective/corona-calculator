@@ -1,17 +1,14 @@
+COLOR_MAP = {"default": "#262730", "pink": "#E22A5B"}
 
-COLOR_MAP = {
-    "default": "#262730",
-    "pink": "#E22A5B"
-}
 
 def generate_html(
-    text, 
-    color=COLOR_MAP["default"], 
+    text,
+    color=COLOR_MAP["default"],
     bold=False,
     font_family=None,
     font_size=None,
     line_height=None,
-    tag="div"
+    tag="div",
 ):
     if bold:
         text = f"<strong>{text}</strong>"
@@ -23,4 +20,4 @@ def generate_html(
     if line_height:
         css_style += f"line-height:{line_height};"
 
-    return f'<{tag} style={css_style}>{text}</{tag}>'
+    return f"<{tag} style={css_style}>{text}</{tag}>"
