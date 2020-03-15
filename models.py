@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 import pandas as pd
 
-_STATUSES_TO_SHOW = ["Infected", "Deaths", "Hospitalized", "Ventilated"]
+_STATUSES_TO_SHOW = ["Infected", "Deaths", "Need Hospitalization", "Need Ventilation"]
 
 
 def get_predictions(
@@ -26,8 +26,8 @@ def get_predictions(
         time_steps=max_days,
     )
     predictions["Deaths"] = death_toll_model.predict(predictions["Infected"])
-    predictions["Hospitalized"], predictions[
-        "Ventilated"
+    predictions["Need Hospitalization"], predictions[
+        "Need Ventilation"
     ] = hospitalization_model.predict(predictions["Infected"])
     num_entries = max_days + 1
 
