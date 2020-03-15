@@ -15,8 +15,9 @@ DATESTRING_FORMAT_READABLE = "%A %d %B %Y, %H:%M"  # 'Sunday 30 November 2014'
 
 class Sidebar:
     country = st.sidebar.selectbox(
-        "What country do you live in?", options=constants.Countries.countries, 
-        index=constants.Countries.default_selection
+        "What country do you live in?",
+        options=constants.Countries.countries,
+        index=constants.Countries.default_selection,
     )
 
     if country:
@@ -48,7 +49,7 @@ class Sidebar:
         st.sidebar.markdown(
             body=generate_html(
                 text=f'Population: {int(country_data["Population"]):,}<br>Infected: {country_data["Confirmed"]}<br>'
-                     f'Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
+                f'Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
                 line_height=0,
                 font_family="Arial",
                 font_size="0.9rem",
@@ -78,20 +79,16 @@ class Sidebar:
 
 def run_app():
     st.markdown(
-        body=generate_html( 
-            text=f'Corona Calculator',
-            bold=True,
-            tag="h2",
-        ),
-        unsafe_allow_html=True
+        body=generate_html(text=f"Corona Calculator", bold=True, tag="h2"),
+        unsafe_allow_html=True,
     )
     st.markdown(
-        body=generate_html( 
+        body=generate_html(
             text="The goal of this data viz is to help you visualize what is the impact "
-                 "of having infected people entering in contact with other people<hr>",
+            "of having infected people entering in contact with other people<hr>",
             tag="h4",
         ),
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     Sidebar()
