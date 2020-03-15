@@ -1,18 +1,26 @@
 from dataclasses import dataclass
 
 import streamlit as st
-
+import datetime
 import graphing
 import models
 from data import constants
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
 
+#TODO make this accurate
+data_last_fetched = datetime.datetime.today().date()
+
 
 class Sidebar:
     country = st.sidebar.selectbox(
-            "What country do you live in?", options=constants.Countries.countries
-        )
+        "What country do you live in?", options=constants.Countries.countries
+    )
+
+    if country:
+        country_data = constants.Countries.data[country]
+        st.sidebar.markdown(f'As of **{data_last_fetched}**, there are **{country_data["confirmed_cases"]}** confirmed cases in {country} and '
+                            f'the population is **{country_data["population"]:,}**')
 
     transmission_probability = st.sidebar.slider(
         label="Probability of a sick person infecting a susceptible person upon contact",
@@ -64,6 +72,9 @@ def run_app():
         constants.AscertainmentRate.default
     )
     death_toll_model = models.DeathTollModel(constants.MortalityRate.default)
+    hospitalization_model = models.HospitalizationModel(constants.HospitalizationRate.default,
+                                                        constants.VentilationRate.default)
+
     df = models.get_predictions(
         true_cases_estimator,
         sir_model,
@@ -71,7 +82,7 @@ def run_app():
         hospitalization_model,
         number_cases_confirmed,
         population,
-        sidebar.num_days_for_prediction,
+        Sidebar.num_days_for_prediction,
     )
 
     # Split df into hospital and non-hospital stats
@@ -88,7 +99,7 @@ def run_app():
              ' and ventilation at any one time')
     st.write(hospital_graph)
     peak_occupancy = df.loc[df.Status=='Hospitalized']['Forecast'].max()
-    percent_beds_at_peak =  min(100 * Sidebar.number_of_beds / peak_occupancy, 100)
+    percent_beds_at_peak = min(100 * Sidebar.number_of_beds / peak_occupancy, 100)
 
     peak_ventilation = df.loc[df.Status == 'Ventilated']['Forecast'].max()
     percent_ventilators_at_peak = min(100 * Sidebar.number_of_ventilators / peak_ventilation, 100)
