@@ -10,12 +10,10 @@ from data import constants
 
 
 class Sidebar:
-    area_population = st.sidebar.number_input(
-        "Population in your area (million)", min_value=1, step=1
-    )
-    number_cases_confirmed = st.sidebar.number_input(
-        "Confirmed cases in your area", min_value=1, step=10
-    )
+    country = st.sidebar.selectbox(
+            "What country do you live in?", options=constants.Countries.countries
+        )
+
     transmission_probability = st.sidebar.slider(
         label="Probability of a sick person infecting a susceptible person upon contact",
         min_value=constants.TransmissionRatePerContact.min,
@@ -53,6 +51,10 @@ def run_app():
     st.write("The critical factor for controlling spread is how many others infected people interact with each day. "
              "This has a dramatic effect upon the dynamics of the disease.")
     Sidebar()
+    country = Sidebar.country
+    number_cases_confirmed = constants.Countries.data[country]["confirmed_cases"]
+    population = constants.Countries.data[country]["population"]
+
     sir_model = models.SIRModel(
         Sidebar.transmission_probability,
         Sidebar.contact_rate,
@@ -62,16 +64,14 @@ def run_app():
         constants.AscertainmentRate.default
     )
     death_toll_model = models.DeathTollModel(constants.MortalityRate.default)
-    hospitalization_model = models.HospitalizationModel(constants.HospitalizationRate.default,
-                                                        constants.VentilationRate.default)
     df = models.get_predictions(
         true_cases_estimator,
         sir_model,
         death_toll_model,
         hospitalization_model,
-        Sidebar.number_cases_confirmed,
-        Sidebar.area_population * 1000000,
-        Sidebar.num_days_for_prediction,
+        number_cases_confirmed,
+        population,
+        sidebar.num_days_for_prediction,
     )
 
     # Split df into hospital and non-hospital stats

@@ -5,6 +5,15 @@ and https://www.mdpi.com/2077-0383/9/2/462/htm
 Parameter bounds were subjectively chosen from positively peer-reviewed estimates.
 """
 
+import pandas as pd
+
+
+class Countries:
+    data = pd.read_csv("data/country_data.csv", index_col="Country").to_dict(
+        orient="index"
+    )
+    countries = list(data.keys())
+
 
 """
 SIR model constants
@@ -12,18 +21,18 @@ SIR model constants
 
 
 class RemovalRate:
-    min = 1 / 10
+    min = 1 / 7
     default = 1 / 10  # Recovery period around 10 days
-    max = 1 / 10
+    max = 1 / 14
 
 
 class TransmissionRatePerContact:
     # Probability of a contact between carrier and susceptible leading to infection
-    min = 0.017857142857142856
+    min = 0.01
     default = (
         0.018
     )  # Found using binomial distribution in Wuhan scenario: 14 contacts per day, 10 infectious days, 2.5 average people infected.
-    max = 0.02
+    max = 0.022
 
 
 class AverageDailyContacts:
@@ -52,9 +61,9 @@ class MortalityRate:
 
 class HospitalizationRate:
     # Cases requiring hospitalization
-    min = 0.05
-    max = 0.02
-    default = 0.2
+    min = 0.1
+    max = 0.2
+    default = 0.15
 
 
 class VentilationRate:
