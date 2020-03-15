@@ -8,7 +8,7 @@ Parameter bounds were subjectively chosen from positively peer-reviewed estimate
 from pathlib import Path
 
 import pandas as pd
-from  data.process_bed_data import preprocess_bed_data
+from data.process_bed_data import preprocess_bed_data
 
 
 _DEMOGRAPHICS_DATA_PATH = Path(__file__).parent / "demographics.csv"

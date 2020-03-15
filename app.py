@@ -22,7 +22,7 @@ class Sidebar:
         country_data = constants.Countries.country_data[country]
         st.sidebar.markdown(
             f'As of **{data_last_fetched}**, there are **{country_data["Confirmed"]}** confirmed cases in {country} and '
-            f'the population is **{country_data["Population"]:,}**'
+            f'the population is **{int(country_data["Population"]):,}**'
         )
 
     transmission_probability = st.sidebar.slider(
@@ -75,7 +75,9 @@ def run_app():
     number_cases_confirmed = constants.Countries.country_data[country]["Confirmed"]
     population = constants.Countries.country_data[country]["Population"]
     num_hospital_beds = constants.Countries.country_data[country]["Num Hospital Beds"]
-    num_ventilators = constants.Countries.country_data[country]["Num Ventilators"]
+
+    # We don't have this for now
+    # num_ventilators = constants.Countries.country_data[country]["Num Ventilators"]
 
     sir_model = models.SIRModel(
         Sidebar.transmission_probability,
@@ -126,24 +128,26 @@ def run_app():
         " and ventilation at any one time."
     )
 
-    st.write(f'Your country has around {num_hospital_beds} and {num_ventilators}. Bear in mind that most of these '
+    # Do some rounding to avoid beds sounding too precise!
+    st.write(f'Your country has around **{round(num_hospital_beds / 100) * 100}** beds. Bear in mind that most of these '
              'are probably already in use for people sick for other reasons.')
 
     st.write(hospital_graph)
-    peak_occupancy = df.loc[df.Status == "Hospitalized"]["Forecast"].max()
-    percent_beds_at_peak = min(100 * Sidebar.number_of_beds / peak_occupancy, 100)
+    peak_occupancy = df.loc[df.Status == "Need Hospitalization"]["Forecast"].max()
+    percent_beds_at_peak = min(100 * num_hospital_beds / peak_occupancy, 100)
 
-    peak_ventilation = df.loc[df.Status == "Ventilated"]["Forecast"].max()
-    percent_ventilators_at_peak = min(
-        100 * Sidebar.number_of_ventilators / peak_ventilation, 100
-    )
+    # peak_ventilation = df.loc[df.Status == "Ventilated"]["Forecast"].max()
+    # percent_ventilators_at_peak = min(
+    #     100 * Sidebar.number_of_ventilators / peak_ventilation, 100
+    # )
 
     st.markdown(
-        f"At peak, ** {percent_beds_at_peak:.1f} % ** of people who need a bed in hospital have one"
+        f"At peak, **{peak_occupancy:,}** people will need hospital beds. ** {percent_beds_at_peak:.1f} % ** of people "
+        f"who need a bed in hospital will have access to one given current resources."
     )
-    st.markdown(
-        f"At peak, ** {percent_ventilators_at_peak:.1f} % ** of people who need a ventilator have one"
-    )
+    # st.markdown(
+    #     f"At peak, ** {percent_ventilators_at_peak:.1f} % ** of people who need a ventilator have one"
+    # )
 
 
 if __name__ == "__main__":
