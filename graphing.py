@@ -1,7 +1,8 @@
 import pandas as pd
 import plotly.express as px
 
-TEMPLATE = 'plotly_white'
+TEMPLATE = "plotly_white"
+
 
 def plot_true_versus_confirmed(confirmed, predicted):
     df = pd.DataFrame(
@@ -48,6 +49,5 @@ def hospitalization_graph(df, number_of_beds):
         fillcolor="rgba(255,0,0,.1)",
         line={"color": "rgba(255,0,0,.5)"},
     )
-
 
     return fig
