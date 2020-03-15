@@ -26,10 +26,13 @@ class Sidebar:
                 date_last_fetched, DATESTRING_FORMAT
             ).strftime(DATESTRING_FORMAT_READABLE)
 
-        st.sidebar.markdown(f"Current date and stats")
+        st.sidebar.markdown(
+            body=generate_html(text=f"Current date and stats", line_height=0, font_family="Arial",),
+            unsafe_allow_html=True
+        )
 
         st.sidebar.markdown(
-            body=generate_html(text=f"{date_last_fetched}", bold=True, color=COLOR_MAP["pink"]),
+            body=generate_html(text=f"{date_last_fetched}", bold=True, color=COLOR_MAP["pink"], line_height=0,),
             unsafe_allow_html=True
         )
 
