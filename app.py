@@ -50,6 +50,8 @@ class Sidebar:
 
 def run_app():
     st.title("Corona Calculator")
+    st.write("The critical factor for controlling spread is how many others infected people interact with each day. "
+             "This has a dramatic effect upon the dynamics of the disease.")
     Sidebar()
     sir_model = models.SIRModel(
         Sidebar.transmission_probability,
@@ -80,15 +82,20 @@ def run_app():
     hospital_graph = graphing.hospitalization_graph(df[df.Status.isin(['Infected', 'Hospitalized', 'Ventilated'])],
                                                     Sidebar.number_of_beds,
                                                     Sidebar.number_of_ventilators)
-    st.write(hospital_graph)
 
+    st.title('How will this affect my healthcare system?')
+    st.write('The important variable for hospitals is the peak number of people who require hospitalization'
+             ' and ventilation at any one time')
+    st.write(hospital_graph)
     peak_occupancy = df.loc[df.Status=='Hospitalized']['Forecast'].max()
     percent_beds_at_peak =  min(100 * Sidebar.number_of_beds / peak_occupancy, 100)
 
     peak_ventilation = df.loc[df.Status == 'Ventilated']['Forecast'].max()
     percent_ventilators_at_peak = min(100 * Sidebar.number_of_ventilators / peak_ventilation, 100)
 
-    st.write(f"At peak, {percent_beds_at_peak:.1f} % of people who need a bed in hospital have one")
-    st.write(f"At peak, {percent_ventilators_at_peak:.1f} % of people who need a ventilator have one")
+    st.markdown(f"At peak, ** {percent_beds_at_peak:.1f} % ** of people who need a bed in hospital have one")
+    st.markdown(f"At peak, ** {percent_ventilators_at_peak:.1f} % ** of people who need a ventilator have one")
+
+
 if __name__ == "__main__":
     run_app()
