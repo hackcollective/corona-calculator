@@ -116,7 +116,3 @@ class VentilationRate:
     min = 0.01
     max = 0.02
     default = 0.015
-
-
-if __name__ == "__main__":
-    df = join_source_data()
