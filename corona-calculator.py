@@ -20,8 +20,8 @@ class Sidebar:
         index=constants.Countries.default_selection,
     )
 
+    transmission_probability = constants.TransmissionRatePerContact.default
     if country:
-        transmission_probability = constants.TransmissionRatePerContact.default
         country_data = constants.Countries.country_data[country]
         with open(LOG_PATH) as f:
             date_last_fetched = f.read()
@@ -49,7 +49,7 @@ class Sidebar:
         st.sidebar.markdown(
             body=generate_html(
                 text=f'Population: {int(country_data["Population"]):,}<br>Infected: {country_data["Confirmed"]}<br>'
-                f'Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
+                     f'Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
                 line_height=0,
                 font_family="Arial",
                 font_size="0.9rem",
@@ -59,6 +59,8 @@ class Sidebar:
         )
         # Horizontal divider line
         st.sidebar.markdown("-------")
+
+    st.sidebar.markdown(f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%")
 
     contact_rate = st.sidebar.slider(
         label="Number of people infected people come into contact with daily",
