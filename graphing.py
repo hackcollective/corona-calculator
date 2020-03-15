@@ -1,6 +1,7 @@
 import pandas as pd
 import plotly.express as px
 
+TEMPLATE = 'plotly_white'
 
 def plot_true_versus_confirmed(confirmed, predicted):
     df = pd.DataFrame(
@@ -10,21 +11,21 @@ def plot_true_versus_confirmed(confirmed, predicted):
             "Color": ["b", "r"],
         }
     )
-    fig = px.bar(df, x="Status", y="Cases", color="Color", template='plotly_white')
+    fig = px.bar(df, x="Status", y="Cases", color="Color", template=TEMPLATE)
     fig.layout.update(showlegend=False)
 
     return fig
 
 
 def infection_graph(df):
-    fig = px.line(df, x="Days", y="Forecast", color="Status", template='plotly_white')
+    fig = px.line(df, x="Days", y="Forecast", color="Status", template=TEMPLATE)
     # fig.add_scatter(df, x='Days', y='Patients in Hospital')
     # fig.add_scatter(df, x='Days', y='Deaths')
 
     return fig
 
 
-def hospitalization_graph(df, number_of_beds, number_of_ventilators=None):
+def hospitalization_graph(df, number_of_beds):
     # Add in the number of beds and number of ventilators to the df
     days = list(df.Days.unique())
     n_days = len(days)
@@ -37,7 +38,7 @@ def hospitalization_graph(df, number_of_beds, number_of_ventilators=None):
         }
     )
 
-    fig = px.line(df, x="Days", y="Forecast", color="Status", template='plotly_white')
+    fig = px.line(df, x="Days", y="Forecast", color="Status", template=TEMPLATE)
     fig.add_scatter(
         x=bed_df.Days,
         y=bed_df.Forecast,
