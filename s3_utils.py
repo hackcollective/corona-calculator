@@ -9,7 +9,7 @@ _S3_ACCESS_KEY = os.environ["AWSAccessKeyId"].replace("\r", "")
 _S3_SECRET_KEY = os.environ["AWSSecretKey"].replace("\r", "")
 _S3_BUCKET_NAME = "coronavirus-calculator-data"
 
-DATESTRING_FORMAT_READABLE = "%A %d %B %Y, %H:%M"  # 'Sunday 30 November 2014'
+DATESTRING_FORMAT_READABLE = "%A %d %B %Y, %H:%M %Z"  # 'Sunday 30 November 2014'
 
 
 def _configure_client():
@@ -49,6 +49,5 @@ def download_file(object_name: str):
     object = s3_client.get_object(Key=object_name, Bucket=_S3_BUCKET_NAME)
     content = object["Body"].read()
     last_modified = object["LastModified"]
-    last_modified = last_modified.replace(tzinfo=datetime.timezone.utc).astimezone(None)
     last_modified = last_modified.strftime(DATESTRING_FORMAT_READABLE)
     return content, last_modified

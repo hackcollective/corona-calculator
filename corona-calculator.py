@@ -26,7 +26,7 @@ class Sidebar:
 
         st.sidebar.markdown(
             body=generate_html(
-                text=f"Latest statistics from ", line_height=0, font_family="Arial"
+                text=f"Statistics refreshed as of ", line_height=0, font_family="Arial"
             ),
             unsafe_allow_html=True,
         )
