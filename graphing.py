@@ -18,15 +18,13 @@ def plot_true_versus_confirmed(confirmed, predicted):
     return fig
 
 
-def infection_graph(df):
+def infection_graph(df, y_max):
     fig = px.line(df, x="Days", y="Forecast", color="Status", template=TEMPLATE)
-    # fig.add_scatter(df, x='Days', y='Patients in Hospital')
-    # fig.add_scatter(df, x='Days', y='Deaths')
-
+    fig.update_yaxes(range=[0, y_max])
     return fig
 
 
-def hospitalization_graph(df, number_of_beds):
+def hospitalization_graph(df, number_of_beds, y_max):
     # Add in the number of beds and number of ventilators to the df
     days = list(df.Days.unique())
     n_days = len(days)
@@ -49,5 +47,5 @@ def hospitalization_graph(df, number_of_beds):
         fillcolor="rgba(255,0,0,.1)",
         line={"color": "rgba(255,0,0,.5)"},
     )
-
+    fig.update_yaxes(range=[0, y_max])
     return fig

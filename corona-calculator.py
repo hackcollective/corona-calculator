@@ -160,7 +160,7 @@ def run_app():
     )
 
     df_base = df[~df.Status.isin(["Need Hospitalization", "Need Ventilation"])]
-    base_graph = graphing.infection_graph(df_base)
+    base_graph = graphing.infection_graph(df_base, population)
     st.write(base_graph)
 
     # TODO: psteeves can you confirm total number of deaths should change? Not clear to me why this would be
@@ -168,7 +168,8 @@ def run_app():
     # st.write('Note how the speed of spread affects both the *peak number of cases* and the *total number of deaths*.')
 
     hospital_graph = graphing.hospitalization_graph(
-        df[df.Status.isin(["Infected", "Need Hospitalization"])], num_hospital_beds
+        df[df.Status.isin(["Infected", "Need Hospitalization"])], num_hospital_beds,
+        population
     )
 
     st.subheader("How will this affect my healthcare system?")
