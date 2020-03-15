@@ -75,12 +75,21 @@ class Sidebar:
 
 
 def run_app():
-    st.title("Corona Calculator")
-    st.subheader('This is a subheader')
-    st.sidebar.markdown(
-            body=generate_html(text=f"<hr>"),
-            unsafe_allow_html=True
-        )
+    st.markdown(
+        body=generate_html( 
+            text=f'Corona Calculator',
+            bold=True,
+            tag="h2",
+        ),
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        body=generate_html( 
+            text=f'The goal of this data viz is to help you visualize what is the impact of having infected people entering in contact with other people<hr>',
+            tag="h4",
+        ),
+        unsafe_allow_html=True
+    )
 
     Sidebar()
     country = Sidebar.country
