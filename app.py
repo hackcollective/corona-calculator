@@ -9,11 +9,11 @@ from data import constants
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
 
 
-@dataclass
-class sidebar:
+class Sidebar:
     country = st.sidebar.selectbox(
-        "What country do you live in?", options=constants.Countries.countries
-    )
+            "What country do you live in?", options=constants.Countries.countries
+        )
+
     transmission_probability = st.sidebar.slider(
         label="Probability of a sick person infecting a susceptible person upon contact",
         min_value=constants.TransmissionRatePerContact.min,
@@ -31,6 +31,9 @@ class sidebar:
         label="Number of days for prediction", min_value=50, max_value=365, value=100
     )
 
+    number_of_beds = st.sidebar.slider(label='Number of hospital beds available', min_value=100, max_value=1000000, value=100000)
+    number_of_ventilators = st.sidebar.slider(label='Number of ventilators available', min_value=100, max_value=1000000, value=100000)
+
     # Don't know if we want to present doubling time here or R or something else
     # estimated_doubling_time = st.sidebar.slider(label='Estimated time (days) for number of infected people to double', min_value=1, max_value=10, value=5)
     # symptom_delay =  st.sidebar.slider(label='Time between infection and symptoms being displayed', min_value=1, max_value=10, value=5)
@@ -45,14 +48,16 @@ class sidebar:
 
 def run_app():
     st.title("Corona Calculator")
-    sidebar()
-    country = sidebar.country
+    st.write("The critical factor for controlling spread is how many others infected people interact with each day. "
+             "This has a dramatic effect upon the dynamics of the disease.")
+    Sidebar()
+    country = Sidebar.country
     number_cases_confirmed = constants.Countries.data[country]["confirmed_cases"]
     population = constants.Countries.data[country]["population"]
 
     sir_model = models.SIRModel(
-        sidebar.transmission_probability,
-        sidebar.contact_rate,
+        Sidebar.transmission_probability,
+        Sidebar.contact_rate,
         constants.RemovalRate.default,
     )
     true_cases_estimator = models.TrueInfectedCasesModel(
@@ -63,13 +68,33 @@ def run_app():
         true_cases_estimator,
         sir_model,
         death_toll_model,
+        hospitalization_model,
         number_cases_confirmed,
         population,
         sidebar.num_days_for_prediction,
     )
 
-    figure = graphing.infection_graph(df)
-    st.write(figure)
+    # Split df into hospital and non-hospital stats
+    df_base = df[~df.Status.isin(['Hospitalized', 'Ventilated'])]
+    base_graph = graphing.infection_graph(df_base)
+    st.write(base_graph)
+
+    hospital_graph = graphing.hospitalization_graph(df[df.Status.isin(['Infected', 'Hospitalized', 'Ventilated'])],
+                                                    Sidebar.number_of_beds,
+                                                    Sidebar.number_of_ventilators)
+
+    st.title('How will this affect my healthcare system?')
+    st.write('The important variable for hospitals is the peak number of people who require hospitalization'
+             ' and ventilation at any one time')
+    st.write(hospital_graph)
+    peak_occupancy = df.loc[df.Status=='Hospitalized']['Forecast'].max()
+    percent_beds_at_peak =  min(100 * Sidebar.number_of_beds / peak_occupancy, 100)
+
+    peak_ventilation = df.loc[df.Status == 'Ventilated']['Forecast'].max()
+    percent_ventilators_at_peak = min(100 * Sidebar.number_of_ventilators / peak_ventilation, 100)
+
+    st.markdown(f"At peak, ** {percent_beds_at_peak:.1f} % ** of people who need a bed in hospital have one")
+    st.markdown(f"At peak, ** {percent_ventilators_at_peak:.1f} % ** of people who need a ventilator have one")
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ def get_predictions(
     cases_estimator,
     sir_model,
     death_toll_model,
+    hospitalization_model,
     num_diagnosed,
     area_population,
     max_days,
@@ -22,17 +23,19 @@ def get_predictions(
     )
     S, I, R = predictions.values()
     deaths = death_toll_model.predict(I)
-
+    hospitalized, ventilated = hospitalization_model.predict(I)
     num_entries = max_days + 1
     # Have to use the long format to make plotly express happy
     df = pd.DataFrame(
         {
-            "Days": list(range(num_entries)) * 4,
-            "Forecast": S + I + R + deaths,
+            "Days": list(range(num_entries)) * 6,
+            "Forecast": S + I + R + deaths + hospitalized + ventilated,
             "Status": ["Susceptible"] * num_entries
             + ["Infected"] * num_entries
             + ["Removed"] * num_entries
-            + ["Deaths"] * num_entries,
+            + ["Deaths"] * num_entries
+            + ["Hospitalized"] * num_entries
+            + ["Ventilated"] * num_entries,
         }
     )
     return df
@@ -71,6 +74,32 @@ class DeathTollModel:
             np.random.binomial(n, self._mortality_rate) for n in num_infected_cases
         ]
         return np.cumsum(deaths).tolist()
+
+
+class HospitalizationModel:
+    def __init__(self, hospitalization_rate, ventilation_rate):
+        """
+        :param hospitalization_rate: Fraction of cases of people going into hospital
+        :param ventilation_rate: Fraction of cases in which people need a ventilator
+        """
+        self._hospitalization_rate = hospitalization_rate
+        self._ventilation_rate = ventilation_rate
+
+    def predict(self, num_infected_cases):
+        """
+
+        :param num_infected_cases: List of ints representing number of infected cases over time.
+        :return: tuple of hospitalized and ventilated patients over time
+        """
+        hospitalized = [
+            np.random.binomial(n, self._hospitalization_rate) for n in num_infected_cases
+        ]
+
+        ventilated = [
+            np.random.binomial(n, self._ventilation_rate) for n in num_infected_cases
+        ]
+
+        return hospitalized, ventilated
 
 
 class SIRModel:

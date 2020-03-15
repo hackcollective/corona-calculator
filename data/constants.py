@@ -59,8 +59,16 @@ class MortalityRate:
     default = 0.01
 
 
-class SevereInfectionRate:
+class HospitalizationRate:
     # Cases requiring hospitalization
     min = 0.1
     max = 0.2
     default = 0.15
+
+
+class VentilationRate:
+    # Cases requiring ICU care
+    # From chart 18 https://medium.com/@tomaspueyo/coronavirus-act-today-or-people-will-die-f4d3d9cd99ca
+    min = 0.01
+    max = 0.02
+    default = 0.015
