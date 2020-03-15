@@ -12,16 +12,17 @@ from utils import COLOR_MAP, generate_html
 
 
 class Sidebar:
-    country = st.sidebar.selectbox(
-        "What country do you live in?",
-        options=constants.Countries.countries,
-        index=constants.Countries.default_selection,
-    )
+    def __init__(self, countries):
+        country = st.sidebar.selectbox(
+            "What country do you live in?",
+            options=countries.countries,
+            index=countries.default_selection,
+        )
+        self.country = country
 
-    transmission_probability = constants.TransmissionRatePerContact.default
-    if country:
-        country_data = constants.Countries.country_data[country]
-        date_last_fetched = constants.Countries.last_modified
+        transmission_probability = constants.TransmissionRatePerContact.default
+        country_data = countries.country_data[country]
+        date_last_fetched = countries.last_modified
 
         st.sidebar.markdown(
             body=generate_html(
@@ -54,28 +55,46 @@ class Sidebar:
         # Horizontal divider line
         st.sidebar.markdown("-------")
 
-    st.sidebar.markdown(
-        f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%"
-    )
+        st.sidebar.markdown(
+            f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%"
+        )
 
-    contact_rate = st.sidebar.slider(
-        label="Number of people infected people come into contact with daily",
-        min_value=constants.AverageDailyContacts.min,
-        max_value=constants.AverageDailyContacts.max,
-        value=constants.AverageDailyContacts.default,
-    )
+        self.contact_rate = st.sidebar.slider(
+            label="Number of people infected people come into contact with daily",
+            min_value=constants.AverageDailyContacts.min,
+            max_value=constants.AverageDailyContacts.max,
+            value=constants.AverageDailyContacts.default,
+        )
 
-    horizon = {"3  months": 90, "6 months": 180, "12  months": 365, "24 months": 730}
-    _num_days_for_prediction = st.sidebar.radio(
-        label="What period of time would you like to predict for?",
-        options=list(horizon.keys()),
-        index=3,
-    )
+        horizon = {
+            "3  months": 90,
+            "6 months": 180,
+            "12  months": 365,
+            "24 months": 730,
+        }
+        _num_days_for_prediction = st.sidebar.radio(
+            label="What period of time would you like to predict for?",
+            options=list(horizon.keys()),
+            index=3,
+        )
 
-    num_days_for_prediction = horizon[_num_days_for_prediction]
+        self.num_days_for_prediction = horizon[_num_days_for_prediction]
+
+
+@st.cache
+def _fetch_country_data():
+    timestamp = datetime.datetime.utcnow()
+    return constants.Countries(timestamp=timestamp)
 
 
 def run_app():
+    # Get cached country data
+    countries = _fetch_country_data()
+
+    if countries.stale:
+        st.caching.clear_cache()
+        countries = _fetch_country_data()
+
     st.markdown(
         body=generate_html(text=f"Corona Calculator", bold=True, tag="h2"),
         unsafe_allow_html=True,
@@ -89,18 +108,19 @@ def run_app():
         unsafe_allow_html=True,
     )
 
-    Sidebar()
-    country = Sidebar.country
-    number_cases_confirmed = constants.Countries.country_data[country]["Confirmed"]
-    population = constants.Countries.country_data[country]["Population"]
-    num_hospital_beds = constants.Countries.country_data[country]["Num Hospital Beds"]
+    sidebar = Sidebar(countries)
+    country = sidebar.country
+    country_data = countries.country_data[country]
+    number_cases_confirmed = country_data["Confirmed"]
+    population = country_data["Population"]
+    num_hospital_beds = country_data["Num Hospital Beds"]
 
     # We don't have this for now
     # num_ventilators = constants.Countries.country_data[country]["Num Ventilators"]
 
     sir_model = models.SIRModel(
         constants.TransmissionRatePerContact.default,
-        Sidebar.contact_rate,
+        sidebar.contact_rate,
         constants.RemovalRate.default,
     )
     true_cases_estimator = models.TrueInfectedCasesModel(
@@ -118,7 +138,7 @@ def run_app():
         hospitalization_model,
         number_cases_confirmed,
         population,
-        Sidebar.num_days_for_prediction,
+        sidebar.num_days_for_prediction,
     )
 
     reported_vs_true_cases(number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed))
