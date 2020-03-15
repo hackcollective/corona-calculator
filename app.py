@@ -1,14 +1,15 @@
+import datetime
 from dataclasses import dataclass
 
 import streamlit as st
-import datetime
+
 import graphing
 import models
 from data import constants
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
 
-#TODO make this accurate
+# TODO make this accurate
 data_last_fetched = datetime.datetime.today().date()
 
 
@@ -19,8 +20,10 @@ class Sidebar:
 
     if country:
         country_data = constants.Countries.country_data[country]
-        st.sidebar.markdown(f'As of **{data_last_fetched}**, there are **{country_data["Confirmed"]}** confirmed cases in {country} and '
-                            f'the population is **{country_data["Population"]:,}**')
+        st.sidebar.markdown(
+            f'As of **{data_last_fetched}**, there are **{country_data["Confirmed"]}** confirmed cases in {country} and '
+            f'the population is **{country_data["Population"]:,}**'
+        )
 
     transmission_probability = st.sidebar.slider(
         label="Probability of a sick person infecting a susceptible person upon contact",
@@ -39,8 +42,18 @@ class Sidebar:
         label="Number of days for prediction", min_value=50, max_value=365, value=100
     )
 
-    number_of_beds = st.sidebar.slider(label='Number of hospital beds available', min_value=100, max_value=1000000, value=100000)
-    number_of_ventilators = st.sidebar.slider(label='Number of ventilators available', min_value=100, max_value=1000000, value=100000)
+    number_of_beds = st.sidebar.slider(
+        label="Number of hospital beds available",
+        min_value=100,
+        max_value=1_000_000,
+        value=100_000,
+    )
+    number_of_ventilators = st.sidebar.slider(
+        label="Number of ventilators available",
+        min_value=100,
+        max_value=1_000_000,
+        value=100_000,
+    )
 
     # Don't know if we want to present doubling time here or R or something else
     # estimated_doubling_time = st.sidebar.slider(label='Estimated time (days) for number of infected people to double', min_value=1, max_value=10, value=5)
@@ -56,8 +69,10 @@ class Sidebar:
 
 def run_app():
     st.title("Corona Calculator")
-    st.write("The critical factor for controlling spread is how many others infected people interact with each day. "
-             "This has a dramatic effect upon the dynamics of the disease.")
+    st.write(
+        "The critical factor for controlling spread is how many others infected people interact with each day. "
+        "This has a dramatic effect upon the dynamics of the disease."
+    )
     Sidebar()
     country = Sidebar.country
     number_cases_confirmed = constants.Countries.country_data[country]["Confirmed"]
@@ -72,8 +87,9 @@ def run_app():
         constants.AscertainmentRate.default
     )
     death_toll_model = models.DeathTollModel(constants.MortalityRate.default)
-    hospitalization_model = models.HospitalizationModel(constants.HospitalizationRate.default,
-                                                        constants.VentilationRate.default)
+    hospitalization_model = models.HospitalizationModel(
+        constants.HospitalizationRate.default, constants.VentilationRate.default
+    )
 
     df = models.get_predictions(
         true_cases_estimator,
@@ -86,26 +102,36 @@ def run_app():
     )
 
     # Split df into hospital and non-hospital stats
-    df_base = df[~df.Status.isin(['Hospitalized', 'Ventilated'])]
+    df_base = df[~df.Status.isin(["Hospitalized", "Ventilated"])]
     base_graph = graphing.infection_graph(df_base)
     st.write(base_graph)
 
-    hospital_graph = graphing.hospitalization_graph(df[df.Status.isin(['Infected', 'Hospitalized', 'Ventilated'])],
-                                                    Sidebar.number_of_beds,
-                                                    Sidebar.number_of_ventilators)
+    hospital_graph = graphing.hospitalization_graph(
+        df[df.Status.isin(["Infected", "Hospitalized", "Ventilated"])],
+        Sidebar.number_of_beds,
+        Sidebar.number_of_ventilators,
+    )
 
-    st.title('How will this affect my healthcare system?')
-    st.write('The important variable for hospitals is the peak number of people who require hospitalization'
-             ' and ventilation at any one time')
+    st.title("How will this affect my healthcare system?")
+    st.write(
+        "The important variable for hospitals is the peak number of people who require hospitalization"
+        " and ventilation at any one time"
+    )
     st.write(hospital_graph)
-    peak_occupancy = df.loc[df.Status=='Hospitalized']['Forecast'].max()
+    peak_occupancy = df.loc[df.Status == "Hospitalized"]["Forecast"].max()
     percent_beds_at_peak = min(100 * Sidebar.number_of_beds / peak_occupancy, 100)
 
-    peak_ventilation = df.loc[df.Status == 'Ventilated']['Forecast'].max()
-    percent_ventilators_at_peak = min(100 * Sidebar.number_of_ventilators / peak_ventilation, 100)
+    peak_ventilation = df.loc[df.Status == "Ventilated"]["Forecast"].max()
+    percent_ventilators_at_peak = min(
+        100 * Sidebar.number_of_ventilators / peak_ventilation, 100
+    )
 
-    st.markdown(f"At peak, ** {percent_beds_at_peak:.1f} % ** of people who need a bed in hospital have one")
-    st.markdown(f"At peak, ** {percent_ventilators_at_peak:.1f} % ** of people who need a ventilator have one")
+    st.markdown(
+        f"At peak, ** {percent_beds_at_peak:.1f} % ** of people who need a bed in hospital have one"
+    )
+    st.markdown(
+        f"At peak, ** {percent_ventilators_at_peak:.1f} % ** of people who need a ventilator have one"
+    )
 
 
 if __name__ == "__main__":

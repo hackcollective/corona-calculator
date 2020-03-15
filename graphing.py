@@ -1,5 +1,5 @@
-import plotly.express as px
 import pandas as pd
+import plotly.express as px
 
 
 def example_graph():
@@ -21,18 +21,38 @@ def hospitalization_graph(df, number_of_beds, number_of_ventilators):
     days = list(df.Days.unique())
     n_days = len(days)
 
-    bed_df = pd.DataFrame({'Days': days ,
-                                'Forecast': [number_of_beds] * n_days,
-                                'Status': ['Number of Beds'] * n_days})
+    bed_df = pd.DataFrame(
+        {
+            "Days": days,
+            "Forecast": [number_of_beds] * n_days,
+            "Status": ["Number of Beds"] * n_days,
+        }
+    )
 
-    ventilator_df = pd.DataFrame({'Days': days,
-                           'Forecast': [number_of_ventilators] * n_days,
-                           'Status': ['Number of Ventilators'] * n_days})
+    ventilator_df = pd.DataFrame(
+        {
+            "Days": days,
+            "Forecast": [number_of_ventilators] * n_days,
+            "Status": ["Number of Ventilators"] * n_days,
+        }
+    )
 
     fig = px.line(df, x="Days", y="Forecast", color="Status")
-    fig.add_scatter(x=bed_df.Days, y=bed_df.Forecast, name='Number of Beds', fill='tozeroy',  opacity=.1,
-                    fillcolor='rgba(255,0,0,.1)')
-    fig.add_scatter(x=ventilator_df.Days, y=ventilator_df.Forecast, name='Number of Ventilators', fill='tozeroy',
-                    opacity=.1, fillcolor='rgba(0,255,0,.1)')
+    fig.add_scatter(
+        x=bed_df.Days,
+        y=bed_df.Forecast,
+        name="Number of Beds",
+        fill="tozeroy",
+        opacity=0.1,
+        fillcolor="rgba(255,0,0,.1)",
+    )
+    fig.add_scatter(
+        x=ventilator_df.Days,
+        y=ventilator_df.Forecast,
+        name="Number of Ventilators",
+        fill="tozeroy",
+        opacity=0.1,
+        fillcolor="rgba(0,255,0,.1)",
+    )
 
     return fig

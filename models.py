@@ -1,5 +1,9 @@
+import itertools
+
 import numpy as np
 import pandas as pd
+
+_STATUSES_TO_SHOW = ["Infected", "Deaths", "Hospitalized", "Ventilated"]
 
 
 def get_predictions(
@@ -21,21 +25,26 @@ def get_predictions(
         removed=0,
         time_steps=max_days,
     )
-    S, I, R = predictions.values()
-    deaths = death_toll_model.predict(I)
-    hospitalized, ventilated = hospitalization_model.predict(I)
+    predictions["Deaths"] = death_toll_model.predict(predictions["Infected"])
+    predictions["Hospitalized"], predictions[
+        "Ventilated"
+    ] = hospitalization_model.predict(predictions["Infected"])
     num_entries = max_days + 1
+
     # Have to use the long format to make plotly express happy
     df = pd.DataFrame(
         {
-            "Days": list(range(num_entries)) * 6,
-            "Forecast": S + I + R + deaths + hospitalized + ventilated,
-            "Status": ["Susceptible"] * num_entries
-            + ["Infected"] * num_entries
-            + ["Removed"] * num_entries
-            + ["Deaths"] * num_entries
-            + ["Hospitalized"] * num_entries
-            + ["Ventilated"] * num_entries,
+            "Days": list(range(num_entries)) * len(_STATUSES_TO_SHOW),
+            "Forecast": list(
+                itertools.chain.from_iterable(
+                    predictions[status] for status in _STATUSES_TO_SHOW
+                )
+            ),
+            "Status": list(
+                itertools.chain.from_iterable(
+                    [status] * num_entries for status in _STATUSES_TO_SHOW
+                )
+            ),
         }
     )
     return df
@@ -92,7 +101,8 @@ class HospitalizationModel:
         :return: tuple of hospitalized and ventilated patients over time
         """
         hospitalized = [
-            np.random.binomial(n, self._hospitalization_rate) for n in num_infected_cases
+            np.random.binomial(n, self._hospitalization_rate)
+            for n in num_infected_cases
         ]
 
         ventilated = [
@@ -140,9 +150,4 @@ class SIRModel:
             I.append(round(i_t))
             R.append(round(r_t))
 
-        return {"S": S, "I": I, "R": R}
-
-
-if __name__ == "__main__":
-    df = get_predictions(1, 5, 2, 2)
-    pd.wide_to_long(df, stubnames=["Confirmed"], i="Days", j="Source")
+        return {"Susceptible": S, "Infected": I, "Removed": R}
