@@ -8,10 +8,11 @@ from data import constants
 from interface.elements import reported_vs_true_cases
 from utils import COLOR_MAP, generate_html, graph_warning
 
-
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
 
-NOTION_MODELLING_DOC = "https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc"
+NOTION_MODELLING_DOC = (
+    "https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc"
+)
 MEDIUM_BLOGPOST = "https://medium.com/@archydeberker/should-i-go-to-brunch-an-interactive-tool-for-covid-19-curve-flattening-6ab6a914af0"
 
 
@@ -90,6 +91,7 @@ def _fetch_country_data():
     timestamp = datetime.datetime.utcnow()
     return constants.Countries(timestamp=timestamp)
 
+
 def run_app():
     # Get cached country data
     countries = _fetch_country_data()
@@ -106,7 +108,7 @@ def run_app():
         body=generate_html(
             tag="h4",
             text="The goal of this data viz is to help you visualize what is the impact "
-            "of having infected people entering in contact with other people.<br>"  
+            "of having infected people entering in contact with other people.<br>",
         ),
         unsafe_allow_html=True,
     )
@@ -116,8 +118,8 @@ def run_app():
             tag="h4",
             text=f"Read up on our methodology <a href=\"{NOTION_MODELLING_DOC}\" target=\"_blank\" style=color:{COLOR_MAP['purple']};>"
             "here</a> and our introductory blogpost "
-                 f"<a href=\"{MEDIUM_BLOGPOST}\" target=\"_blank\" style=color:{COLOR_MAP['purple']};>"
-            "here.</a>"
+            f"<a href=\"{MEDIUM_BLOGPOST}\" target=\"_blank\" style=color:{COLOR_MAP['purple']};>"
+            "here.</a>",
         ),
         unsafe_allow_html=True,
     )
@@ -126,7 +128,7 @@ def run_app():
         body=generate_html(
             text="<strong>Disclaimer:</strong> <em>The creators of this application are not healthcare professionals. "
             "The illustrations provided were estimated using best available data but might not accurately reflect reality.</em>"
-            "<hr>", 
+            "<hr>",
             tag="h4",
         ),
         unsafe_allow_html=True,
@@ -165,7 +167,9 @@ def run_app():
         sidebar.num_days_for_prediction,
     )
 
-    reported_vs_true_cases(number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed))
+    reported_vs_true_cases(
+        number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed)
+    )
 
     st.write(
         "The number of reported cases radically underestimates the true cases, because people do not show symptoms for "
@@ -184,18 +188,17 @@ def run_app():
     )
 
     df_base = df[~df.Status.isin(["Need Hospitalization", "Need Ventilation"])]
-    base_graph = graphing.infection_graph(df_base,
-                                          max(0.5*population, df.Forecast.max()))
+    base_graph = graphing.infection_graph(df_base, df.Forecast.max())
     st.warning(graph_warning)
     st.write(base_graph)
 
     # TODO: psteeves can you confirm total number of deaths should change? Not clear to me why this would be
     # apart from herd immunity?
     # st.write('Note how the speed of spread affects both the *peak number of cases* and the *total number of deaths*.')
-
     hospital_graph = graphing.hospitalization_graph(
-        df[df.Status.isin(["Infected", "Need Hospitalization"])], num_hospital_beds,
-        max(0.5*population, df.Forecast.max())
+        df[df.Status.isin(["Infected", "Need Hospitalization"])],
+        num_hospital_beds,
+        max(num_hospital_beds, df.Forecast.max()),
     )
 
     st.subheader("How will this affect my healthcare system?")

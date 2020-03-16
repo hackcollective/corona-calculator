@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 import pandas as pd
 
-_STATUSES_TO_SHOW = ["Infected", "Deaths", "Need Hospitalization", "Need Ventilation"]
+_STATUSES_TO_SHOW = ["Infected", "Deaths", "Need Hospitalization"]
 
 
 def get_predictions(
