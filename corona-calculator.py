@@ -65,7 +65,7 @@ class Sidebar:
         )
 
         self.contact_rate = st.sidebar.slider(
-            label="Number of people infected people come into contact with daily",
+            label="How many people does an infected individual meet on a daily basis?",
             min_value=constants.AverageDailyContacts.min,
             max_value=constants.AverageDailyContacts.max,
             value=constants.AverageDailyContacts.default,
