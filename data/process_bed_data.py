@@ -22,8 +22,3 @@ def preprocess_bed_data(path=_BED_DATA_PATH):
     df["Latest Bed Estimate"] = df.apply(_get_latest_bed_estimate, axis=1)
 
     return df
-
-
-if __name__ == "__main__":
-    df = preprocess_bed_data(_BED_DATA_PATH)
-    print(df)

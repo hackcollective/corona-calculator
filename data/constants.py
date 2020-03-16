@@ -1,8 +1,6 @@
 """
-Range estimates for various epidemiology constants.
-Data gathered from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
-and https://www.mdpi.com/2077-0383/9/2/462/htm
-Parameter bounds were subjectively chosen from positively peer-reviewed estimates.
+Range estimates for various epidemiology constants. Currently only default values are used.
+For sources, please visit https://www.notion.so/coronahack/Modelling
 """
 
 import datetime
@@ -104,10 +102,11 @@ class MortalityRate:
 
 
 class HospitalizationRate:
-    # Cases requiring hospitalization
-    min = 0.1
-    max = 0.2
-    default = 0.15
+    # Cases requiring hospitalization. We multiply by the ascertainment rate because our source got their estimate
+    # from the reported cases, whereas we will be using it with total cases.
+    min = 0.1 * AscertainmentRate.default
+    max = 0.25 * AscertainmentRate.default
+    default = 0.19 * AscertainmentRate.default
 
 
 class VentilationRate:
@@ -116,7 +115,3 @@ class VentilationRate:
     min = 0.01
     max = 0.02
     default = 0.015
-
-
-if __name__ == "__main__":
-    df = join_source_data()
