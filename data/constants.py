@@ -1,6 +1,6 @@
 """
 Range estimates for various epidemiology constants. Currently only default values are used.
-For sources, please visit https://www.notion.so/coronahack/Modelling
+For sources, please visit https://www.notion.so/Modelling-d650e1351bf34ceeb97c82bd24ae04cc
 """
 
 import datetime
