@@ -23,4 +23,4 @@ def generate_html(
     return f"<{tag} style={css_style}>{text}</{tag}>"
 
 
-graph_warning = 'Please be aware the scale of this graph changes!'
+graph_warning = "Please be aware the scale of this graph changes!"
