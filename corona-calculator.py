@@ -194,6 +194,10 @@ def run_app():
         max(0.5*population, df.Forecast.max())
     )
 
+    st.write('Note that we use a fixed estimate of the mortality rate here, of 1% [(source)](https://institutefordiseasemodeling.github.io/nCoV-public/analyses/first_adjusted_mortality_estimates_and_risk_assessment/2019-nCoV-preliminary_age_and_time_adjusted_mortality_rates_and_pandemic_risk_assessment.html). '
+             'In reality, the mortality rate will be highly dependent upon the load upon the healthcare system and '
+             'the availability of treatment. Some estimates ([like this one](https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30195-X/fulltext)) are closer to 6%.')
+
     st.subheader("How will this affect my healthcare system?")
     st.write(
         "The important variable for hospitals is the peak number of people who require hospitalization"
@@ -225,6 +229,7 @@ def run_app():
         f"who need a bed in hospital will have access to one given your country's historical resources. This does "
         f"not take into account any special measures that may have been taken in the last few months."
     )
+
     # st.markdown(
     #     f"At peak, ** {percent_ventilators_at_peak:.1f} % ** of people who need a ventilator have one"
     # )
