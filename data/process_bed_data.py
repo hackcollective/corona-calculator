@@ -21,4 +21,15 @@ def preprocess_bed_data(path=_BED_DATA_PATH):
     df.set_index("Country/Region", inplace=True)
     df["Latest Bed Estimate"] = df.apply(_get_latest_bed_estimate, axis=1)
 
+    # Rename countries to match demographics and disease data
+    df = df.rename(index={
+        "Iran, Islamic Rep.": "Iran",
+        "Korea, Rep.": "Korea, South",
+        "Russian Federation": "Russia",
+        "Egypt, Arab Rep.": "Egypt",
+        "Slovak Republic": "Slovakia",
+        "Congo, Dem. Rep.": "Congo (Kinshasa)",
+        # "Brunei Darussalam": "Brunei",
+    })
+
     return df
