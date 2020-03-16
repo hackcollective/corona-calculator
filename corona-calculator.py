@@ -12,6 +12,8 @@ from utils import COLOR_MAP, generate_html, graph_warning
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
 
 NOTION_MODELLING_DOC = "https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc"
+MEDIUM_BLOGPOST = "https://medium.com/@archydeberker/should-i-go-to-brunch-an-interactive-tool-for-covid-19-curve-flattening-6ab6a914af0"
+
 
 class Sidebar:
     def __init__(self, countries):
@@ -112,8 +114,10 @@ def run_app():
     st.markdown(
         body=generate_html(
             tag="h4",
-            text=f"<a href=\"{NOTION_MODELLING_DOC}\" target=\"_blank\" style=color:{COLOR_MAP['purple']};>"
-            "Read up on our methodology here</a>"  
+            text=f"Read up on our methodology <a href=\"{NOTION_MODELLING_DOC}\" target=\"_blank\" style=color:{COLOR_MAP['purple']};>"
+            "here</a> and our introductory blogpost "
+                 f"<a href=\"{MEDIUM_BLOGPOST}\" target=\"_blank\" style=color:{COLOR_MAP['purple']};>"
+            "here.</a>"
         ),
         unsafe_allow_html=True,
     )
