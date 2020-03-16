@@ -46,8 +46,7 @@ def download_file(object_name: str):
     :return: Object bytes and date last modified.
     """
     s3_client = _configure_client()
-    object = s3_client.get_object(Key=object_name, Bucket=_S3_BUCKET_NAME)
-    content = object["Body"].read()
-    last_modified = object["LastModified"]
-    last_modified = last_modified.strftime(DATESTRING_FORMAT_READABLE)
+    download = s3_client.get_object(Key=object_name, Bucket=_S3_BUCKET_NAME)
+    content = download["Body"].read()
+    last_modified = download["LastModified"].strftime(DATESTRING_FORMAT_READABLE)
     return content, last_modified
