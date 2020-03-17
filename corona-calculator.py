@@ -92,6 +92,13 @@ class Sidebar:
             value=constants.AverageDailyContacts.default,
         )
 
+        self.severe_mortality_rate = st.sidebar.slider(
+            label="What is the mortality rate for people who need urgent medical care but cannot get access to it??",
+            min_value=constants.CriticalDeathRate.min,
+            max_value=constants.CriticalDeathRate.max,
+            value=constants.CriticalDeathRate.default,
+        )
+
         horizon = {
             "3  months": 90,
             "6 months": 180,
@@ -180,7 +187,7 @@ def run_app():
         contact_rate=sidebar.contact_rate,
         recovery_rate=constants.RecoveryRate.default,
         normal_death_rate=constants.MortalityRate.default,
-        critical_death_rate=constants.CriticalDeathRate.default,
+        critical_death_rate=sidebar.severe_mortality_rate,
         hospitalization_rate=constants.HospitalizationRate.default,
         hospital_capacity=num_hospital_beds,
     )
@@ -253,7 +260,6 @@ def run_app():
     st.write(hospital_graph)
     peak_occupancy = df.loc[df.Status == "Need Hospitalization"]["Forecast"].max()
     percent_beds_at_peak = min(100 * num_hospital_beds / peak_occupancy, 100)
-
 
     st.markdown(
         f"At peak, **{peak_occupancy:,}** people will need hospital beds. ** {percent_beds_at_peak:.1f} % ** of people "

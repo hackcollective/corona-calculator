@@ -72,7 +72,9 @@ class MortalityRate:
 
 class CriticalDeathRate:
     # Death rate of critically ill patients who don't have access to a hospital bed.
-    default = 0.01  # Same as normal death rate for now
+    min = 0.01
+    max = 1.0
+    default = 0.5
 
 
 class TransmissionRatePerContact:
