@@ -3,6 +3,9 @@ import plotly.express as px
 
 TEMPLATE = "plotly_white"
 
+def _set_legends(fig):
+    fig.layout.update(legend=dict(x=-.1, y=1.2))
+    fig.layout.update(legend_orientation="h")
 
 def _set_legends(fig):
     fig.layout.update(legend=dict(x=-.1, y=1.2))
@@ -24,6 +27,7 @@ def plot_true_versus_confirmed(confirmed, predicted):
 
 
 def infection_graph(df, y_max):
+    # We cannot explicitly set graph width here, have to do it as injected css: see interface.css
     fig = px.line(df, x="Days", y="Forecast", color="Status", template=TEMPLATE)
     fig.update_yaxes(range=[0, y_max])
     _set_legends(fig)
