@@ -5,8 +5,8 @@ import streamlit as st
 import graphing
 import models
 from data import constants
-from interface.elements import reported_vs_true_cases
 from interface import css
+from interface.elements import reported_vs_true_cases
 from utils import COLOR_MAP, generate_html, graph_warning
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
@@ -32,7 +32,10 @@ class Sidebar:
 
         st.sidebar.markdown(
             body=generate_html(
-                text=f"Statistics refreshed as of ", line_height=0, font_family="Arial", font_size="12px",
+                text=f"Statistics refreshed as of ",
+                line_height=0,
+                font_family="Arial",
+                font_size="12px",
             ),
             unsafe_allow_html=True,
         )
@@ -74,10 +77,11 @@ class Sidebar:
         st.sidebar.markdown(
             body=generate_html(
                 text=f"Change the degree of social distancing to see the effect upon disease "
-                     f"spread and access to hospital beds.",
+                f"spread and access to hospital beds.",
                 line_height=0,
                 font_size="12px",
-            ) + '<br>',
+            )
+            + "<br>",
             unsafe_allow_html=True,
         )
 
@@ -103,7 +107,7 @@ class Sidebar:
         st.sidebar.markdown(
             body=generate_html(
                 text=f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%,"
-                     f" see our <a href='https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc'> methods for details</a>.",
+                f" see our <a href='https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc'> methods for details</a>.",
                 line_height=0,
                 font_size="10px",
             ),
@@ -147,8 +151,8 @@ def run_app():
         body=generate_html(
             text="<strong>Disclaimer:</strong> <em>The creators of this application are not healthcare professionals. "
             "The illustrations provided were estimated using best available data but might not accurately reflect reality.</em>",
-            color='gray',
-            font_size='12px',
+            color="gray",
+            font_size="12px",
         ),
         unsafe_allow_html=True,
     )
@@ -159,11 +163,10 @@ def run_app():
             "Methodology</a></u> <span> &nbsp;&nbsp;&nbsp;&nbsp</span>"
             f"<u><a href=\"{MEDIUM_BLOGPOST}\" target=\"_blank\" style=color:{COLOR_MAP['pink']};>"
             "Blogpost</a> </u>"
-                 "<hr>",
+            "<hr>",
         ),
         unsafe_allow_html=True,
     )
-
 
     sidebar = Sidebar(countries)
     country = sidebar.country
@@ -176,23 +179,21 @@ def run_app():
     # num_ventilators = constants.Countries.country_data[country]["Num Ventilators"]
 
     sir_model = models.SIRModel(
-        constants.TransmissionRatePerContact.default,
-        sidebar.contact_rate,
-        constants.RemovalRate.default,
+        transmission_rate_per_contact=constants.TransmissionRatePerContact.default,
+        contact_rate=sidebar.contact_rate,
+        recovery_rate=constants.RecoveryRate.default,
+        normal_death_rate=constants.MortalityRate.default,
+        critical_death_rate=constants.CriticalDeathRate.default,
+        hospitalization_rate=constants.HospitalizationRate.default,
+        hospital_capacity=num_hospital_beds,
     )
     true_cases_estimator = models.TrueInfectedCasesModel(
         constants.AscertainmentRate.default
-    )
-    death_toll_model = models.DeathTollModel(constants.MortalityRate.default)
-    hospitalization_model = models.HospitalizationModel(
-        constants.HospitalizationRate.default, constants.VentilationRate.default
     )
 
     df = models.get_predictions(
         true_cases_estimator,
         sir_model,
-        death_toll_model,
-        hospitalization_model,
         number_cases_confirmed,
         population,
         sidebar.num_days_for_prediction,
@@ -223,18 +224,17 @@ def run_app():
     st.warning(graph_warning)
     st.write(base_graph)
 
-    # TODO: psteeves can you confirm total number of deaths should change? Not clear to me why this would be
-    # apart from herd immunity?
-    # st.write('Note how the speed of spread affects both the *peak number of cases* and the *total number of deaths*.')
     hospital_graph = graphing.hospitalization_graph(
         df[df.Status.isin(["Infected", "Need Hospitalization"])],
         num_hospital_beds,
         max(num_hospital_beds, df.Forecast.max()),
     )
 
-    st.write('Note that we use a fixed estimate of the mortality rate here, of 1% [(source)](https://institutefordiseasemodeling.github.io/nCoV-public/analyses/first_adjusted_mortality_estimates_and_risk_assessment/2019-nCoV-preliminary_age_and_time_adjusted_mortality_rates_and_pandemic_risk_assessment.html). '
-             'In reality, the mortality rate will be highly dependent upon the load upon the healthcare system and '
-             'the availability of treatment. Some estimates ([like this one](https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30195-X/fulltext)) are closer to 6%.')
+    st.write(
+        "Note that we use a fixed estimate of the mortality rate here, of 1% [(source)](https://institutefordiseasemodeling.github.io/nCoV-public/analyses/first_adjusted_mortality_estimates_and_risk_assessment/2019-nCoV-preliminary_age_and_time_adjusted_mortality_rates_and_pandemic_risk_assessment.html). "
+        "In reality, the mortality rate will be highly dependent upon the load upon the healthcare system and "
+        "the availability of treatment. Some estimates ([like this one](https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30195-X/fulltext)) are closer to 6%."
+    )
 
     st.subheader("How will this affect my healthcare system?")
     st.write(

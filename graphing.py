@@ -3,12 +3,9 @@ import plotly.express as px
 
 TEMPLATE = "plotly_white"
 
-def _set_legends(fig):
-    fig.layout.update(legend=dict(x=-.1, y=1.2))
-    fig.layout.update(legend_orientation="h")
 
 def _set_legends(fig):
-    fig.layout.update(legend=dict(x=-.1, y=1.2))
+    fig.layout.update(legend=dict(x=-0.1, y=1.2))
     fig.layout.update(legend_orientation="h")
 
 

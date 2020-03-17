@@ -1,19 +1,12 @@
 import itertools
 
-import numpy as np
 import pandas as pd
 
-_STATUSES_TO_SHOW = ["Infected", "Deaths", "Need Hospitalization"]
+_STATUSES_TO_SHOW = ["Infected", "Dead", "Need Hospitalization"]
 
 
 def get_predictions(
-    cases_estimator,
-    sir_model,
-    death_toll_model,
-    hospitalization_model,
-    num_diagnosed,
-    area_population,
-    max_days,
+    cases_estimator, sir_model, num_diagnosed, area_population, max_days
 ):
 
     true_cases = cases_estimator.predict(num_diagnosed)
@@ -25,10 +18,7 @@ def get_predictions(
         removed=0,
         time_steps=max_days,
     )
-    predictions["Deaths"] = death_toll_model.predict(predictions["Removed"])
-    predictions["Need Hospitalization"], predictions[
-        "Need Ventilation"
-    ] = hospitalization_model.predict(predictions["Infected"])
+
     num_entries = max_days + 1
 
     # Have to use the long format to make plotly express happy
@@ -65,61 +55,36 @@ class TrueInfectedCasesModel:
         return diagnosed_cases / self._ascertainment_rate
 
 
-class DeathTollModel:
-    """
-    Given a list of points in time representing the infected persons in a population and the mortality rate
-    of the disease, compute the cumulative death toll.
-    """
-
-    def __init__(self, mortality_rate):
-        self._mortality_rate = mortality_rate
-
-    def predict(self, num_removed_cases):
-        """
-        :param num_infected_cases: List of ints representing number of infected cases over time.
-        :return: Cumulative death toll over time.
-        """
-        deaths = [
-            np.random.binomial(n, self._mortality_rate) for n in num_removed_cases
-        ]
-        return deaths
-
-
-class HospitalizationModel:
-    def __init__(self, hospitalization_rate, ventilation_rate):
-        """
-        :param hospitalization_rate: Fraction of cases of people going into hospital
-        :param ventilation_rate: Fraction of cases in which people need a ventilator
-        """
-        self._hospitalization_rate = hospitalization_rate
-        self._ventilation_rate = ventilation_rate
-
-    def predict(self, num_infected_cases):
-        """
-        :param num_infected_cases: List of ints representing number of infected cases over time.
-        :return: tuple of hospitalized and ventilated patients over time
-        """
-        hospitalized = [
-            np.random.binomial(n, self._hospitalization_rate)
-            for n in num_infected_cases
-        ]
-
-        ventilated = [
-            np.random.binomial(n, self._ventilation_rate) for n in num_infected_cases
-        ]
-
-        return hospitalized, ventilated
-
-
 class SIRModel:
-    def __init__(self, transmission_rate_per_contact, contact_rate, removal_rate):
+    def __init__(
+        self,
+        transmission_rate_per_contact,
+        contact_rate,
+        recovery_rate,
+        normal_death_rate,
+        critical_death_rate,
+        hospitalization_rate,
+        hospital_capacity,
+    ):
         """
         :param transmission_rate_per_contact: Prob of contact between infected and susceptible leading to infection.
         :param contact_rate: Mean number of daily contacts between an infected individual and susceptible people.
-        :param removal_rate: Rate of removal of infected individuals (death or recovery)
+        :param recovery_rate: Rate of recovery of infected individuals.
+        :param normal_death_rate: Average death rate in normal conditions.
+        :param critical_death_rate: Rate of mortality among severe or critical cases that can't get access
+            to necessary medical facilities.
+        :param hospitalization_rate: Proportion of illnesses who need are severely ill and need acute medical care.
+        :param hospital_capacity: Max capacity of medical system in area.
         """
         self._infection_rate = transmission_rate_per_contact * contact_rate
-        self._removal_rate = removal_rate
+        self._recovery_rate = recovery_rate
+        # Death rate is amortized over the recovery period
+        # since the chances of dying per day are mortality rate / number of days with infection
+        self._normal_death_rate = normal_death_rate * recovery_rate
+        # Death rate of sever cases with no access to medical care.
+        self._critical_death_rate = critical_death_rate * recovery_rate
+        self._hospitalization_rate = hospitalization_rate
+        self._hospital_capacity = hospital_capacity
 
     def predict(self, susceptible, infected, removed, time_steps=100):
         """
@@ -135,18 +100,47 @@ class SIRModel:
         S = [int(susceptible)]
         I = [int(infected)]
         R = [int(removed)]
+        D = [0]
+        H = [round(self._hospitalization_rate * infected)]
 
         for t in range(time_steps):
+
+            # There is an additional chance of dying if people are critically ill
+            # and have no access to the medical system.
+            if I[-1] > 0:
+                underserved_critically_ill_proportion = (
+                    max(0, H[-1] - self._hospital_capacity) / I[-1]
+                )
+            else:
+                underserved_critically_ill_proportion = 0
+            weighted_death_rate = (
+                self._normal_death_rate * (1 - underserved_critically_ill_proportion)
+                + self._critical_death_rate * underserved_critically_ill_proportion
+            )
+
+            # Forecast
+
             s_t = S[-1] - self._infection_rate * I[-1] * S[-1] / population
             i_t = (
                 I[-1]
                 + self._infection_rate * I[-1] * S[-1] / population
-                - self._removal_rate * I[-1]
+                - (weighted_death_rate + self._recovery_rate) * I[-1]
             )
-            r_t = R[-1] + self._removal_rate * I[-1]
+            r_t = R[-1] + self._recovery_rate * I[-1]
+            d_t = D[-1] + weighted_death_rate * I[-1]
 
-            S.append(int(s_t))
-            I.append(int(i_t))
-            R.append(int(r_t))
+            h_t = self._hospitalization_rate * i_t
 
-        return {"Susceptible": S, "Infected": I, "Removed": R}
+            S.append(round(s_t))
+            I.append(round(i_t))
+            R.append(round(r_t))
+            D.append(round(d_t))
+            H.append(round(h_t))
+
+        return {
+            "Susceptible": S,
+            "Infected": I,
+            "Recovered": R,
+            "Dead": D,
+            "Need Hospitalization": H,
+        }
