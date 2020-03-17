@@ -127,25 +127,13 @@ def run_app():
         countries = _fetch_country_data()
 
     st.markdown(
-        body=generate_html(text=f"Corona Calculator", bold=True, tag="h2"),
+        body=generate_html(text=f"Corona Calculator", bold=True, tag="h1"),
         unsafe_allow_html=True,
     )
     st.markdown(
         body=generate_html(
-            tag="h4",
-            text="The goal of this data viz is to help you visualize what is the impact "
-            "of having infected people entering in contact with other people.<br>",
-        ),
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        body=generate_html(
-            tag="h4",
-            text=f"Read up on our methodology <a href=\"{NOTION_MODELLING_DOC}\" target=\"_blank\" style=color:{COLOR_MAP['purple']};>"
-            "here</a> and our introductory blogpost "
-            f"<a href=\"{MEDIUM_BLOGPOST}\" target=\"_blank\" style=color:{COLOR_MAP['purple']};>"
-            "here.</a>",
+            tag="h2",
+            text="A tool to help you visualize the impact of social distancing <br>",
         ),
         unsafe_allow_html=True,
     )
@@ -153,12 +141,24 @@ def run_app():
     st.markdown(
         body=generate_html(
             text="<strong>Disclaimer:</strong> <em>The creators of this application are not healthcare professionals. "
-            "The illustrations provided were estimated using best available data but might not accurately reflect reality.</em>"
-            "<hr>",
-            tag="h4",
+            "The illustrations provided were estimated using best available data but might not accurately reflect reality.</em>",
+            color='gray',
+            font_size='12px',
         ),
         unsafe_allow_html=True,
     )
+    st.markdown(
+        body=generate_html(
+            tag="h4",
+            text=f"<u><a href=\"{NOTION_MODELLING_DOC}\" target=\"_blank\" style=color:{COLOR_MAP['pink']};>"
+            "Methodology</a></u> <span> &nbsp;&nbsp;&nbsp;&nbsp</span>"
+            f"<u><a href=\"{MEDIUM_BLOGPOST}\" target=\"_blank\" style=color:{COLOR_MAP['pink']};>"
+            "Blogpost</a> </u>"
+                 "<hr>",
+        ),
+        unsafe_allow_html=True,
+    )
+
 
     sidebar = Sidebar(countries)
     country = sidebar.country
