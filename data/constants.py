@@ -63,14 +63,10 @@ SIR model constants
 
 
 class RecoveryRate:
-    min = 1 / 7
     default = 1 / 10  # Recovery period around 10 days
-    max = 1 / 14
 
 
 class MortalityRate:
-    min = 0.005
-    max = 0.05
     default = 0.01
 
 
@@ -80,12 +76,9 @@ class CriticalDeathRate:
 
 
 class TransmissionRatePerContact:
-    # Probability of a contact between carrier and susceptible leading to infection
-    min = 0.01
-    default = (
-        0.018
-    )  # Found using binomial distribution in Wuhan scenario: 14 contacts per day, 10 infectious days, 2.5 average people infected.
-    max = 0.022
+    # Probability of a contact between carrier and susceptible leading to infection.
+    # Found using binomial distribution in Wuhan scenario: 14 contacts per day, 10 infectious days, 2.5 average people infected.
+    default = 0.018
 
 
 class AverageDailyContacts:
@@ -101,22 +94,10 @@ Health care constants
 
 class AscertainmentRate:
     # Proportion of true cases diagnosed
-    min = 0.05
-    max = 0.25
     default = 0.1
 
 
 class HospitalizationRate:
     # Cases requiring hospitalization. We multiply by the ascertainment rate because our source got their estimate
     # from the reported cases, whereas we will be using it with total cases.
-    min = 0.1 * AscertainmentRate.default
-    max = 0.25 * AscertainmentRate.default
     default = 0.19 * AscertainmentRate.default
-
-
-class VentilationRate:
-    # Cases requiring ICU care
-    # From chart 18 https://medium.com/@tomaspueyo/coronavirus-act-today-or-people-will-die-f4d3d9cd99ca
-    min = 0.01
-    max = 0.02
-    default = 0.015

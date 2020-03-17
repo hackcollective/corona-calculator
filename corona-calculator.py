@@ -175,9 +175,6 @@ def run_app():
     population = country_data["Population"]
     num_hospital_beds = country_data["Num Hospital Beds"]
 
-    # We don't have this for now
-    # num_ventilators = constants.Countries.country_data[country]["Num Ventilators"]
-
     sir_model = models.SIRModel(
         transmission_rate_per_contact=constants.TransmissionRatePerContact.default,
         contact_rate=sidebar.contact_rate,
@@ -257,20 +254,12 @@ def run_app():
     peak_occupancy = df.loc[df.Status == "Need Hospitalization"]["Forecast"].max()
     percent_beds_at_peak = min(100 * num_hospital_beds / peak_occupancy, 100)
 
-    # peak_ventilation = df.loc[df.Status == "Ventilated"]["Forecast"].max()
-    # percent_ventilators_at_peak = min(
-    #     100 * Sidebar.number_of_ventilators / peak_ventilation, 100
-    # )
 
     st.markdown(
         f"At peak, **{peak_occupancy:,}** people will need hospital beds. ** {percent_beds_at_peak:.1f} % ** of people "
         f"who need a bed in hospital will have access to one given your country's historical resources. This does "
         f"not take into account any special measures that may have been taken in the last few months."
     )
-
-    # st.markdown(
-    #     f"At peak, ** {percent_ventilators_at_peak:.1f} % ** of people who need a ventilator have one"
-    # )
 
 
 if __name__ == "__main__":
