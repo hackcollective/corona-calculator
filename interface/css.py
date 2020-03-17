@@ -27,7 +27,7 @@ def limit_plot_size(limit='95vw'):
 
     plot_style = """
             <style>
-         @media screen and (max-width:7000px)  {
+         @media screen and (max-width:700px)  {
          .js-plotly-plot, .plotly, .plot-container 
         {min-width:""" + limit + """;
         max-width:300px;}
