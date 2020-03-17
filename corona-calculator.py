@@ -59,9 +59,25 @@ class Sidebar:
         )
         # Horizontal divider line
         st.sidebar.markdown("-------")
+        st.sidebar.markdown(
+            body=generate_html(
+                text=f"Play with the numbers",
+                line_height=0,
+                color=COLOR_MAP["pink"],
+                bold=True,
+                font_size="16px",
+            ),
+            unsafe_allow_html=True,
+        )
 
         st.sidebar.markdown(
-            f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%"
+            body=generate_html(
+                text=f"Change the degree of social distancing to see the effect upon disease "
+                     f"spread and access to hospital beds.",
+                line_height=0,
+                font_size="12px",
+            ) + '<br>',
+            unsafe_allow_html=True,
         )
 
         self.contact_rate = st.sidebar.slider(
@@ -81,6 +97,16 @@ class Sidebar:
             label="What period of time would you like to predict for?",
             options=list(horizon.keys()),
             index=1,
+        )
+
+        st.sidebar.markdown(
+            body=generate_html(
+                text=f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%,"
+                     f" see our <a href='https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc'> methods for details</a>.",
+                line_height=0,
+                font_size="10px",
+            ),
+            unsafe_allow_html=True,
         )
 
         self.num_days_for_prediction = horizon[_num_days_for_prediction]
