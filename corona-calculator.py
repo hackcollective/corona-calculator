@@ -31,7 +31,7 @@ class Sidebar:
 
         st.sidebar.markdown(
             body=generate_html(
-                text=f"Statistics refreshed as of ", line_height=0, font_family="Arial"
+                text=f"Statistics refreshed as of ", line_height=0, font_family="Arial", font_size="12px",
             ),
             unsafe_allow_html=True,
         )
@@ -40,7 +40,7 @@ class Sidebar:
             body=generate_html(
                 text=f"{date_last_fetched}",
                 bold=True,
-                color=COLOR_MAP["pink"],
+                # color=COLOR_MAP["pink"],
                 line_height=0,
             ),
             unsafe_allow_html=True,

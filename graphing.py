@@ -3,9 +3,11 @@ import plotly.express as px
 
 TEMPLATE = "plotly_white"
 
+
 def _set_legends(fig):
     fig.layout.update(legend=dict(x=-.1, y=1.2))
     fig.layout.update(legend_orientation="h")
+
 
 def plot_true_versus_confirmed(confirmed, predicted):
     df = pd.DataFrame(
