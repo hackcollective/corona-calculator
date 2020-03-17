@@ -6,6 +6,7 @@ import graphing
 import models
 from data import constants
 from interface.elements import reported_vs_true_cases
+from interface import css
 from utils import COLOR_MAP, generate_html, graph_warning
 
 # estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
@@ -93,6 +94,10 @@ def _fetch_country_data():
 
 
 def run_app():
+
+    css.hide_menu()
+    css.limit_plot_size()
+
     # Get cached country data
     countries = _fetch_country_data()
 
