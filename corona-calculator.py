@@ -31,7 +31,7 @@ class Sidebar:
 
         st.sidebar.markdown(
             body=generate_html(
-                text=f"Statistics refreshed as of ", line_height=0, font_family="Arial"
+                text=f"Statistics refreshed as of ", line_height=0, font_family="Arial", font_size="12px",
             ),
             unsafe_allow_html=True,
         )
@@ -40,7 +40,7 @@ class Sidebar:
             body=generate_html(
                 text=f"{date_last_fetched}",
                 bold=True,
-                color=COLOR_MAP["pink"],
+                # color=COLOR_MAP["pink"],
                 line_height=0,
             ),
             unsafe_allow_html=True,
@@ -59,9 +59,25 @@ class Sidebar:
         )
         # Horizontal divider line
         st.sidebar.markdown("-------")
+        st.sidebar.markdown(
+            body=generate_html(
+                text=f"Play with the numbers",
+                line_height=0,
+                color=COLOR_MAP["pink"],
+                bold=True,
+                font_size="16px",
+            ),
+            unsafe_allow_html=True,
+        )
 
         st.sidebar.markdown(
-            f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%"
+            body=generate_html(
+                text=f"Change the degree of social distancing to see the effect upon disease "
+                     f"spread and access to hospital beds.",
+                line_height=0,
+                font_size="12px",
+            ) + '<br>',
+            unsafe_allow_html=True,
         )
 
         self.contact_rate = st.sidebar.slider(
@@ -83,6 +99,16 @@ class Sidebar:
             index=1,
         )
 
+        st.sidebar.markdown(
+            body=generate_html(
+                text=f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%,"
+                     f" see our <a href='https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc'> methods for details</a>.",
+                line_height=0,
+                font_size="10px",
+            ),
+            unsafe_allow_html=True,
+        )
+
         self.num_days_for_prediction = horizon[_num_days_for_prediction]
 
 
@@ -101,25 +127,13 @@ def run_app():
         countries = _fetch_country_data()
 
     st.markdown(
-        body=generate_html(text=f"Corona Calculator", bold=True, tag="h2"),
+        body=generate_html(text=f"Corona Calculator", bold=True, tag="h1"),
         unsafe_allow_html=True,
     )
     st.markdown(
         body=generate_html(
-            tag="h4",
-            text="The goal of this data viz is to help you visualize what is the impact "
-            "of having infected people entering in contact with other people.<br>",
-        ),
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        body=generate_html(
-            tag="h4",
-            text=f"Read up on our methodology <a href=\"{NOTION_MODELLING_DOC}\" target=\"_blank\" style=color:{COLOR_MAP['purple']};>"
-            "here</a> and our introductory blogpost "
-            f"<a href=\"{MEDIUM_BLOGPOST}\" target=\"_blank\" style=color:{COLOR_MAP['purple']};>"
-            "here.</a>",
+            tag="h2",
+            text="A tool to help you visualize the impact of social distancing <br>",
         ),
         unsafe_allow_html=True,
     )
@@ -127,12 +141,24 @@ def run_app():
     st.markdown(
         body=generate_html(
             text="<strong>Disclaimer:</strong> <em>The creators of this application are not healthcare professionals. "
-            "The illustrations provided were estimated using best available data but might not accurately reflect reality.</em>"
-            "<hr>",
-            tag="h4",
+            "The illustrations provided were estimated using best available data but might not accurately reflect reality.</em>",
+            color='gray',
+            font_size='12px',
         ),
         unsafe_allow_html=True,
     )
+    st.markdown(
+        body=generate_html(
+            tag="h4",
+            text=f"<u><a href=\"{NOTION_MODELLING_DOC}\" target=\"_blank\" style=color:{COLOR_MAP['pink']};>"
+            "Methodology</a></u> <span> &nbsp;&nbsp;&nbsp;&nbsp</span>"
+            f"<u><a href=\"{MEDIUM_BLOGPOST}\" target=\"_blank\" style=color:{COLOR_MAP['pink']};>"
+            "Blogpost</a> </u>"
+                 "<hr>",
+        ),
+        unsafe_allow_html=True,
+    )
+
 
     sidebar = Sidebar(countries)
     country = sidebar.country
