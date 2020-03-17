@@ -62,10 +62,21 @@ SIR model constants
 """
 
 
-class RemovalRate:
+class RecoveryRate:
     min = 1 / 7
     default = 1 / 10  # Recovery period around 10 days
     max = 1 / 14
+
+
+class MortalityRate:
+    min = 0.005
+    max = 0.05
+    default = 0.01
+
+
+class CriticalDeathRate:
+    # Death rate of critically ill patients who don't have access to a hospital bed.
+    default = 0.01  # Same as normal death rate for now
 
 
 class TransmissionRatePerContact:
@@ -93,12 +104,6 @@ class AscertainmentRate:
     min = 0.05
     max = 0.25
     default = 0.1
-
-
-class MortalityRate:
-    min = 0.005
-    max = 0.05
-    default = 0.01
 
 
 class HospitalizationRate:
