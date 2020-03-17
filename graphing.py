@@ -3,6 +3,9 @@ import plotly.express as px
 
 TEMPLATE = "plotly_white"
 
+def _set_legends(fig):
+    fig.layout.update(legend=dict(x=-.1, y=1.2))
+    fig.layout.update(legend_orientation="h")
 
 def plot_true_versus_confirmed(confirmed, predicted):
     df = pd.DataFrame(
@@ -21,6 +24,7 @@ def plot_true_versus_confirmed(confirmed, predicted):
 def infection_graph(df, y_max):
     fig = px.line(df, x="Days", y="Forecast", color="Status", template=TEMPLATE)
     fig.update_yaxes(range=[0, y_max])
+    _set_legends(fig)
     return fig
 
 
@@ -44,8 +48,9 @@ def hospitalization_graph(df, number_of_beds, y_max):
         name="Number of Beds",
         fill="tozeroy",
         opacity=0.1,
-        fillcolor="rgba(255,0,0,.1)",
-        line={"color": "rgba(255,0,0,.5)"},
+        fillcolor="rgba(50,255,140,.2)",
+        line={"color": "rgba(50,255,140,.5)"},
     )
     fig.update_yaxes(range=[0, y_max])
+    _set_legends(fig)
     return fig
