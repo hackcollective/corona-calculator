@@ -33,12 +33,19 @@ def infection_graph(df, y_max):
     return fig
 
 
-def age_segregated_hospitalization_and_mortality(df):
-    colors = ['blue', 'pink', 'red', 'grey', ]
-    fig = px.bar(df, x='Age group', y='Percentage', color='Outcome',
-                 color_discrete_sequence=colors,
-                 opacity=0.4,
-                 template=TEMPLATE)
+def age_segregated_mortality(df, pop_size):
+    df.rename(index={ag: "<30" for ag in ["0-9", "10-19", "20-29"]}, inplace=True)
+    fig = px.pie(df, values="Dead", names=df.index)
+
+    # Change size of graph according to death count. Deaths usually between almost 5e-4% and 1%.
+    dead_prop = df.Dead.sum() / pop_size
+    max_size = 800
+    min_size = 400
+    graph_size = dead_prop * max_size * 100
+    graph_size = max(min_size, graph_size)
+    graph_size = min(max_size, graph_size)
+    fig.update_layout(autosize=False, width=graph_size, height=graph_size)
+    fig.update_traces(hoverinfo="label+percent", textinfo="value", textfont_size=16)
     return fig
 
 

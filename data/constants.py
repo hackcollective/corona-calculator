@@ -12,11 +12,14 @@ import pandas as pd
 from data.preprocessing import preprocess_bed_data
 from s3_utils import download_file
 
-_DEMOGRAPHICS_DATA_PATH = Path(__file__).parent / "demographics.csv"
-_BED_DATA_PATH = Path(__file__).parent / "world_bank_bed_data.csv"
+_DATA_DIR = Path(__file__).parent
+_DEMOGRAPHICS_DATA_PATH = _DATA_DIR / "demographics.csv"
+_BED_DATA_PATH = _DATA_DIR / "world_bank_bed_data.csv"
+_AGE_DATA_PATH = _DATA_DIR / "age_data.csv"
 
 DEMOGRAPHIC_DATA = pd.read_csv(_DEMOGRAPHICS_DATA_PATH, index_col="Country/Region")
 BED_DATA = preprocess_bed_data(_BED_DATA_PATH)
+AGE_DATA = pd.read_csv(_AGE_DATA_PATH, index_col="Age Group")
 
 
 def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
@@ -57,6 +60,10 @@ class Countries:
         return delta > datetime.timedelta(hours=1)
 
 
+class AgeData:
+    data = AGE_DATA
+
+
 """
 SIR model constants
 """
@@ -67,7 +74,10 @@ class RecoveryRate:
 
 
 class MortalityRate:
-    default = 0.01
+    # Take weighted average of death rate across age groups. This assumes each age group is equally likely to
+    # get infected, which may not be exact, but is an assumption we need to make for further analysis,
+    # notably segmenting deaths by age group.
+    default = (AgeData.data.Proportion * AgeData.data.Mortality).sum()
 
 
 class CriticalDeathRate:
