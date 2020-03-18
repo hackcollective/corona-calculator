@@ -68,10 +68,15 @@ def get_status_by_age_group(death_prediction: int, recovered_prediction: int):
 
     # Get outcomes by age
     age_data["Infected"] = (age_data.Proportion * infections_prediction).astype(int)
-    age_data["Dead"] = (age_data.Mortality * death_increase_ratio * age_data.Infected).astype(int)
+    age_data["Need Hospitalization"] = (
+        age_data["Hospitalization Rate"] * age_data.Infected
+    )
+    age_data["Dead"] = (
+        age_data.Mortality * death_increase_ratio * age_data.Infected
+    ).astype(int)
     age_data["Recovered"] = (age_data.Infected - age_data.Dead).astype(int)
 
-    return age_data.iloc[:, -3:]
+    return age_data.iloc[:, -4:]
 
 
 class TrueInfectedCasesModel:

@@ -33,47 +33,30 @@ def infection_graph(df, y_max):
     return fig
 
 
-def age_segregated_mortality(df, pop_size):
-    df.rename(index={ag: "<30" for ag in ["0-9", "10-19", "20-29"]}, inplace=True)
-    fig = px.pie(df, values="Dead", names=df.index)
-
-    # Change size of graph according to death count. Deaths usually between almost 5e-4% and 1%.
-    dead_prop = df.Dead.sum() / pop_size
-    max_size = 800
-    min_size = 400
-    graph_size = dead_prop * max_size * 100
-    graph_size = max(min_size, graph_size)
-    graph_size = min(max_size, graph_size)
-    fig.update_layout(autosize=False, width=graph_size, height=graph_size)
-    fig.update_traces(hoverinfo="label+percent", textinfo="value", textfont_size=16)
-    return fig
-
-
-def hospitalization_graph(df, number_of_beds, y_max):
-    # Add in the number of beds and number of ventilators to the df
-    days = list(df.Days.unique())
-    n_days = len(days)
-
-    bed_df = pd.DataFrame(
-        {
-            "Days": days,
-            "Forecast": [number_of_beds] * n_days,
-            "Status": ["Number of Beds"] * n_days,
-        }
+def age_segregated_mortality(df):
+    df = df.rename(index={ag: "0-30" for ag in ["0-9", "10-19", "20-29"]}).reset_index()
+    df = pd.melt(df, id_vars="Age Group", var_name="Status", value_name="Forecast")
+    # Add up values for < 30
+    df = (
+        df.groupby(["Age Group", "Status"])
+        .sum()
+        .reset_index(1)
+        .sort_values(by="Status", ascending=False)
     )
-
-    fig = px.line(df, x="Days", y="Forecast", color="Status", template=TEMPLATE)
-    fig.add_scatter(
-        x=bed_df.Days,
-        y=bed_df.Forecast,
-        name="Number of Beds",
-        fill="tozeroy",
-        opacity=0.1,
-        fillcolor="rgba(50,255,140,.2)",
-        line={"color": "rgba(50,255,140,.5)"},
+    fig = px.bar(
+        df,
+        x=df.index,
+        y="Forecast",
+        color="Status",
+        template=TEMPLATE,
+        opacity=0.7,
+        color_discrete_sequence=["pink", "red"],
     )
-    fig.update_yaxes(range=[0, y_max])
-    _set_legends(fig)
+    fig.layout.update(
+        xaxis_title="",
+        yaxis_title="",
+        font=dict(family="Arial", size=15, color=COLOR_MAP["default"]),
+    )
     return fig
 
 

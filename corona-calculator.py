@@ -4,7 +4,7 @@ import streamlit as st
 
 import graphing
 import models
-from data import constants, preprocessing
+from data import constants
 from interface import css
 from interface.elements import reported_vs_true_cases
 from utils import COLOR_MAP, generate_html, graph_warning
@@ -222,7 +222,7 @@ def run_app():
     st.write(base_graph)
 
     st.write(
-        "Note that we use a fixed estimate of the mortality rate here, of 1% [(source)](https://institutefordiseasemodeling.github.io/nCoV-public/analyses/first_adjusted_mortality_estimates_and_risk_assessment/2019-nCoV-preliminary_age_and_time_adjusted_mortality_rates_and_pandemic_risk_assessment.html). "
+        "Note that we use a fixed estimate of the mortality rate here, of 0.6%."
         "In reality, the mortality rate will be highly dependent upon the load upon the healthcare system and "
         "the availability of treatment. Our models also account for a higher death rate for patients who are in critical"
         " condition but cannot get access to medical care because the system is overloaded. We use a rate of 5.8%, which is the "
@@ -261,17 +261,20 @@ def run_app():
         f"not take into account any special measures that may have been taken in the last few months."
     )
 
-    st.subheader("How many people will die?")
+    st.subheader("How many people will be affected?")
 
     num_dead = df[df.Status == "Dead"].Forecast.iloc[-1]
     num_recovered = df[df.Status == "Recovered"].Forecast.iloc[-1]
     st.markdown(
         f"If the average person in your country adopts the selected behavior, **{int(num_dead):,}** "
-        f"people will die. The graph below shows a breakdown of casualties by age group."
+        f"people might die. The graph below shows a breakdown of casualties and hospitalizations by age group. Parameters"
+        f"by age group, including demographic distribution, are worldwide numbers so they may be slightly different in your contry."
     )
 
     outcomes_by_age_group = models.get_status_by_age_group(num_dead, num_recovered)
-    fig = graphing.age_segregated_mortality(outcomes_by_age_group, population)
+    fig = graphing.age_segregated_mortality(
+        outcomes_by_age_group.loc[:, ["Dead", "Need Hospitalization"]]
+    )
     st.write(fig)
 
 
