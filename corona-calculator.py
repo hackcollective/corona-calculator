@@ -92,13 +92,6 @@ class Sidebar:
             value=constants.AverageDailyContacts.default,
         )
 
-        self.severe_mortality_rate = st.sidebar.slider(
-            label="What is the mortality rate for people who need urgent medical care but cannot get access to it??",
-            min_value=constants.CriticalDeathRate.min,
-            max_value=constants.CriticalDeathRate.max,
-            value=constants.CriticalDeathRate.default,
-        )
-
         horizon = {
             "3  months": 90,
             "6 months": 180,
@@ -187,7 +180,7 @@ def run_app():
         contact_rate=sidebar.contact_rate,
         recovery_rate=constants.RecoveryRate.default,
         normal_death_rate=constants.MortalityRate.default,
-        critical_death_rate=sidebar.severe_mortality_rate,
+        critical_death_rate=constants.CriticalDeathRate.default,
         hospitalization_rate=constants.HospitalizationRate.default,
         hospital_capacity=num_hospital_beds,
     )
@@ -231,7 +224,9 @@ def run_app():
     st.write(
         "Note that we use a fixed estimate of the mortality rate here, of 1% [(source)](https://institutefordiseasemodeling.github.io/nCoV-public/analyses/first_adjusted_mortality_estimates_and_risk_assessment/2019-nCoV-preliminary_age_and_time_adjusted_mortality_rates_and_pandemic_risk_assessment.html). "
         "In reality, the mortality rate will be highly dependent upon the load upon the healthcare system and "
-        "the availability of treatment. Some estimates ([like this one](https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30195-X/fulltext)) are closer to 6%."
+        "the availability of treatment. Our models also account for a higher death rate for patients who are in critical"
+        " condition but cannot get access to medical care because the system is overloaded. We use a rate of 5.8%, which is the "
+        "highest estimate reported in Wuhan by the WHO. This is probably an underestimate."
     )
 
     st.subheader("How will this affect my healthcare system?")
