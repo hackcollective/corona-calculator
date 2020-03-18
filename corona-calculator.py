@@ -44,7 +44,6 @@ class Sidebar:
             body=generate_html(
                 text=f"{date_last_fetched}",
                 bold=True,
-                # color=COLOR_MAP["pink"],
                 line_height=0,
             ),
             unsafe_allow_html=True,
