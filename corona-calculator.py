@@ -228,12 +228,6 @@ def run_app():
     st.warning(graph_warning)
     st.write(base_graph)
 
-    hospital_graph = graphing.hospitalization_graph(
-        df[df.Status.isin(["Infected", "Need Hospitalization"])],
-        num_hospital_beds,
-        max(num_hospital_beds, df.Forecast.max()),
-    )
-
     st.write(
         "Note that we use a fixed estimate of the mortality rate here, of 1% [(source)](https://institutefordiseasemodeling.github.io/nCoV-public/analyses/first_adjusted_mortality_estimates_and_risk_assessment/2019-nCoV-preliminary_age_and_time_adjusted_mortality_rates_and_pandemic_risk_assessment.html). "
         "In reality, the mortality rate will be highly dependent upon the load upon the healthcare system and "
@@ -257,14 +251,11 @@ def run_app():
         "shortage. Many countries are scrambling to buy them [(source)](https://www.reuters.com/article/us-health-coronavirus-draegerwerk-ventil/germany-italy-rush-to-buy-life-saving-ventilators-as-manufacturers-warn-of-shortages-idUSKBN210362)."
     )
 
-    st.warning(graph_warning)
-    st.write(hospital_graph)
     peak_occupancy = df.loc[df.Status == "Need Hospitalization"]["Forecast"].max()
     percent_beds_at_peak = min(100 * num_hospital_beds / peak_occupancy, 100)
 
     num_beds_comparison_chart = graphing.num_beds_occupancy_comparison_chart(
-        num_beds_available=approx_num_beds,
-        max_num_beds_needed=peak_occupancy
+        num_beds_available=approx_num_beds, max_num_beds_needed=peak_occupancy
     )
 
     st.write(num_beds_comparison_chart)

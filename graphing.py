@@ -60,6 +60,7 @@ def hospitalization_graph(df, number_of_beds, y_max):
     _set_legends(fig)
     return fig
 
+
 def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed):
     """
     A horizontal bar chart comparing # of beds available compared to 
@@ -73,21 +74,26 @@ def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed)
             "Color": ["b", "r"],
         }
     )
-    fig = px.bar(df, x="Value", y="Label", color='Color', text="Text",
-            orientation='h', opacity=0.9, template=TEMPLATE, height=300)
+    fig = px.bar(
+        df,
+        x="Value",
+        y="Label",
+        color="Color",
+        text="Text",
+        orientation="h",
+        opacity=0.7,
+        template=TEMPLATE,
+        height=300,
+    )
 
-    fig.layout.update( 
-        showlegend=False, 
+    fig.layout.update(
+        showlegend=False,
         xaxis_title="",
         xaxis_showticklabels=False,
         yaxis_title="",
         yaxis_showticklabels=True,
-        font=dict(
-            family="Arial",
-            size=15,
-            color=COLOR_MAP["default"]
-        )
+        font=dict(family="Arial", size=15, color=COLOR_MAP["default"]),
     )
+    fig.update_traces(textposition="outside", cliponaxis=False)
 
     return fig
-    
