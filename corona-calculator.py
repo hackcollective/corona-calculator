@@ -247,8 +247,9 @@ def run_app():
     )
 
     # Do some rounding to avoid beds sounding too precise!
+    approx_num_beds = round(num_hospital_beds / 100) * 100
     st.write(
-        f"Your country has around **{round(num_hospital_beds / 100) * 100:,}** beds. Bear in mind that most of these "
+        f"Your country has around **{approx_num_beds:,}** beds. Bear in mind that most of these "
         "are probably already in use for people sick for other reasons."
     )
     st.write(
@@ -260,6 +261,13 @@ def run_app():
     st.write(hospital_graph)
     peak_occupancy = df.loc[df.Status == "Need Hospitalization"]["Forecast"].max()
     percent_beds_at_peak = min(100 * num_hospital_beds / peak_occupancy, 100)
+
+    num_beds_comparison_chart = graphing.num_beds_occupancy_comparison_chart(
+        num_beds_available=approx_num_beds,
+        max_num_beds_needed=peak_occupancy
+    )
+
+    st.write(num_beds_comparison_chart)
 
     st.markdown(
         f"At peak, **{peak_occupancy:,}** people will need hospital beds. ** {percent_beds_at_peak:.1f} % ** of people "
