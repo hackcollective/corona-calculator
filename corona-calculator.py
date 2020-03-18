@@ -247,7 +247,7 @@ def run_app():
         "are probably already in use for people sick for other reasons."
     )
     st.write(
-        "It's hard to know how many ventilators are present per country, but there will certainly be a worldwide "
+        "It's hard to know exactly how many ventilators are present per country, but there will certainly be a worldwide "
         "shortage. Many countries are scrambling to buy them [(source)](https://www.reuters.com/article/us-health-coronavirus-draegerwerk-ventil/germany-italy-rush-to-buy-life-saving-ventilators-as-manufacturers-warn-of-shortages-idUSKBN210362)."
     )
 
