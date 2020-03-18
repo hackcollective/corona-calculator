@@ -44,7 +44,6 @@ class Sidebar:
             body=generate_html(
                 text=f"{date_last_fetched}",
                 bold=True,
-                # color=COLOR_MAP["pink"],
                 line_height=0,
             ),
             unsafe_allow_html=True,
@@ -216,13 +215,13 @@ def run_app():
         "**Play with the slider to the left to see how this changes the dynamics of disease spread**"
     )
 
-    df_base = df[~df.Status.isin(["Need Hospitalization", "Need Ventilation"])]
-    base_graph = graphing.infection_graph(df_base, df.Forecast.max())
+    df_base = df[~df.Status.isin(["Need Hospitalization", "Dead"])]
+    base_graph = graphing.infection_graph(df_base, df_base.Forecast.max())
     st.warning(graph_warning)
     st.write(base_graph)
 
     st.write(
-        "Note that we use a fixed estimate of the mortality rate here, of 1% [(source)](https://institutefordiseasemodeling.github.io/nCoV-public/analyses/first_adjusted_mortality_estimates_and_risk_assessment/2019-nCoV-preliminary_age_and_time_adjusted_mortality_rates_and_pandemic_risk_assessment.html). "
+        "Note that we use a fixed estimate of the mortality rate here, of 0.6%."
         "In reality, the mortality rate will be highly dependent upon the load upon the healthcare system and "
         "the availability of treatment. Our models also account for a higher death rate for patients who are in critical"
         " condition but cannot get access to medical care because the system is overloaded. We use a rate of 5.8%, which is the "
@@ -260,6 +259,22 @@ def run_app():
         f"who need a bed in hospital will have access to one given your country's historical resources. This does "
         f"not take into account any special measures that may have been taken in the last few months."
     )
+
+    st.subheader("How many people will be affected?")
+
+    num_dead = df[df.Status == "Dead"].Forecast.iloc[-1]
+    num_recovered = df[df.Status == "Recovered"].Forecast.iloc[-1]
+    st.markdown(
+        f"If the average person in your country adopts the selected behavior, **{int(num_dead):,}** "
+        f"people might die. The graph below shows a breakdown of casualties and hospitalizations by age group. Parameters"
+        f"by age group, including demographic distribution, are worldwide numbers so they may be slightly different in your contry."
+    )
+
+    outcomes_by_age_group = models.get_status_by_age_group(num_dead, num_recovered)
+    fig = graphing.age_segregated_mortality(
+        outcomes_by_age_group.loc[:, ["Dead", "Need Hospitalization"]]
+    )
+    st.write(fig)
 
 
 if __name__ == "__main__":

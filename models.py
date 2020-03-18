@@ -2,7 +2,15 @@ import itertools
 
 import pandas as pd
 
-_STATUSES_TO_SHOW = ["Infected", "Dead", "Need Hospitalization"]
+import data.constants as constants
+
+_STATUSES_TO_SHOW = [
+    "Infected",
+    "Dead",
+    "Need Hospitalization",
+    "Susceptible",
+    "Recovered",
+]
 
 
 def get_predictions(
@@ -38,6 +46,37 @@ def get_predictions(
         }
     )
     return df
+
+
+def get_status_by_age_group(death_prediction: int, recovered_prediction: int):
+    """
+    Get outcomes segmented by age. The important assumption here is that age groups get infected at the same rate, that
+    is every group is as likely to contract the infection.
+    :param death_prediction: Number of deaths predicted.
+    :param recovered_prediction: Number of recovered people predicted.
+    :return: Outcomes by age in a DataFrame.
+    """
+    age_data = constants.AgeData.data
+    infections_prediction = recovered_prediction + death_prediction
+
+    # Effective mortality rate may be different than the one defined in data/constants.py because once we reach
+    # hospital capacity, we increase the death rate. We assume the increase in death rate will be proportional, even
+    # though it probably won't be since more old people require medical care, and thus will see increased mortality
+    # when the medical system reaches capacity.
+    effective_death_rate = death_prediction / infections_prediction
+    death_increase_ratio = effective_death_rate / constants.MortalityRate.default
+
+    # Get outcomes by age
+    age_data["Infected"] = (age_data.Proportion * infections_prediction).astype(int)
+    age_data["Need Hospitalization"] = (
+        age_data["Hospitalization Rate"] * age_data.Infected
+    )
+    age_data["Dead"] = (
+        age_data.Mortality * death_increase_ratio * age_data.Infected
+    ).astype(int)
+    age_data["Recovered"] = (age_data.Infected - age_data.Dead).astype(int)
+
+    return age_data.iloc[:, -4:]
 
 
 class TrueInfectedCasesModel:

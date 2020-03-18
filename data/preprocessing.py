@@ -1,9 +1,5 @@
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
-
-_BED_DATA_PATH = Path(__file__).parent / "world_bank_bed_data.csv"
 
 
 def _get_latest_bed_estimate(row):
@@ -14,7 +10,7 @@ def _get_latest_bed_estimate(row):
         return np.nan
 
 
-def preprocess_bed_data(path=_BED_DATA_PATH):
+def preprocess_bed_data(path):
     df = pd.read_csv(path, header=2)
     df.rename({"Country Name": "Country/Region"}, axis=1, inplace=True)
     df.drop(["Country Code", "Indicator Name", "Indicator Code"], axis=1, inplace=True)
