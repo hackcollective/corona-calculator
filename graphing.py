@@ -74,7 +74,7 @@ def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed)
         }
     )
     fig = px.bar(df, x="Value", y="Label", color='Color', text="Text",
-            orientation='h', template=TEMPLATE, height=300)
+            orientation='h', opacity=0.9, template=TEMPLATE, height=300)
 
     fig.layout.update( 
         showlegend=False, 
