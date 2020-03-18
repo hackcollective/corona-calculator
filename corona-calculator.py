@@ -4,7 +4,7 @@ import streamlit as st
 
 import graphing
 import models
-from data import constants
+from data import constants, preprocessing
 from interface import css
 from interface.elements import reported_vs_true_cases
 from utils import COLOR_MAP, generate_html, graph_warning
@@ -216,8 +216,8 @@ def run_app():
         "**Play with the slider to the left to see how this changes the dynamics of disease spread**"
     )
 
-    df_base = df[~df.Status.isin(["Need Hospitalization", "Need Ventilation"])]
-    base_graph = graphing.infection_graph(df_base, df.Forecast.max())
+    df_base = df[~df.Status.isin(["Need Hospitalization", "Dead"])]
+    base_graph = graphing.infection_graph(df_base, df_base.Forecast.max())
     st.warning(graph_warning)
     st.write(base_graph)
 
@@ -260,6 +260,10 @@ def run_app():
         f"who need a bed in hospital will have access to one given your country's historical resources. This does "
         f"not take into account any special measures that may have been taken in the last few months."
     )
+
+    df = preprocessing.process_mortality_by_demographics()
+    fig = graphing.age_segregated_hospitalization_and_mortality(df)
+    st.write(fig)
 
 
 if __name__ == "__main__":

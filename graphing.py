@@ -33,6 +33,15 @@ def infection_graph(df, y_max):
     return fig
 
 
+def age_segregated_hospitalization_and_mortality(df):
+    colors = ['blue', 'pink', 'red', 'grey', ]
+    fig = px.bar(df, x='Age group', y='Percentage', color='Outcome',
+                 color_discrete_sequence=colors,
+                 opacity=0.4,
+                 template=TEMPLATE)
+    return fig
+
+
 def hospitalization_graph(df, number_of_beds, y_max):
     # Add in the number of beds and number of ventilators to the df
     days = list(df.Days.unique())
