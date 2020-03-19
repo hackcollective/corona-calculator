@@ -91,7 +91,7 @@ def age_segregated_mortality(df):
         .sort_values(by="Status", ascending=False)
     )
 
-    df['Status'] = df['Status'].apply(lambda x: {'Need Hospitalization': 'Hospitalized but survived'}.get(x, x))
+    df['Status'] = df['Status'].apply(lambda x: {'Need Hospitalization': 'Hospitalized'}.get(x, x))
 
     fig = px.bar(
         df,
