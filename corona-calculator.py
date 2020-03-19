@@ -88,18 +88,6 @@ class Sidebar:
             value=constants.AverageDailyContacts.default,
         )
 
-        horizon = {
-            "3  months": 90,
-            "6 months": 180,
-            "12  months": 365,
-            "24 months": 730,
-        }
-        _num_days_for_prediction = st.sidebar.radio(
-            label="What period of time would you like to predict for?",
-            options=list(horizon.keys()),
-            index=1,
-        )
-
         st.sidebar.markdown(
             body=generate_html(
                 text=f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%,"
@@ -109,8 +97,6 @@ class Sidebar:
             ),
             unsafe_allow_html=True,
         )
-
-        self.num_days_for_prediction = horizon[_num_days_for_prediction]
 
 
 @st.cache
@@ -196,7 +182,6 @@ def run_app():
         num_recovered=country_data["Recovered"],
         num_deaths=country_data["Deaths"],
         area_population=population,
-        max_days=sidebar.num_days_for_prediction,
     )
 
     reported_vs_true_cases(
