@@ -50,8 +50,12 @@ def get_predictions(
 
 def get_status_by_age_group(death_prediction: int, recovered_prediction: int):
     """
-    Get outcomes segmented by age. The important assumption here is that age groups get infected at the same rate, that
-    is every group is as likely to contract the infection.
+    Get outcomes segmented by age.
+
+    We modify the original percentage death rates from data/age_data.csv to reflect a mortality rate that has been
+    adjusted to take into account hospital capacity. The important assumption here is that age groups get infected at
+    the same rate; that is, every group is equaly as likely to contract the infection.
+
     :param death_prediction: Number of deaths predicted.
     :param recovered_prediction: Number of recovered people predicted.
     :return: Outcomes by age in a DataFrame.
