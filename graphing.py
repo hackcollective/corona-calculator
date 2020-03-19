@@ -12,6 +12,16 @@ def _set_legends(fig):
     fig.layout.update(legend_orientation="h")
 
 
+def plot_historical_data(df):
+    # Convert wide to long
+
+    df = pd.melt(df, id_vars='Date', value_vars=['Confirmed', 'Deaths', 'Recovered'], var_name='Status', value_name='Number')
+
+    fig = px.line(df, x='Date', y='Number', color='Status', template=TEMPLATE)
+
+    return fig
+
+
 def plot_true_versus_confirmed(confirmed, predicted):
     df = pd.DataFrame(
         {
@@ -94,13 +104,15 @@ def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed)
     A horizontal bar chart comparing # of beds available compared to 
     max number number of beds needed
     """
+    num_beds_available, max_num_beds_needed = int(num_beds_available), int(max_num_beds_needed)
+
     df = pd.DataFrame(
         {
             "Label": ["Total Beds ", "Peak Occupancy "],
             "Value": [num_beds_available, max_num_beds_needed],
             "Text": [f"{num_beds_available:,}  ", f"{max_num_beds_needed:,}  "],
             "Color": ["b", "r"],
-        }
+        },
     )
     fig = px.bar(
         df,

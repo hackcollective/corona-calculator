@@ -4,6 +4,7 @@ import streamlit as st
 
 import graphing
 import models
+import utils
 from data import constants
 from interface import css
 from interface.elements import reported_vs_true_cases
@@ -52,7 +53,7 @@ class Sidebar:
         st.sidebar.markdown(
             body=generate_html(
                 text=f'Population: {int(country_data["Population"]):,}<br>Infected: {country_data["Confirmed"]}<br>'
-                f'Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
+                     f'Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
                 line_height=0,
                 font_family="Arial",
                 font_size="0.9rem",
@@ -76,11 +77,11 @@ class Sidebar:
         st.sidebar.markdown(
             body=generate_html(
                 text=f"Change the degree of social distancing to see the effect upon disease "
-                f"spread and access to hospital beds.",
+                     f"spread and access to hospital beds.",
                 line_height=0,
                 font_size="12px",
             )
-            + "<br>",
+                 + "<br>",
             unsafe_allow_html=True,
         )
 
@@ -106,7 +107,7 @@ class Sidebar:
         st.sidebar.markdown(
             body=generate_html(
                 text=f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%,"
-                f" see our <a href='https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc'> methods for details</a>.",
+                     f" see our <a href='https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc'> methods for details</a>.",
                 line_height=0,
                 font_size="10px",
             ),
@@ -123,7 +124,6 @@ def _fetch_country_data():
 
 
 def run_app():
-
     css.hide_menu()
     css.limit_plot_size()
 
@@ -149,7 +149,7 @@ def run_app():
     st.markdown(
         body=generate_html(
             text="<strong>Disclaimer:</strong> <em>The creators of this application are not healthcare professionals. "
-            "The illustrations provided were estimated using best available data but might not accurately reflect reality.</em>",
+                 "The illustrations provided were estimated using best available data but might not accurately reflect reality.</em>",
             color="gray",
             font_size="12px",
         ),
@@ -159,10 +159,10 @@ def run_app():
         body=generate_html(
             tag="h4",
             text=f"<u><a href=\"{NOTION_MODELLING_DOC}\" target=\"_blank\" style=color:{COLOR_MAP['pink']};>"
-            "Methodology</a></u> <span> &nbsp;&nbsp;&nbsp;&nbsp</span>"
-            f"<u><a href=\"{MEDIUM_BLOGPOST}\" target=\"_blank\" style=color:{COLOR_MAP['pink']};>"
-            "Blogpost</a> </u>"
-            "<hr>",
+                 "Methodology</a></u> <span> &nbsp;&nbsp;&nbsp;&nbsp</span>"
+                 f"<u><a href=\"{MEDIUM_BLOGPOST}\" target=\"_blank\" style=color:{COLOR_MAP['pink']};>"
+                 "Blogpost</a> </u>"
+                 "<hr>",
         ),
         unsafe_allow_html=True,
     )
@@ -170,9 +170,15 @@ def run_app():
     sidebar = Sidebar(countries)
     country = sidebar.country
     country_data = countries.country_data[country]
+    _historical_df = countries.historical_country_data
+    historical_data = _historical_df.loc[_historical_df['Country/Region']==country]
     number_cases_confirmed = country_data["Confirmed"]
     population = country_data["Population"]
     num_hospital_beds = country_data["Num Hospital Beds"]
+
+    st.subheader(f'How has the disease spread in {country}?')
+    fig = graphing.plot_historical_data(historical_data)
+    st.write(fig)
 
     sir_model = models.SIRModel(
         transmission_rate_per_contact=constants.TransmissionRatePerContact.default,
@@ -196,7 +202,7 @@ def run_app():
     )
 
     reported_vs_true_cases(
-        number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed)
+        int(number_cases_confirmed), true_cases_estimator.predict(number_cases_confirmed)
     )
 
     st.write(
@@ -220,13 +226,13 @@ def run_app():
     st.warning(graph_warning)
     st.write(base_graph)
 
-    st.write(
-        "Note that we use a fixed estimate of the mortality rate here, of 0.6%."
-        "In reality, the mortality rate will be highly dependent upon the load upon the healthcare system and "
-        "the availability of treatment. Our models also account for a higher death rate for patients who are in critical"
-        " condition but cannot get access to medical care because the system is overloaded. We use a rate of 5.8%, which is the "
-        "highest estimate reported in Wuhan by the WHO. This is probably an underestimate."
-    )
+    # st.write(
+    #     "Note that we use a fixed estimate of the mortality rate here, of 0.6%."
+    #     "In reality, the mortality rate will be highly dependent upon the load upon the healthcare system and "
+    #     "the availability of treatment. Our models also account for a higher death rate for patients who are in critical"
+    #     " condition but cannot get access to medical care because the system is overloaded. We use a rate of 5.8%, which is the "
+    #     "highest estimate reported in Wuhan by the WHO. This is probably an underestimate."
+    # )
 
     st.subheader("How will this affect my healthcare system?")
     st.write(
@@ -260,15 +266,15 @@ def run_app():
         f"not take into account any special measures that may have been taken in the last few months."
     )
 
-    st.subheader("How many people will be affected?")
+    st.subheader("How severe will the impact be?")
 
     num_dead = df[df.Status == "Dead"].Forecast.iloc[-1]
     num_recovered = df[df.Status == "Recovered"].Forecast.iloc[-1]
     st.markdown(
-        f"If the average person in your country adopts the selected behavior, **{int(num_dead):,}** "
-        f"people might die. The graph below shows a breakdown of casualties and hospitalizations by age group. Parameters"
-        f"by age group, including demographic distribution, are worldwide numbers so they may be slightly different in your contry."
-    )
+        f"If the average person in your country adopts the selected behavior, we estimate that **{int(num_dead):,}** "
+        f"people will die.")
+
+    st.markdown(f"The graph above below a breakdown of casualties and hospitalizations by age group.")
 
     outcomes_by_age_group = models.get_status_by_age_group(num_dead, num_recovered)
     fig = graphing.age_segregated_mortality(
@@ -276,6 +282,19 @@ def run_app():
     )
     st.write(fig)
 
+    # TODO psteeves make sure this links to the correct mortality numbers from Wuhan, or whatever we're using
+    st.write(
+        f"Parameters by age group, including demographic distribution, are worldwide numbers so they may be slightly different in your country.")
+    st.write(
+        f"We've used mortality rates from this [recent paper from Imperial College](https://www.imperial.ac.uk/media/imperial-college/medicine/sph/ide/gida-fellowships/Imperial-College-COVID19-NPI-modelling-16-03-2020.pdf?fbclid=IwAR3TzdPTcLiOZN5r2dMd6_08l8kG0Mmr0mgP3TdzimpqB8H96T47ECBUfTM). "
+        f"However, we've adjusted them according to the [maximum mortality rate recorded in Wuhan]() when your country's hospitals are overwhelmed: "
+        f"if more people who need them lack hospital beds, more people will die."
+        )
+    st.write('<hr>', unsafe_allow_html=True)
+    st.write('Like this? [Click here to share it on Twitter](https://ctt.ac/u5U39), and '
+             '[let us know your feedback via Google Form](https://forms.gle/J6ZFFgh4rVQm4y8G7)')
+
+    utils.insert_github_logo()
 
 if __name__ == "__main__":
     run_app()

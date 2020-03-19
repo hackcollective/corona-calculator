@@ -4,13 +4,15 @@ For sources, please visit https://www.notion.so/Modelling-d650e1351bf34ceeb97c82
 """
 
 import datetime
+import pickle
 from io import StringIO
 from pathlib import Path
 
 import pandas as pd
 
 from data.preprocessing import preprocess_bed_data
-from s3_utils import download_file
+from s3_utils import download_file, S3_DISEASE_DATA_OBJ_NAME
+
 
 _DATA_DIR = Path(__file__).parent
 _DEMOGRAPHICS_DATA_PATH = _DATA_DIR / "demographics.csv"
@@ -23,15 +25,22 @@ AGE_DATA = pd.read_csv(_AGE_DATA_PATH, index_col="Age Group")
 
 
 def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
-    disease_data_bytes, last_modified = download_file("latest_disease_data.csv")
-    disease_data = pd.read_csv(
-        StringIO(disease_data_bytes.decode()), index_col="Country/Region"
-    )
+    data_dict_pkl_bytes, last_modified = download_file(S3_DISEASE_DATA_OBJ_NAME)
+    data_dict = pickle.loads(data_dict_pkl_bytes)
+
+    full_disease_data = data_dict["full_table"]
+    latest_disease_data = data_dict["latest_table"]
+
+    latest_disease_data = latest_disease_data.set_index("Country/Region", drop=True)
+    
     # Rename name "US" to "United States" in disease and demographics data to match bed data
-    disease_data = disease_data.rename(index={"US": "United States"})
+    latest_disease_data = latest_disease_data.rename(index={"US": "United States"})
     demographic_data = demographic_data.rename(index={"US": "United States"})
 
-    country_data = disease_data.merge(demographic_data, on="Country/Region")
+    full_disease_data['Country/Region'] = full_disease_data['Country/Region'].\
+        apply(lambda x: {"US": "United States"}.get(x, x))
+
+    country_data = latest_disease_data.merge(demographic_data, on="Country/Region")
 
     # Beds are per 1000 people so we need to calculate absolute
 
@@ -44,12 +53,16 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
     country_data = country_data.merge(
         bed_data[["Num Hospital Beds"]], on="Country/Region"
     )
-    return country_data.to_dict(orient="index"), last_modified
+
+    # Check that all of the countries in our selectable dropdown are also present in the full data
+    assert set(latest_disease_data.index.unique()).issubset(set(full_disease_data['Country/Region'].unique()))
+
+    return country_data.to_dict(orient="index"), last_modified, full_disease_data
 
 
 class Countries:
     def __init__(self, timestamp):
-        self.country_data, self.last_modified = build_country_data()
+        self.country_data, self.last_modified, self.historical_country_data = build_country_data()
         self.countries = list(self.country_data.keys())
         self.default_selection = self.countries.index("Canada")
         self.timestamp = timestamp
@@ -82,9 +95,9 @@ class MortalityRate:
 
 class CriticalDeathRate:
     # Death rate of critically ill patients who don't have access to a hospital bed.
-    min = 0.01
-    max = 1.0
-    default = 0.5
+    # This is the max reported from Wuhan:
+    # https://www.who.int/docs/default-source/coronaviruse/who-china-joint-mission-on-covid-19-final-report.pdf
+    default = 0.056
 
 
 class TransmissionRatePerContact:
