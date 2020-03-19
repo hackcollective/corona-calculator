@@ -209,7 +209,7 @@ def run_app():
         "The number of reported cases radically underestimates the true cases, because people do not show symptoms for "
         "several days, not everybody gets tested, and the tests take a few days to return results. "
         "The extent depends upon your country's testing strategy."
-        " This estimate is from China ([source](https://science.sciencemag.org/content/early/2020/03/13/science.abb3221))."
+        " This estimate (14% reporting) is from China ([source](https://science.sciencemag.org/content/early/2020/03/13/science.abb3221))."
     )
 
     st.subheader("How will the disease spread?")
