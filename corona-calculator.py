@@ -212,7 +212,7 @@ def run_app():
         " This estimate (14% reporting) is from China ([source](https://science.sciencemag.org/content/early/2020/03/13/science.abb3221))."
     )
 
-    st.subheader("How will the disease spread?")
+    st.subheader("How will my actions affect the spread?")
     st.write(
         "The critical factor for controlling spread is how many others infected people interact with each day. "
         "This has a dramatic effect upon the dynamics of the disease. "
