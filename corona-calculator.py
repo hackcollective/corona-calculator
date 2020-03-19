@@ -237,7 +237,7 @@ def run_app():
     st.write(num_beds_comparison_chart)
 
     st.markdown(
-        f"At peak, **{peak_occupancy:,}** people will need hospital beds. ** {percent_beds_at_peak:.1f} % ** of people "
+        f"At peak, **{int(peak_occupancy):,}** people will need hospital beds. ** {percent_beds_at_peak:.1f}% ** of people "
         f"who need a bed in hospital will have access to one given your country's historical resources. This does "
         f"not take into account any special measures that may have been taken in the last few months."
     )
@@ -262,7 +262,8 @@ def run_app():
     st.write(fig)
 
     st.write(
-        f"Parameters by age group, including demographic distribution, are worldwide numbers so they may be slightly different in your country."
+        f"Parameters by age group, including demographic distribution, are [worldwide numbers](https://population.un.org/wpp/DataQuery/) "
+        f"so they may be slightly different in your country."
     )
     st.write(
         f"We've used mortality rates from this [recent paper from Imperial College](https://www.imperial.ac.uk/media/imperial-college/medicine/sph/ide/gida-fellowships/Imperial-College-COVID19-NPI-modelling-16-03-2020.pdf?fbclid=IwAR3TzdPTcLiOZN5r2dMd6_08l8kG0Mmr0mgP3TdzimpqB8H96T47ECBUfTM). "
