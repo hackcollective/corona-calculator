@@ -1,7 +1,9 @@
 # corona-calculator
-Visualize the prevalence and predicted spread of corona virus near you.
+Visualize the prevalence and predicted spread of corona virus near you. See our [introductory blogpost](https://towardsdatascience.com/should-i-go-to-brunch-an-interactive-tool-for-covid-19-curve-flattening-6ab6a914af0) for more details.
 
-Go to https://corona-calculator.herokuapp.com to see the app (which is continuously deployed from `Master`).
+Go to https://corona-calculator.herokuapp.com to see the app. 
+
+Merges to `master` are continuously deployed to http://corona-calculator-staging.herokuapp.com/
 
 ## Setup venv
 ```
