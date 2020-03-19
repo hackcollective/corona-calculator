@@ -262,7 +262,7 @@ def run_app():
     st.write(fig)
 
     st.write(
-        f"Parameters by age group, including demographic distribution, are worldwide numbers ([source])(https://population.un.org/wpp/DataQuery/) "
+        f"Parameters by age group, including demographic distribution, are [worldwide numbers](https://population.un.org/wpp/DataQuery/) "
         f"so they may be slightly different in your country."
     )
     st.write(
