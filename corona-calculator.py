@@ -48,8 +48,8 @@ class Sidebar:
 
         st.sidebar.markdown(
             body=generate_html(
-                text=f'Population: {int(country_data["Population"]):,}<br>Infected: {country_data["Confirmed"]}<br>'
-                f'Recovered: {country_data["Recovered"]}<br>Dead: {country_data["Deaths"]}',
+                text=f'Population: {int(country_data["Population"]):,}<br>Infected: {int(country_data["Confirmed"])}<br>'
+                f'Recovered: {int(country_data["Recovered"])}<br>Dead: {int(country_data["Deaths"])}',
                 line_height=0,
                 font_family="Arial",
                 font_size="0.9rem",
