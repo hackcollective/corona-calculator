@@ -12,7 +12,7 @@ _STATUSES_TO_SHOW = [
     "Recovered",
 ]
 
-_DEFAULT_TIME_SCALE = 12 * 2 * 31  # 24 months
+_DEFAULT_TIME_SCALE = 12 * 3 * 31  # 36 months
 
 
 def get_predictions(
@@ -192,7 +192,11 @@ class SIRModel:
         # Days with no change in I
         days_to_clip = [I[-i] == I[-i - 1] for i in range(1, len(I))]
         index_to_clip = days_to_clip.index(False)
-        print(index_to_clip)
+        if index_to_clip == 0:
+            index_to_clip = 1
+
+        # Look at at least a few months
+        index_to_clip = min(index_to_clip, _DEFAULT_TIME_SCALE - 3 * 31)
 
         return {
             "Susceptible": S[:-index_to_clip],
