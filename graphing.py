@@ -15,9 +15,16 @@ def _set_legends(fig):
 def plot_historical_data(df):
     # Convert wide to long
 
-    df = pd.melt(df, id_vars='Date', value_vars=['Confirmed', 'Deaths', 'Recovered'], var_name='Status', value_name='Number')
+    df = pd.melt(df,
+                 id_vars='Date',
+                 value_vars=['Confirmed', 'Deaths', 'Recovered'],
+                 var_name='Status',
+                 value_name='Number',
+                 )
 
-    fig = px.line(df, x='Date', y='Number', color='Status', template=TEMPLATE)
+    fig = px.scatter(df, x='Date', y='Number', color='Status', template=TEMPLATE, opacity=0.8   )
+
+    _set_legends(fig)
 
     return fig
 
