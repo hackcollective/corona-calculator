@@ -220,13 +220,13 @@ def run_app():
     st.warning(graph_warning)
     st.write(base_graph)
 
-    st.write(
-        "Note that we use a fixed estimate of the mortality rate here, of 0.6%."
-        "In reality, the mortality rate will be highly dependent upon the load upon the healthcare system and "
-        "the availability of treatment. Our models also account for a higher death rate for patients who are in critical"
-        " condition but cannot get access to medical care because the system is overloaded. We use a rate of 5.8%, which is the "
-        "highest estimate reported in Wuhan by the WHO. This is probably an underestimate."
-    )
+    # st.write(
+    #     "Note that we use a fixed estimate of the mortality rate here, of 0.6%."
+    #     "In reality, the mortality rate will be highly dependent upon the load upon the healthcare system and "
+    #     "the availability of treatment. Our models also account for a higher death rate for patients who are in critical"
+    #     " condition but cannot get access to medical care because the system is overloaded. We use a rate of 5.8%, which is the "
+    #     "highest estimate reported in Wuhan by the WHO. This is probably an underestimate."
+    # )
 
     st.subheader("How will this affect my healthcare system?")
     st.write(
