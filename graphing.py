@@ -27,12 +27,13 @@ def plot_true_versus_confirmed(confirmed, predicted):
 
 
 def infection_graph(df, y_max):
+
     # We cannot explicitly set graph width here, have to do it as injected css: see interface.css
     fig = go.Figure(layout=dict(template=TEMPLATE))
 
     susceptible, infected, recovered = df.loc[df.Status =='Susceptible'], df.loc[df.Status =='Infected'], df.loc[df.Status =='Recovered']
     fig.add_scatter(x=susceptible.Days, y=susceptible.Forecast,
-                    fillcolor='rgba(230,230,230,.4)',
+                    fillcolor=COLOR_MAP['susceptible'],
                     fill='tozeroy',
                     mode='lines',
                     line=dict(width=0),
@@ -41,7 +42,7 @@ def infection_graph(df, y_max):
 
     fig.add_scatter(x=recovered.Days,
                     y=recovered.Forecast,
-                    fillcolor='rgba(180,200,180,.4)',
+                    fillcolor=COLOR_MAP['recovered'],
                     fill='tozeroy',
                     mode='lines',
                     line=dict(width=0),
