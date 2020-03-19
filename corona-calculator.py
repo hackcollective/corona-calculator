@@ -215,7 +215,7 @@ def run_app():
         "**Play with the slider to the left to see how this changes the dynamics of disease spread**"
     )
 
-    df_base = df[~df.Status.isin(["Need Hospitalization", "Dead"])]
+    df_base = df[~df.Status.isin(["Need Hospitalization"])]
     base_graph = graphing.infection_graph(df_base, df_base.Forecast.max())
     st.warning(graph_warning)
     st.write(base_graph)
