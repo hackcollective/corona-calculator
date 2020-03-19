@@ -190,7 +190,7 @@ def run_app():
         hospital_capacity=num_hospital_beds,
     )
     true_cases_estimator = models.TrueInfectedCasesModel(
-        constants.AscertainmentRate.default
+        constants.ReportingRate.default
     )
 
     df = models.get_predictions(

@@ -117,12 +117,12 @@ Health care constants
 """
 
 
-class AscertainmentRate:
+class ReportingRate:
     # Proportion of true cases diagnosed
-    default = 0.1
+    default = 0.14
 
 
 class HospitalizationRate:
     # Cases requiring hospitalization. We multiply by the ascertainment rate because our source got their estimate
     # from the reported cases, whereas we will be using it with total cases.
-    default = 0.19 * AscertainmentRate.default
+    default = 0.19 * ReportingRate.default
