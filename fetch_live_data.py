@@ -1,4 +1,5 @@
 import datetime
+import pickle
 import shutil
 import subprocess
 from pathlib import Path
@@ -17,22 +18,43 @@ def execute_shell_command(command: List[str]):
     return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
 
-def get_latest_filepath(csv_filepaths: List[Path]) -> Tuple[Path, int, int, int]:
+def get_full_and_latest_table(csv_filepaths: List[Path]):
     """
-    Returns the file info for the latest CSV file report.
-    Example filename: 03-13-2020.csv
-    Returns a tuple of (fpath, year, month, day) for the latest report.
+    Returns two dataframes - full table (all dates), table of the latest date
     """
-    file_infos = []
+    total_df = None
+
     for fpath in csv_filepaths:
         stem_split = fpath.stem.split("-")
         month = int(stem_split[0])
         day = int(stem_split[1])
         year = int(stem_split[2])
-        file_infos.append((fpath, year, month, day))
-    # Sort the file info list
-    file_infos = sorted(file_infos, key=lambda t: (t[1], t[2], t[3]))
-    return file_infos[-1]
+        
+        curr_df = pd.read_csv(fpath)
+        country_stats_df = curr_df.groupby("Country/Region").agg(
+            {"Confirmed": "sum", "Deaths": "sum", "Recovered": "sum"}
+        )
+        
+        country_stats_df["Country/Region"] = country_stats_df.index
+        country_stats_df["Date"] = datetime.datetime(year, month, day)
+        
+        if total_df is None:
+            total_df = country_stats_df
+        else:
+            total_df = total_df.append(country_stats_df, ignore_index=True)
+
+    ## Clean data
+    # replacing Mainland china with just China
+    total_df['Country/Region'] = total_df['Country/Region'].replace('Mainland China', 'China')
+
+    # sort by date, then country name
+    total_df = total_df.sort_values(['Date', 'Country/Region'])
+    total_df = total_df.reset_index(drop=True)
+
+    ## Latest date table
+    latest_date_df = total_df[total_df['Date'] == max(total_df['Date'])].reset_index(drop=True)
+
+    return total_df, latest_date_df
 
 
 if __name__ == "__main__":
@@ -42,19 +64,17 @@ if __name__ == "__main__":
 
     # Go to daily reports directory and fetch all CSV files
     csv_filepaths = list(Path(DAILY_REPORTS_DIRPATH).glob("*.csv"))
-    # Get the filepath for latest report
-    latest_filepath, year, month, day = get_latest_filepath(csv_filepaths)
+    # Get the full and latest table
+    full_df, latest_df = get_full_and_latest_table(csv_filepaths)
 
-    # Read the report into a pandas df
-    df = pd.read_csv(latest_filepath)
-    # Aggregate the country stats
-    country_stats_df = df.groupby("Country/Region").agg(
-        {"Confirmed": "sum", "Deaths": "sum", "Recovered": "sum"}
-    )
+    save_dict_pickle = {
+        "full_table": full_df,
+        "latest_table": latest_df
+    }
 
-    data = country_stats_df.to_csv().encode()
+    pickle_byte_obj = pickle.dumps(save_dict_pickle)
 
-    success = upload_file(data, "latest_disease_data.csv")
+    success = upload_file(pickle_byte_obj, "full_and_latest_disease_data_dict_pkl")
 
     if success:
         print(f"Results pushed to S3.")

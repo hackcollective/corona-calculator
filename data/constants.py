@@ -4,6 +4,7 @@ For sources, please visit https://www.notion.so/Modelling-d650e1351bf34ceeb97c82
 """
 
 import datetime
+import pickle
 from io import StringIO
 from pathlib import Path
 
@@ -23,15 +24,21 @@ AGE_DATA = pd.read_csv(_AGE_DATA_PATH, index_col="Age Group")
 
 
 def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
-    disease_data_bytes, last_modified = download_file("latest_disease_data.csv")
-    disease_data = pd.read_csv(
-        StringIO(disease_data_bytes.decode()), index_col="Country/Region"
+    data_dict_pkl_bytes, last_modified = download_file("full_and_latest_disease_data_dict")
+    data_dict = pickle.loads(data_dict_pkl_bytes)
+
+    full_disease_data = pd.read_csv(StringIO(data_dict["full_table"].decode()))
+        
+    latest_disease_data = pd.read_csv(
+        StringIO(data_dict["latest_table"].decode()), index_col="Country/Region"
     )
+
+    
     # Rename name "US" to "United States" in disease and demographics data to match bed data
-    disease_data = disease_data.rename(index={"US": "United States"})
+    latest_disease_data = latest_disease_data.rename(index={"US": "United States"})
     demographic_data = demographic_data.rename(index={"US": "United States"})
 
-    country_data = disease_data.merge(demographic_data, on="Country/Region")
+    country_data = latest_disease_data.merge(demographic_data, on="Country/Region")
 
     # Beds are per 1000 people so we need to calculate absolute
 
