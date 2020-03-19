@@ -85,8 +85,6 @@ def age_segregated_mortality(df):
 
     df['Status'] = df['Status'].apply(lambda x: {'Need Hospitalization': 'Hospitalized but survived'}.get(x, x))
 
-    print(df.columns)
-
     fig = px.bar(
         df,
         x=df.index,
