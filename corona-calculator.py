@@ -4,6 +4,7 @@ import streamlit as st
 
 import graphing
 import models
+import utils
 from data import constants
 from interface import css
 from interface.elements import reported_vs_true_cases
@@ -283,7 +284,11 @@ def run_app():
         f"However, we've adjusted them according to the [maximum mortality rate recorded in Wuhan]() when your country's hospitals are overwhelmed: "
         f"if more people who need them lack hospital beds, more people will die."
         )
+    st.write('<hr>', unsafe_allow_html=True)
+    st.write('Like this? [Click here to share it on Twitter](https://ctt.ac/u5U39), and '
+             '[let us know your feedback via Google Form](https://forms.gle/J6ZFFgh4rVQm4y8G7)')
 
+    utils.insert_github_logo()
 
 if __name__ == "__main__":
     run_app()
