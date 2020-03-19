@@ -190,7 +190,7 @@ def run_app():
         hospital_capacity=num_hospital_beds,
     )
     true_cases_estimator = models.TrueInfectedCasesModel(
-        constants.AscertainmentRate.default
+        constants.ReportingRate.default
     )
 
     df = models.get_predictions(
@@ -207,12 +207,12 @@ def run_app():
 
     st.write(
         "The number of reported cases radically underestimates the true cases, because people do not show symptoms for "
-        "several days, not everybody gets tested, and the tests take a few days to  return results. "
+        "several days, not everybody gets tested, and the tests take a few days to return results. "
         "The extent depends upon your country's testing strategy."
-        " We estimated the above using numbers from Japan ([source](https://www.ncbi.nlm.nih.gov/pubmed/32033064))."
+        " This estimate (14% reporting) is from China ([source](https://science.sciencemag.org/content/early/2020/03/13/science.abb3221))."
     )
 
-    st.subheader("How will the disease spread?")
+    st.subheader("How will my actions affect the spread?")
     st.write(
         "The critical factor for controlling spread is how many others infected people interact with each day. "
         "This has a dramatic effect upon the dynamics of the disease. "
@@ -225,14 +225,6 @@ def run_app():
     base_graph = graphing.infection_graph(df_base, df_base.Forecast.max())
     st.warning(graph_warning)
     st.write(base_graph)
-
-    # st.write(
-    #     "Note that we use a fixed estimate of the mortality rate here, of 0.6%."
-    #     "In reality, the mortality rate will be highly dependent upon the load upon the healthcare system and "
-    #     "the availability of treatment. Our models also account for a higher death rate for patients who are in critical"
-    #     " condition but cannot get access to medical care because the system is overloaded. We use a rate of 5.8%, which is the "
-    #     "highest estimate reported in Wuhan by the WHO. This is probably an underestimate."
-    # )
 
     st.subheader("How will this affect my healthcare system?")
     st.write(
@@ -282,13 +274,12 @@ def run_app():
     )
     st.write(fig)
 
-    # TODO psteeves make sure this links to the correct mortality numbers from Wuhan, or whatever we're using
     st.write(
         f"Parameters by age group, including demographic distribution, are worldwide numbers so they may be slightly different in your country.")
     st.write(
         f"We've used mortality rates from this [recent paper from Imperial College](https://www.imperial.ac.uk/media/imperial-college/medicine/sph/ide/gida-fellowships/Imperial-College-COVID19-NPI-modelling-16-03-2020.pdf?fbclid=IwAR3TzdPTcLiOZN5r2dMd6_08l8kG0Mmr0mgP3TdzimpqB8H96T47ECBUfTM). "
-        f"However, we've adjusted them according to the [maximum mortality rate recorded in Wuhan]() when your country's hospitals are overwhelmed: "
-        f"if more people who need them lack hospital beds, more people will die."
+        f"However, we've adjusted them according to the [maximum mortality rate recorded in Wuhan](https://wwwnc.cdc.gov/eid/article/26/6/20-0233_article)"
+        f" when your country's hospitals are overwhelmed: if more people who need them lack hospital beds, more people will die."
         )
     st.write('<hr>', unsafe_allow_html=True)
     st.write('Like this? [Click here to share it on Twitter](https://ctt.ac/u5U39), and '
