@@ -75,6 +75,7 @@ def infection_graph(df, y_max):
                     name='Infected',
                     opacity=.5)
     fig.update_yaxes(range=[0, y_max])
+    fig.layout.update(xaxis_title="Days")
     _set_legends(fig)
     return fig
 

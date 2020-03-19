@@ -12,6 +12,8 @@ _STATUSES_TO_SHOW = [
     "Recovered",
 ]
 
+_DEFAULT_TIME_SCALE = 12 * 2 * 31  # 24 months
+
 
 def get_predictions(
     cases_estimator,
@@ -20,7 +22,6 @@ def get_predictions(
     num_recovered,
     num_deaths,
     area_population,
-    max_days,
 ):
 
     true_cases = cases_estimator.predict(num_diagnosed)
@@ -31,10 +32,10 @@ def get_predictions(
         infected=true_cases,
         recovered=num_recovered,
         dead=num_deaths,
-        time_steps=max_days,
+        num_days=_DEFAULT_TIME_SCALE,
     )
 
-    num_entries = max_days + 1
+    num_entries = len(predictions["Infected"])
 
     # Have to use the long format to make plotly express happy
     df = pd.DataFrame(
@@ -136,14 +137,14 @@ class SIRModel:
         self._hospitalization_rate = hospitalization_rate
         self._hospital_capacity = hospital_capacity
 
-    def predict(self, susceptible, infected, recovered, dead, time_steps=100):
+    def predict(self, susceptible, infected, recovered, dead, num_days):
         """
         Run simulation.
         :param susceptible: Number of susceptible people in population.
         :param infected: Number of infected people in population.
         :param recovered: Number of recovered people in population.
         :param dead: Number of dead people in the population
-        :param time_steps: Time steps to run simulation for
+        :param num_days: Number of days to forecast.
         :return: List of values for S, I, R over time steps
         """
         population = susceptible + infected + recovered + dead
@@ -154,7 +155,7 @@ class SIRModel:
         D = [int(dead)]
         H = [round(self._hospitalization_rate * infected)]
 
-        for t in range(time_steps):
+        for t in range(num_days):
 
             # There is an additional chance of dying if people are critically ill
             # and have no access to the medical system.
@@ -188,10 +189,15 @@ class SIRModel:
             D.append(round(d_t))
             H.append(round(h_t))
 
+        # Days with no change in I
+        days_to_clip = [I[-i] == I[-i - 1] for i in range(1, len(I))]
+        index_to_clip = days_to_clip.index(False)
+        print(index_to_clip)
+
         return {
-            "Susceptible": S,
-            "Infected": I,
-            "Recovered": R,
-            "Dead": D,
-            "Need Hospitalization": H,
+            "Susceptible": S[:-index_to_clip],
+            "Infected": I[:-index_to_clip],
+            "Recovered": R[:-index_to_clip],
+            "Dead": D[:-index_to_clip],
+            "Need Hospitalization": H[:-index_to_clip],
         }
