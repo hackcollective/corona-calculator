@@ -14,16 +14,23 @@ _STATUSES_TO_SHOW = [
 
 
 def get_predictions(
-    cases_estimator, sir_model, num_diagnosed, area_population, max_days
+    cases_estimator,
+    sir_model,
+    num_diagnosed,
+    num_recovered,
+    num_deaths,
+    area_population,
+    max_days,
 ):
 
     true_cases = cases_estimator.predict(num_diagnosed)
 
     # For now assume removed starts at 0. Doesn't have a huge effect on the model
     predictions = sir_model.predict(
-        susceptible=area_population - true_cases,
+        susceptible=area_population - true_cases - num_recovered - num_deaths,
         infected=true_cases,
-        removed=0,
+        recovered=num_recovered,
+        dead=num_deaths,
         time_steps=max_days,
     )
 
@@ -129,21 +136,22 @@ class SIRModel:
         self._hospitalization_rate = hospitalization_rate
         self._hospital_capacity = hospital_capacity
 
-    def predict(self, susceptible, infected, removed, time_steps=100):
+    def predict(self, susceptible, infected, recovered, dead, time_steps=100):
         """
         Run simulation.
         :param susceptible: Number of susceptible people in population.
         :param infected: Number of infected people in population.
-        :param removed: Number of recovered people in population.
+        :param recovered: Number of recovered people in population.
+        :param dead: Number of dead people in the population
         :param time_steps: Time steps to run simulation for
         :return: List of values for S, I, R over time steps
         """
-        population = susceptible + infected + removed
+        population = susceptible + infected + recovered + dead
 
         S = [int(susceptible)]
         I = [int(infected)]
-        R = [int(removed)]
-        D = [0]
+        R = [int(recovered)]
+        D = [int(dead)]
         H = [round(self._hospitalization_rate * infected)]
 
         for t in range(time_steps):
