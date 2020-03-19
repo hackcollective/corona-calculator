@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 from utils import COLOR_MAP
 
@@ -27,7 +28,33 @@ def plot_true_versus_confirmed(confirmed, predicted):
 
 def infection_graph(df, y_max):
     # We cannot explicitly set graph width here, have to do it as injected css: see interface.css
-    fig = px.line(df, x="Days", y="Forecast", color="Status", template=TEMPLATE)
+    fig = go.Figure(layout=dict(template=TEMPLATE))
+    susceptible, infected, recovered = df.loc[df.Status =='Susceptible'], df.loc[df.Status =='Infected'], df.loc[df.Status =='Recovered']
+    fig.add_scatter(x=susceptible.Days, y=susceptible.Forecast,
+                    fillcolor='rgba(100,100,100,.2)',
+                    fill='tozeroy',
+                    mode='lines',
+                    line=dict(width=0),
+                    name='Susceptible',
+                    opacity=.5)
+
+    fig.add_scatter(x=recovered.Days,
+                    y=recovered.Forecast,
+                    fillcolor='rgba(200,200,200,.2)',
+                    fill='tozeroy',
+                    mode='lines',
+                    line=dict(width=0),
+                    name='Recovered',
+                    opacity=.5)
+
+    fig.add_scatter(x=infected.Days,
+                    y=infected.Forecast,
+                    fillcolor='#FFA000',
+                    fill='tozeroy',
+                    mode='lines',
+                    line=dict(width=0),
+                    name='Infected',
+                    opacity=.5)
     fig.update_yaxes(range=[0, y_max])
     _set_legends(fig)
     return fig
