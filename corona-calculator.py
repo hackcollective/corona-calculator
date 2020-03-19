@@ -170,9 +170,15 @@ def run_app():
     sidebar = Sidebar(countries)
     country = sidebar.country
     country_data = countries.country_data[country]
+    _historical_df = countries.historical_country_data
+    historical_data = _historical_df.loc[_historical_df['Country/Region']==country]
     number_cases_confirmed = country_data["Confirmed"]
     population = country_data["Population"]
     num_hospital_beds = country_data["Num Hospital Beds"]
+
+    st.subheader(f'How has the disease spread in {country}?')
+    fig = graphing.plot_historical_data(historical_data)
+    st.write(fig)
 
     sir_model = models.SIRModel(
         transmission_rate_per_contact=constants.TransmissionRatePerContact.default,
@@ -196,7 +202,7 @@ def run_app():
     )
 
     reported_vs_true_cases(
-        number_cases_confirmed, true_cases_estimator.predict(number_cases_confirmed)
+        int(number_cases_confirmed), true_cases_estimator.predict(number_cases_confirmed)
     )
 
     st.write(

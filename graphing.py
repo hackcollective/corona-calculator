@@ -11,6 +11,16 @@ def _set_legends(fig):
     fig.layout.update(legend_orientation="h")
 
 
+def plot_historical_data(df):
+    # Convert wide to long
+
+    df = pd.melt(df, id_vars='Date', value_vars=['Confirmed', 'Deaths', 'Recovered'], var_name='Status', value_name='Number')
+
+    fig = px.line(df, x='Date', y='Number', color='Status', template=TEMPLATE)
+
+    return fig
+
+
 def plot_true_versus_confirmed(confirmed, predicted):
     df = pd.DataFrame(
         {
