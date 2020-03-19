@@ -11,7 +11,8 @@ from pathlib import Path
 import pandas as pd
 
 from data.preprocessing import preprocess_bed_data
-from s3_utils import download_file
+from s3_utils import download_file, S3_DISEASE_DATA_OBJ_NAME
+
 
 _DATA_DIR = Path(__file__).parent
 _DEMOGRAPHICS_DATA_PATH = _DATA_DIR / "demographics.csv"
@@ -24,15 +25,13 @@ AGE_DATA = pd.read_csv(_AGE_DATA_PATH, index_col="Age Group")
 
 
 def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
-    data_dict_pkl_bytes, last_modified = download_file("full_and_latest_disease_data_dict")
+    data_dict_pkl_bytes, last_modified = download_file(S3_DISEASE_DATA_OBJ_NAME)
     data_dict = pickle.loads(data_dict_pkl_bytes)
 
-    full_disease_data = pd.read_csv(StringIO(data_dict["full_table"].decode()))
-        
-    latest_disease_data = pd.read_csv(
-        StringIO(data_dict["latest_table"].decode()), index_col="Country/Region"
-    )
+    full_disease_data = data_dict["full_table"]
+    latest_disease_data = data_dict["latest_table"]
 
+    latest_disease_data = latest_disease_data.set_index("Country/Region", drop=True)
     
     # Rename name "US" to "United States" in disease and demographics data to match bed data
     latest_disease_data = latest_disease_data.rename(index={"US": "United States"})

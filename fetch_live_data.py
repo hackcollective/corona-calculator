@@ -7,7 +7,7 @@ from typing import List, Tuple
 
 import pandas as pd
 
-from s3_utils import upload_file
+from s3_utils import upload_file, S3_DISEASE_DATA_OBJ_NAME
 
 GITHUB_REPO = "https://github.com/CSSEGISandData/COVID-19.git"
 REPO_DIRPATH = "COVID-19"
@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
     pickle_byte_obj = pickle.dumps(save_dict_pickle)
 
-    success = upload_file(pickle_byte_obj, "full_and_latest_disease_data_dict_pkl")
+    success = upload_file(pickle_byte_obj, S3_DISEASE_DATA_OBJ_NAME)
 
     if success:
         print(f"Results pushed to S3.")
