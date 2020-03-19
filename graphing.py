@@ -28,28 +28,25 @@ def plot_true_versus_confirmed(confirmed, predicted):
 
 def infection_graph(df, y_max):
     # We cannot explicitly set graph width here, have to do it as injected css: see interface.css
-    # fig = go.Figure(layout=dict(template=TEMPLATE))
-    subset_df = df[df.Status.isin(['Recovered', 'Dead'])]
-    subset_df.sort_values(by='Status', ascending=False, inplace=True)
-    fig = px.area(subset_df, x='Days', y='Forecast', color='Status', color_discrete_sequence=["lightgrey", "red"],
-                  template=TEMPLATE)
+    fig = go.Figure(layout=dict(template=TEMPLATE))
+
     susceptible, infected, recovered = df.loc[df.Status =='Susceptible'], df.loc[df.Status =='Infected'], df.loc[df.Status =='Recovered']
-    # fig.add_scatter(x=susceptible.Days, y=susceptible.Forecast,
-    #                 fillcolor='rgba(100,100,100,.2)',
-    #                 fill='tozeroy',
-    #                 mode='lines',
-    #                 line=dict(width=0),
-    #                 name='Susceptible',
-    #                 opacity=.5)
-    # #
-    # fig.add_scatter(x=recovered.Days,
-    #                 y=recovered.Forecast,
-    #                 fillcolor='rgba(200,200,200,.2)',
-    #                 fill='tozeroy',
-    #                 mode='lines',
-    #                 line=dict(width=0),
-    #                 name='Recovered',
-    #                 opacity=.5)
+    fig.add_scatter(x=susceptible.Days, y=susceptible.Forecast,
+                    fillcolor='rgba(230,230,230,.2)',
+                    fill='tozeroy',
+                    mode='lines',
+                    line=dict(width=0),
+                    name='Uninfected',
+                    opacity=.5)
+
+    fig.add_scatter(x=recovered.Days,
+                    y=recovered.Forecast,
+                    fillcolor='rgba(180,200,180,.2)',
+                    fill='tozeroy',
+                    mode='lines',
+                    line=dict(width=0),
+                        name='Recovered',
+                    opacity=.5)
 
     fig.add_scatter(x=infected.Days,
                     y=infected.Forecast,
