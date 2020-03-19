@@ -96,8 +96,8 @@ class MortalityRate:
 class CriticalDeathRate:
     # Death rate of critically ill patients who don't have access to a hospital bed.
     # This is the max reported from Wuhan:
-    # https://www.who.int/docs/default-source/coronaviruse/who-china-joint-mission-on-covid-19-final-report.pdf
-    default = 0.056
+    # https://wwwnc.cdc.gov/eid/article/26/6/20-0233_article
+    default = 0.122
 
 
 class TransmissionRatePerContact:
