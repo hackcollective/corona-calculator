@@ -5,6 +5,8 @@ from io import BytesIO
 import boto3
 from botocore.exceptions import ClientError
 
+S3_DISEASE_DATA_OBJ_NAME = "full_and_latest_disease_data_dict_pkl"
+
 _S3_ACCESS_KEY = os.environ["AWSAccessKeyId"].replace("\r", "")
 _S3_SECRET_KEY = os.environ["AWSSecretKey"].replace("\r", "")
 _S3_BUCKET_NAME = "coronavirus-calculator-data"
