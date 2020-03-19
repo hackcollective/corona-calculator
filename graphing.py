@@ -51,12 +51,14 @@ def age_segregated_mortality(df):
         template=TEMPLATE,
         opacity=0.7,
         color_discrete_sequence=["pink", "red"],
+        barmode='group',
     )
     fig.layout.update(
         xaxis_title="",
         yaxis_title="",
         font=dict(family="Arial", size=15, color=COLOR_MAP["default"]),
     )
+    _set_legends(fig)
     return fig
 
 
