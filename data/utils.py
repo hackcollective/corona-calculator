@@ -11,8 +11,8 @@ import pandas as pd
 from botocore.exceptions import ClientError
 
 from data import constants
-from data.constants import _READABLE_DATESTRING_FORMAT, _S3_ACCESS_KEY, _S3_SECRET_KEY, _S3_BUCKET_NAME, \
-    _S3_DISEASE_DATA_OBJ_NAME, DISEASE_DATA_GITHUB_REPO, REPO_DIRPATH, DAILY_REPORTS_DIRPATH, DEMOGRAPHIC_DATA, BED_DATA
+from data.constants import READABLE_DATESTRING_FORMAT, S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET_NAME, \
+    S3_DISEASE_DATA_OBJ_NAME, DISEASE_DATA_GITHUB_REPO, REPO_DIRPATH, DAILY_REPORTS_DIRPATH, DEMOGRAPHIC_DATA, BED_DATA
 
 
 def execute_shell_command(command: List[str]):
@@ -89,12 +89,12 @@ def download_data():
 def _configure_s3_client():
     # Upload the file
     s3_client = boto3.client(
-        "s3", aws_access_key_id=_S3_ACCESS_KEY, aws_secret_access_key=_S3_SECRET_KEY
+        "s3", aws_access_key_id=S3_ACCESS_KEY, aws_secret_access_key=S3_SECRET_KEY
     )
     return s3_client
 
 
-def upload_data_to_s3(data: bytes, object_name: str = _S3_DISEASE_DATA_OBJ_NAME):
+def upload_data_to_s3(data: bytes, object_name: str = S3_DISEASE_DATA_OBJ_NAME):
     """
     Upload a file to an S3 bucket
     :param data: Bytes to upload.
@@ -104,14 +104,14 @@ def upload_data_to_s3(data: bytes, object_name: str = _S3_DISEASE_DATA_OBJ_NAME)
     buf = BytesIO(data)
     s3_client = _configure_s3_client()
     try:
-        s3_client.put_object(Body=buf, Bucket=_S3_BUCKET_NAME, Key=object_name)
+        s3_client.put_object(Body=buf, Bucket=S3_BUCKET_NAME, Key=object_name)
     except ClientError as e:
         print(e)
         return False
     return True
 
 
-def download_data_from_s3(object_name: str = _S3_DISEASE_DATA_OBJ_NAME):
+def download_data_from_s3(object_name: str = S3_DISEASE_DATA_OBJ_NAME):
     """
     Download a file from S3 bucket.
     :param object_name: Name of object to download.
@@ -119,13 +119,13 @@ def download_data_from_s3(object_name: str = _S3_DISEASE_DATA_OBJ_NAME):
     """
     s3_client = _configure_s3_client()
     try:
-        download = s3_client.get_object(Key=object_name, Bucket=_S3_BUCKET_NAME)
+        download = s3_client.get_object(Key=object_name, Bucket=S3_BUCKET_NAME)
     except ClientError:
         return None
     content = download["Body"].read()
 
     # e.g. Sunday 30 November 2014
-    last_modified = download["LastModified"].strftime(_READABLE_DATESTRING_FORMAT)
+    last_modified = download["LastModified"].strftime(READABLE_DATESTRING_FORMAT)
     return content, last_modified
 
 
@@ -134,7 +134,7 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
     objects = download_data_from_s3()
     if objects is None:
         data_dict = download_data()
-        last_modified = datetime.datetime.now().strftime(_READABLE_DATESTRING_FORMAT)
+        last_modified = datetime.datetime.now().strftime(READABLE_DATESTRING_FORMAT)
     else:
         data_dict_pkl_bytes, last_modified = objects
         data_dict = pickle.loads(data_dict_pkl_bytes)
@@ -165,7 +165,7 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
 
 
 def _check_if_aws_credentials_present():
-    if len(constants._S3_ACCESS_KEY) is 0:
+    if len(constants.S3_ACCESS_KEY) is 0:
         print('No S3 credentials present, using local file storage. '
               'This make some time the first time you run. We will clone '
               'the John Hopkins data repo (COVID-19) into this one.')

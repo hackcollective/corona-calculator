@@ -10,21 +10,21 @@ import pandas as pd
 
 from data.preprocessing import preprocess_bed_data
 
-_READABLE_DATESTRING_FORMAT = "%A %d %B %Y, %H:%M %Z"
-_S3_ACCESS_KEY = os.environ.get("AWSAccessKeyId", "").replace("\r", "")
-_S3_SECRET_KEY = os.environ.get("AWSSecretKey", "").replace("\r", "")
-_S3_BUCKET_NAME = "coronavirus-calculator-data"
-_S3_DISEASE_DATA_OBJ_NAME = "full_and_latest_disease_data_dict_v2"
+READABLE_DATESTRING_FORMAT = "%A %d %B %Y, %H:%M %Z"
+S3_ACCESS_KEY = os.environ.get("AWSAccessKeyId", "").replace("\r", "")
+S3_SECRET_KEY = os.environ.get("AWSSecretKey", "").replace("\r", "")
+S3_BUCKET_NAME = "coronavirus-calculator-data"
+S3_DISEASE_DATA_OBJ_NAME = "full_and_latest_disease_data_dict_v2"
 DISEASE_DATA_GITHUB_REPO = "https://github.com/CSSEGISandData/COVID-19.git"
 REPO_DIRPATH = "COVID-19"
 DAILY_REPORTS_DIRPATH = "COVID-19/csse_covid_19_data/csse_covid_19_daily_reports"
-_DATA_DIR = Path(__file__).parent
-_DEMOGRAPHICS_DATA_PATH = _DATA_DIR / "demographics.csv"
-_BED_DATA_PATH = _DATA_DIR / "world_bank_bed_data.csv"
-_AGE_DATA_PATH = _DATA_DIR / "age_data.csv"
-DEMOGRAPHIC_DATA = pd.read_csv(_DEMOGRAPHICS_DATA_PATH, index_col="Country/Region")
-BED_DATA = preprocess_bed_data(_BED_DATA_PATH)
-AGE_DATA = pd.read_csv(_AGE_DATA_PATH, index_col="Age Group")
+DATA_DIR = Path(__file__).parent
+DEMOGRAPHICS_DATA_PATH = DATA_DIR / "demographics.csv"
+BED_DATA_PATH = DATA_DIR / "world_bank_bed_data.csv"
+AGE_DATA_PATH = DATA_DIR / "age_data.csv"
+DEMOGRAPHIC_DATA = pd.read_csv(DEMOGRAPHICS_DATA_PATH, index_col="Country/Region")
+BED_DATA = preprocess_bed_data(BED_DATA_PATH)
+AGE_DATA = pd.read_csv(AGE_DATA_PATH, index_col="Age Group")
 
 
 class AgeData:
