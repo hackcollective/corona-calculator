@@ -153,7 +153,7 @@ def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed)
         yaxis_title="",
         yaxis_showticklabels=True,
         font=dict(family="Arial", size=15, color=COLOR_MAP["default"]),
-        title=dict(text=f"Peak Occupancy<br>when meeting {int(contact_rate)} people per day"),
+        title=dict(text=f"Peak occupancy<br>when meeting {int(contact_rate)} people per day"),
     )
     fig.update_traces(textposition="outside", cliponaxis=False)
     _set_title(fig)
