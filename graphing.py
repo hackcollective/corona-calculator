@@ -10,7 +10,7 @@ def _set_title(fig):
     fig.layout.update(title=dict(y=0.9, x=0.5, xanchor='center', yanchor='top'))
 
 def _set_legends(fig):
-    fig.layout.update(legend=dict(x=0, y=-0.05))
+    fig.layout.update(legend=dict(x=0, y=-0.075))
     fig.layout.update(legend_orientation="h")
 
 
@@ -158,3 +158,9 @@ def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed,
     fig.update_traces(textposition="outside", cliponaxis=False)
     _set_title(fig)
     return fig
+
+if __name__=='__main__':
+    df = pd.DataFrame({'Status': ['Susceptible', 'Infected', 'Recovered', 'Susceptible', 'Infected', 'Recovered'],
+                       'Forecast': range(6), 'Days': range(6)})
+    
+    infection_graph(df, 8, 5).show()
