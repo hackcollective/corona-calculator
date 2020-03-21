@@ -10,7 +10,7 @@ def _set_title(fig):
     fig.layout.update(title=dict(y=0.9, x=0.5, xanchor='center', yanchor='top'))
 
 def _set_legends(fig):
-    fig.layout.update(legend=dict(x=0, y=-0.1))
+    fig.layout.update(legend=dict(x=0, y=-0.175))
     fig.layout.update(legend_orientation="h")
 
 
