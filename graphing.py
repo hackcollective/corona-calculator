@@ -6,6 +6,8 @@ from utils import COLOR_MAP
 
 TEMPLATE = "plotly_white"
 
+def _set_title(fig):
+    fig.layout.update(title=dict(y=0.9, x=0.5, xanchor='center', yanchor='top'))
 
 def _set_legends(fig):
     fig.layout.update(legend=dict(x=0, y=-0.05))
@@ -76,8 +78,10 @@ def infection_graph(df, y_max, contact_rate):
                     opacity=.5)
     fig.update_yaxes(range=[0, y_max])
     fig.layout.update(xaxis_title="Number of days from now")
-    fig.layout.update(title={'text': f"Disease spread\nwhen meeting {int(contact_rate)} people per day", 'y':0.9, 'x':0.5, 'xanchor': 'center', 'yanchor': 'top'})
+    fig.layout.update(title=dict(text=f"Disease spread<br>when meeting {int(contact_rate)} people per day"))
     _set_legends(fig)
+    _set_title(fig)
+
     return fig
 
 
@@ -108,8 +112,10 @@ def age_segregated_mortality(df):
         xaxis_title="",
         yaxis_title="",
         font=dict(family="Arial", size=15, color=COLOR_MAP["default"]),
+        title=dict(text=f"Casualties and hospitalizations by age group<br>when meeting {int(contact_rate)} people per day"),
     )
     _set_legends(fig)
+    _set_title(fig)
     return fig
 
 
@@ -147,7 +153,8 @@ def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed)
         yaxis_title="",
         yaxis_showticklabels=True,
         font=dict(family="Arial", size=15, color=COLOR_MAP["default"]),
+        title=dict(text=f"Peak Occupancy<br>when meeting {int(contact_rate)} people per day"),
     )
     fig.update_traces(textposition="outside", cliponaxis=False)
-
+    _set_title(fig)
     return fig
