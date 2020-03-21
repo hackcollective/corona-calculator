@@ -158,9 +158,3 @@ def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed,
     fig.update_traces(textposition="outside", cliponaxis=False)
     _set_title(fig)
     return fig
-
-if __name__=='__main__':
-    df = pd.DataFrame({'Status': ['Susceptible', 'Infected', 'Recovered', 'Susceptible', 'Infected', 'Recovered'],
-                       'Forecast': range(6), 'Days': range(6)})
-    
-    infection_graph(df, 8, 5).show()
