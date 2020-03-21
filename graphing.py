@@ -43,7 +43,7 @@ def plot_true_versus_confirmed(confirmed, predicted):
     return fig
 
 
-def infection_graph(df, y_max):
+def infection_graph(df, y_max, contact_rate):
 
     # We cannot explicitly set graph width here, have to do it as injected css: see interface.css
     fig = go.Figure(layout=dict(template=TEMPLATE))
@@ -76,6 +76,7 @@ def infection_graph(df, y_max):
                     opacity=.5)
     fig.update_yaxes(range=[0, y_max])
     fig.layout.update(xaxis_title="Number of days from now")
+    fig.layout.update(title={'text': f"Disease spread\nwhen meeting {int(contact_rate)} people per day", 'y':0.9, 'x':0.5, 'xanchor': 'center', 'yanchor': 'top'})
     _set_legends(fig)
     return fig
 
