@@ -8,7 +8,7 @@ TEMPLATE = "plotly_white"
 
 
 def _set_legends(fig):
-    fig.layout.update(legend=dict(x=-0.1, y=1.2))
+    fig.layout.update(legend=dict(x=0, y=-0.05))
     fig.layout.update(legend_orientation="h")
 
 
