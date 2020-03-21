@@ -10,8 +10,6 @@ from interface import css
 from interface.elements import reported_vs_true_cases
 from utils import COLOR_MAP, generate_html, graph_warning
 
-# estimates from https://github.com/midas-network/COVID-19/tree/master/parameter_estimates/2019_novel_coronavirus
-
 NOTION_MODELLING_DOC = (
     "https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc"
 )
@@ -48,8 +46,8 @@ class Sidebar:
 
         st.sidebar.markdown(
             body=generate_html(
-                text=f'Population: {int(country_data["Population"]):,}<br>Infected: {int(country_data["Confirmed"])}<br>'
-                f'Recovered: {int(country_data["Recovered"])}<br>Dead: {int(country_data["Deaths"])}',
+                text=f'Population: {int(country_data["Population"]):,}<br>Infected: {int(country_data["Confirmed"]):,}<br>'
+                f'Recovered: {int(country_data["Recovered"]):,}<br>Dead: {int(country_data["Deaths"]):,}',
                 line_height=0,
                 font_family="Arial",
                 font_size="0.9rem",
@@ -153,7 +151,7 @@ def run_app():
     country = sidebar.country
     country_data = countries.country_data[country]
     _historical_df = countries.historical_country_data
-    historical_data = _historical_df.loc[_historical_df["Country/Region"] == country]
+    historical_data = _historical_df.loc[_historical_df.index == country]
     number_cases_confirmed = country_data["Confirmed"]
     population = country_data["Population"]
     num_hospital_beds = country_data["Num Hospital Beds"]

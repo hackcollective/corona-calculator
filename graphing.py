@@ -15,14 +15,17 @@ def _set_legends(fig):
 def plot_historical_data(df):
     # Convert wide to long
 
-    df = pd.melt(df,
-                 id_vars='Date',
-                 value_vars=['Confirmed', 'Deaths', 'Recovered'],
-                 var_name='Status',
-                 value_name='Number',
-                 )
+    df = pd.melt(
+        df,
+        id_vars="Date",
+        value_vars=["Confirmed", "Deaths", "Recovered"],
+        var_name="Status",
+        value_name="Number",
+    )
 
-    fig = px.scatter(df, x='Date', y='Number', color='Status', template=TEMPLATE, opacity=0.8   )
+    fig = px.scatter(
+        df, x="Date", y="Number", color="Status", template=TEMPLATE, opacity=0.8
+    )
 
     _set_legends(fig)
 
@@ -48,32 +51,43 @@ def infection_graph(df, y_max):
     # We cannot explicitly set graph width here, have to do it as injected css: see interface.css
     fig = go.Figure(layout=dict(template=TEMPLATE))
 
-    susceptible, infected, recovered = df.loc[df.Status =='Susceptible'], df.loc[df.Status =='Infected'], df.loc[df.Status =='Recovered']
-    fig.add_scatter(x=susceptible.Days, y=susceptible.Forecast,
-                    fillcolor=COLOR_MAP['susceptible'],
-                    fill='tozeroy',
-                    mode='lines',
-                    line=dict(width=0),
-                    name='Uninfected',
-                    opacity=.5)
+    susceptible, infected, recovered = (
+        df.loc[df.Status == "Susceptible"],
+        df.loc[df.Status == "Infected"],
+        df.loc[df.Status == "Recovered"],
+    )
+    fig.add_scatter(
+        x=susceptible.Days,
+        y=susceptible.Forecast,
+        fillcolor=COLOR_MAP["susceptible"],
+        fill="tozeroy",
+        mode="lines",
+        line=dict(width=0),
+        name="Uninfected",
+        opacity=0.5,
+    )
 
-    fig.add_scatter(x=recovered.Days,
-                    y=recovered.Forecast,
-                    fillcolor=COLOR_MAP['recovered'],
-                    fill='tozeroy',
-                    mode='lines',
-                    line=dict(width=0),
-                        name='Recovered',
-                    opacity=.5)
+    fig.add_scatter(
+        x=recovered.Days,
+        y=recovered.Forecast,
+        fillcolor=COLOR_MAP["recovered"],
+        fill="tozeroy",
+        mode="lines",
+        line=dict(width=0),
+        name="Recovered",
+        opacity=0.5,
+    )
 
-    fig.add_scatter(x=infected.Days,
-                    y=infected.Forecast,
-                    fillcolor='#FFA000',
-                    fill='tozeroy',
-                    mode='lines',
-                    line=dict(width=0),
-                    name='Infected',
-                    opacity=.5)
+    fig.add_scatter(
+        x=infected.Days,
+        y=infected.Forecast,
+        fillcolor="#FFA000",
+        fill="tozeroy",
+        mode="lines",
+        line=dict(width=0),
+        name="Infected",
+        opacity=0.5,
+    )
     fig.update_yaxes(range=[0, y_max])
     fig.layout.update(xaxis_title="Days")
     _set_legends(fig)
@@ -93,6 +107,7 @@ def age_segregated_mortality(df):
 
     df['Status'] = df['Status'].apply(lambda x: {'Need Hospitalization': 'Hospitalized'}.get(x, x))
 
+
     fig = px.bar(
         df,
         x=df.index,
@@ -101,7 +116,7 @@ def age_segregated_mortality(df):
         template=TEMPLATE,
         opacity=0.7,
         color_discrete_sequence=["pink", "red"],
-        barmode='group',
+        barmode="group",
     )
     fig.layout.update(
         xaxis_title="",
@@ -117,7 +132,10 @@ def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed)
     A horizontal bar chart comparing # of beds available compared to 
     max number number of beds needed
     """
-    num_beds_available, max_num_beds_needed = int(num_beds_available), int(max_num_beds_needed)
+    num_beds_available, max_num_beds_needed = (
+        int(num_beds_available),
+        int(max_num_beds_needed),
+    )
 
     df = pd.DataFrame(
         {
@@ -125,7 +143,7 @@ def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed)
             "Value": [num_beds_available, max_num_beds_needed],
             "Text": [f"{num_beds_available:,}  ", f"{max_num_beds_needed:,}  "],
             "Color": ["b", "r"],
-        },
+        }
     )
     fig = px.bar(
         df,
