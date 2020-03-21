@@ -1,5 +1,4 @@
 import datetime
-import os
 import pickle
 import shutil
 import subprocess
@@ -11,27 +10,8 @@ import boto3
 import pandas as pd
 from botocore.exceptions import ClientError
 
-from data.preprocessing import preprocess_bed_data
-
-_READABLE_DATESTRING_FORMAT = "%A %d %B %Y, %H:%M %Z"
-
-_S3_ACCESS_KEY = os.environ.get("AWSAccessKeyId", "").replace("\r", "")
-_S3_SECRET_KEY = os.environ.get("AWSSecretKey", "").replace("\r", "")
-_S3_BUCKET_NAME = "coronavirus-calculator-data"
-_S3_DISEASE_DATA_OBJ_NAME = "full_and_latest_disease_data_dict_v2"
-
-
-DISEASE_DATA_GITHUB_REPO = "https://github.com/CSSEGISandData/COVID-19.git"
-REPO_DIRPATH = "COVID-19"
-DAILY_REPORTS_DIRPATH = "COVID-19/csse_covid_19_data/csse_covid_19_daily_reports"
-
-_DATA_DIR = Path(__file__).parent
-_DEMOGRAPHICS_DATA_PATH = _DATA_DIR / "demographics.csv"
-_BED_DATA_PATH = _DATA_DIR / "world_bank_bed_data.csv"
-_AGE_DATA_PATH = _DATA_DIR / "age_data.csv"
-DEMOGRAPHIC_DATA = pd.read_csv(_DEMOGRAPHICS_DATA_PATH, index_col="Country/Region")
-BED_DATA = preprocess_bed_data(_BED_DATA_PATH)
-AGE_DATA = pd.read_csv(_AGE_DATA_PATH, index_col="Age Group")
+from data.constants import _READABLE_DATESTRING_FORMAT, _S3_ACCESS_KEY, _S3_SECRET_KEY, _S3_BUCKET_NAME, \
+    _S3_DISEASE_DATA_OBJ_NAME, DISEASE_DATA_GITHUB_REPO, REPO_DIRPATH, DAILY_REPORTS_DIRPATH, DEMOGRAPHIC_DATA, BED_DATA
 
 
 def execute_shell_command(command: List[str]):

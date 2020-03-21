@@ -1,4 +1,5 @@
 import datetime
+import os
 
 import streamlit as st
 
@@ -102,6 +103,9 @@ def _fetch_country_data():
     timestamp = datetime.datetime.utcnow()
     return constants.Countries(timestamp=timestamp)
 
+
+def _check_if_AWS_credentials_present():
+    os.getenv('')
 
 def run_app():
     css.hide_menu()
