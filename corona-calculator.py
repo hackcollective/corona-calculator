@@ -206,7 +206,7 @@ def run_app():
     )
 
     df_base = df[~df.Status.isin(["Need Hospitalization"])]
-    base_graph = graphing.infection_graph(df_base, df_base.Forecast.max())
+    base_graph = graphing.infection_graph(df_base, df_base.Forecast.max(), sidebar.contact_rate)
     st.warning(graph_warning)
     st.write(base_graph)
 
