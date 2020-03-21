@@ -85,7 +85,7 @@ def infection_graph(df, y_max, contact_rate):
     return fig
 
 
-def age_segregated_mortality(df):
+def age_segregated_mortality(df, contact_rate):
     df = df.rename(index={ag: "0-30" for ag in ["0-9", "10-19", "20-29"]}).reset_index()
     df = pd.melt(df, id_vars="Age Group", var_name="Status", value_name="Forecast")
     # Add up values for < 30
@@ -119,7 +119,7 @@ def age_segregated_mortality(df):
     return fig
 
 
-def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed):
+def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed, contact_rate):
     """
     A horizontal bar chart comparing # of beds available compared to 
     max number number of beds needed

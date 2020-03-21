@@ -231,7 +231,7 @@ def run_app():
     percent_beds_at_peak = min(100 * num_hospital_beds / peak_occupancy, 100)
 
     num_beds_comparison_chart = graphing.num_beds_occupancy_comparison_chart(
-        num_beds_available=approx_num_beds, max_num_beds_needed=peak_occupancy
+        num_beds_available=approx_num_beds, max_num_beds_needed=peak_occupancy, contact_rate=sidebar.contact_rate
     )
 
     st.write(num_beds_comparison_chart)
@@ -257,7 +257,7 @@ def run_app():
 
     outcomes_by_age_group = models.get_status_by_age_group(num_dead, num_recovered)
     fig = graphing.age_segregated_mortality(
-        outcomes_by_age_group.loc[:, ["Dead", "Need Hospitalization"]]
+        outcomes_by_age_group.loc[:, ["Dead", "Need Hospitalization"]], contact_rate=sidebar.contact_rate
     )
     st.write(fig)
 
