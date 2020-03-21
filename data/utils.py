@@ -13,6 +13,8 @@ from botocore.exceptions import ClientError
 
 from data.preprocessing import preprocess_bed_data
 
+_READABLE_DATESTRING_FORMAT = "%A %d %B %Y, %H:%M %Z"
+
 _S3_ACCESS_KEY = os.environ.get("AWSAccessKeyId", "").replace("\r", "")
 _S3_SECRET_KEY = os.environ.get("AWSSecretKey", "").replace("\r", "")
 _S3_BUCKET_NAME = "coronavirus-calculator-data"
@@ -142,7 +144,7 @@ def download_data_from_s3(object_name: str = _S3_DISEASE_DATA_OBJ_NAME):
     content = download["Body"].read()
 
     # e.g. Sunday 30 November 2014
-    last_modified = download["LastModified"].strftime("%A %d %B %Y, %H:%M %Z")
+    last_modified = download["LastModified"].strftime(_READABLE_DATESTRING_FORMAT)
     return content, last_modified
 
 
@@ -151,7 +153,7 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
     objects = download_data_from_s3()
     if objects is None:
         data_dict = download_data()
-        last_modified = datetime.datetime.now()
+        last_modified = datetime.datetime.now().strftime(_READABLE_DATESTRING_FORMAT)
     else:
         data_dict_pkl_bytes, last_modified = objects
         data_dict = pickle.loads(data_dict_pkl_bytes)
