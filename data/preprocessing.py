@@ -15,7 +15,8 @@ def preprocess_bed_data(path):
     df.rename({"Country Name": "Country/Region"}, axis=1, inplace=True)
     df.drop(["Country Code", "Indicator Name", "Indicator Code"], axis=1, inplace=True)
     df.set_index("Country/Region", inplace=True)
-    df["Latest Bed Estimate"] = df.apply(_get_latest_bed_estimate, axis=1)
+    # Beds are per 1000 people
+    df["Latest Bed Estimate"] = df.apply(_get_latest_bed_estimate, axis=1) / 1000
 
     # Rename countries to match demographics and disease data
     df = df.rename(

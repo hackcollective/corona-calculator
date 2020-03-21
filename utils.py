@@ -1,11 +1,16 @@
 import streamlit as st
 
-_SUSCEPTIBLE_COLOR = 'rgba(230,230,230,.4)'
-_RECOVERED_COLOR = 'rgba(180,200,180,.4)'
+_SUSCEPTIBLE_COLOR = "rgba(230,230,230,.4)"
+_RECOVERED_COLOR = "rgba(180,200,180,.4)"
 
-COLOR_MAP = {"default": "#262730", "pink": "#E22A5B", "purple": "#985FFF",
-             'susceptible': _SUSCEPTIBLE_COLOR,
-             'recovered': _RECOVERED_COLOR}
+COLOR_MAP = {
+    "default": "#262730",
+    "pink": "#E22A5B",
+    "purple": "#985FFF",
+    "susceptible": _SUSCEPTIBLE_COLOR,
+    "recovered": _RECOVERED_COLOR,
+}
+
 
 def generate_html(
     text,
@@ -33,9 +38,12 @@ graph_warning = "Please be aware the scale of this graph changes!"
 
 
 def insert_github_logo():
-    st.markdown('<br>'
-                '<div style="text-align: center;">'
-                '<a href="https://github.com/archydeberker/corona-calculator"> '
-                '<img src="https://image.flaticon.com/icons/png/128/1051/1051326.png" width=64>'
-                ' </img>'
-                '</a> </div>', unsafe_allow_html=True)
+    st.markdown(
+        "<br>"
+        '<div style="text-align: center;">'
+        '<a href="https://github.com/archydeberker/corona-calculator"> '
+        '<img src="https://image.flaticon.com/icons/png/128/1051/1051326.png" width=64>'
+        " </img>"
+        "</a> </div>",
+        unsafe_allow_html=True,
+    )

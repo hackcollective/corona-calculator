@@ -4,65 +4,15 @@ For sources, please visit https://www.notion.so/Modelling-d650e1351bf34ceeb97c82
 """
 
 import datetime
-import pickle
-from io import StringIO
-from pathlib import Path
 
-import pandas as pd
-
-from data.preprocessing import preprocess_bed_data
-from s3_utils import download_file, S3_DISEASE_DATA_OBJ_NAME
-
-
-_DATA_DIR = Path(__file__).parent
-_DEMOGRAPHICS_DATA_PATH = _DATA_DIR / "demographics.csv"
-_BED_DATA_PATH = _DATA_DIR / "world_bank_bed_data.csv"
-_AGE_DATA_PATH = _DATA_DIR / "age_data.csv"
-
-DEMOGRAPHIC_DATA = pd.read_csv(_DEMOGRAPHICS_DATA_PATH, index_col="Country/Region")
-BED_DATA = preprocess_bed_data(_BED_DATA_PATH)
-AGE_DATA = pd.read_csv(_AGE_DATA_PATH, index_col="Age Group")
-
-
-def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
-    data_dict_pkl_bytes, last_modified = download_file(S3_DISEASE_DATA_OBJ_NAME)
-    data_dict = pickle.loads(data_dict_pkl_bytes)
-
-    full_disease_data = data_dict["full_table"]
-    latest_disease_data = data_dict["latest_table"]
-
-    latest_disease_data = latest_disease_data.set_index("Country/Region", drop=True)
-    
-    # Rename name "US" to "United States" in disease and demographics data to match bed data
-    latest_disease_data = latest_disease_data.rename(index={"US": "United States"})
-    demographic_data = demographic_data.rename(index={"US": "United States"})
-
-    full_disease_data['Country/Region'] = full_disease_data['Country/Region'].\
-        apply(lambda x: {"US": "United States"}.get(x, x))
-
-    country_data = latest_disease_data.merge(demographic_data, on="Country/Region")
-
-    # Beds are per 1000 people so we need to calculate absolute
-
-    bed_data = bed_data.merge(demographic_data, on="Country/Region")
-
-    bed_data["Num Hospital Beds"] = (
-        bed_data["Latest Bed Estimate"] * bed_data["Population"] / 1000
-    )
-
-    country_data = country_data.merge(
-        bed_data[["Num Hospital Beds"]], on="Country/Region"
-    )
-
-    # Check that all of the countries in our selectable dropdown are also present in the full data
-    assert set(latest_disease_data.index.unique()).issubset(set(full_disease_data['Country/Region'].unique()))
-
-    return country_data.to_dict(orient="index"), last_modified, full_disease_data
+from data.utils import AGE_DATA, build_country_data
 
 
 class Countries:
     def __init__(self, timestamp):
-        self.country_data, self.last_modified, self.historical_country_data = build_country_data()
+        self.country_data, self.last_modified, self.historical_country_data = (
+            build_country_data()
+        )
         self.countries = list(self.country_data.keys())
         self.default_selection = self.countries.index("Canada")
         self.timestamp = timestamp
