@@ -160,8 +160,6 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
         data_dict["full_table"],
         data_dict["latest_table"],
     )
-    full_disease_data.to_csv("full.csv")
-    latest_disease_data.to_csv("latest.csv")
 
     # Rename name "US" to "United States" in demographics data to match bed data
     demographic_data = demographic_data.rename(index={"US": "United States"})
