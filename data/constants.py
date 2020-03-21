@@ -3,14 +3,12 @@ Range estimates for various epidemiology constants. Currently only default value
 For sources, please visit https://www.notion.so/Modelling-d650e1351bf34ceeb97c82bd24ae04cc
 """
 
-import datetime
 import os
 from pathlib import Path
 
 import pandas as pd
 
 from data.preprocessing import preprocess_bed_data
-from data.utils import build_country_data
 
 _READABLE_DATESTRING_FORMAT = "%A %d %B %Y, %H:%M %Z"
 _S3_ACCESS_KEY = os.environ.get("AWSAccessKeyId", "").replace("\r", "")
@@ -27,21 +25,6 @@ _AGE_DATA_PATH = _DATA_DIR / "age_data.csv"
 DEMOGRAPHIC_DATA = pd.read_csv(_DEMOGRAPHICS_DATA_PATH, index_col="Country/Region")
 BED_DATA = preprocess_bed_data(_BED_DATA_PATH)
 AGE_DATA = pd.read_csv(_AGE_DATA_PATH, index_col="Age Group")
-
-
-class Countries:
-    def __init__(self, timestamp):
-        self.country_data, self.last_modified, self.historical_country_data = (
-            build_country_data()
-        )
-        self.countries = list(self.country_data.keys())
-        self.default_selection = self.countries.index("Canada")
-        self.timestamp = timestamp
-
-    @property
-    def stale(self):
-        delta = datetime.datetime.utcnow() - self.timestamp
-        return delta > datetime.timedelta(hours=1)
 
 
 class AgeData:

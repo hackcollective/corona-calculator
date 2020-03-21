@@ -10,6 +10,7 @@ import boto3
 import pandas as pd
 from botocore.exceptions import ClientError
 
+from data import constants
 from data.constants import _READABLE_DATESTRING_FORMAT, _S3_ACCESS_KEY, _S3_SECRET_KEY, _S3_BUCKET_NAME, \
     _S3_DISEASE_DATA_OBJ_NAME, DISEASE_DATA_GITHUB_REPO, REPO_DIRPATH, DAILY_REPORTS_DIRPATH, DEMOGRAPHIC_DATA, BED_DATA
 
@@ -161,3 +162,13 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
     )
 
     return country_data.to_dict(orient="index"), last_modified, full_disease_data
+
+
+def _check_if_aws_credentials_present():
+    if len(constants._S3_ACCESS_KEY) is 0:
+        print('No S3 credentials present, using local file storage. '
+              'This make some time the first time you run. We will clone '
+              'the John Hopkins data repo (COVID-19) into this one.')
+
+    else:
+        print('S3 credentials found, using AWS.')
