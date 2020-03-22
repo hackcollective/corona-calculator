@@ -341,9 +341,6 @@ class SIRModel2:
                 ]
             )
 
-            print(self._infection_rate)
-            print(delta_s_t, - list(self._infection_rate.values())[0] * I[-1] * S[-1] / population)
-
             s_t = S[-1] + delta_s_t
             i_t = (
                 I[-1]
