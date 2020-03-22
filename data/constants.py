@@ -77,7 +77,7 @@ class AsymptomaticRate:
     # The number comes from a study led on passengers of the Diamond Princess Cruise, in Japan
     # We assume this figure stands true for the rest of the world
     # https://www.eurosurveillance.org/content/10.2807/1560-7917.ES.2020.25.10.2000180
-    default = 17.9
+    default = 0.179
 
 class HospitalizationRate:
     # Cases requiring hospitalization. We multiply by the ascertainment rate because our source got their estimate
