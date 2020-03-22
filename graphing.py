@@ -94,7 +94,7 @@ def infection_graph(df, y_max, contact_rate):
         opacity=0.5,
     )
     fig.update_yaxes(range=[0, y_max])
-    fig.layout.update(xaxis_title="Days")
+    fig.layout.update(xaxis_title="Number of days from today")
     fig.layout.update(title=dict(text=f"Disease propagation with people meeting <b>{int(contact_rate)} person{plural(contact_rate)}</b> a day"))
     _set_legends(fig)
     _set_title(fig)
