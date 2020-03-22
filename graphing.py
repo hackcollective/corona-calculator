@@ -6,11 +6,16 @@ from utils import COLOR_MAP
 
 TEMPLATE = "plotly_white"
 
+def _set_title(fig):
+    fig.layout.update(title=dict(y=0.95, x=0, xanchor='left', yanchor='top'))
 
 def _set_legends(fig):
     fig.layout.update(legend=dict(x=-0.1, y=1.2))
     fig.layout.update(legend_orientation="h")
 
+def plural(x):
+    """Return 's' if x > 1"""
+    return 's' if int(x) > 1 else ''
 
 def plot_historical_data(df):
     # Convert wide to long
@@ -46,7 +51,7 @@ def plot_true_versus_confirmed(confirmed, predicted):
     return fig
 
 
-def infection_graph(df, y_max):
+def infection_graph(df, y_max, contact_rate):
 
     # We cannot explicitly set graph width here, have to do it as injected css: see interface.css
     fig = go.Figure(layout=dict(template=TEMPLATE))
@@ -90,11 +95,14 @@ def infection_graph(df, y_max):
     )
     fig.update_yaxes(range=[0, y_max])
     fig.layout.update(xaxis_title="Days")
+    fig.layout.update(title=dict(text=f"Disease propagation with people meeting <b>{int(contact_rate)} person{plural(contact_rate)}</b> a day"))
     _set_legends(fig)
+    _set_title(fig)
+
     return fig
 
 
-def age_segregated_mortality(df):
+def age_segregated_mortality(df, contact_rate):
     df = df.rename(index={ag: "0-30" for ag in ["0-9", "10-19", "20-29"]}).reset_index()
     df = pd.melt(df, id_vars="Age Group", var_name="Status", value_name="Forecast")
     # Add up values for < 30
@@ -118,16 +126,21 @@ def age_segregated_mortality(df):
         color_discrete_sequence=["pink", "red"],
         barmode="group",
     )
+
     fig.layout.update(
         xaxis_title="",
         yaxis_title="",
         font=dict(family="Arial", size=15, color=COLOR_MAP["default"]),
+        title=dict(text=f"Casualties and hospitalizations with people meeting <b>{int(contact_rate)} person{plural(contact_rate)}</b> a day"),
     )
     _set_legends(fig)
+    _set_title(fig)
+
+    fig.layout.update(legend=dict(y=1.05))
     return fig
 
 
-def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed):
+def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed, contact_rate):
     """
     A horizontal bar chart comparing # of beds available compared to 
     max number number of beds needed
@@ -164,7 +177,9 @@ def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed)
         yaxis_title="",
         yaxis_showticklabels=True,
         font=dict(family="Arial", size=15, color=COLOR_MAP["default"]),
+        title=dict(text=f"Peak occupancy with people meeting <b>{int(contact_rate)} person{plural(contact_rate)}</b> a day"),
     )
     fig.update_traces(textposition="outside", cliponaxis=False)
+    _set_title(fig)
 
     return fig
