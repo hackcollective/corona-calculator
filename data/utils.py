@@ -201,6 +201,5 @@ def check_if_aws_credentials_present():
         print('No S3 credentials present, using local file storage. '
               'This make some time the first time you run. We will clone '
               'the John Hopkins data repo (COVID-19) into this one.')
-
     else:
         print('S3 credentials found, using AWS.')
