@@ -44,6 +44,9 @@ Data is stored in an S3 bucket. See the [data README](./data/README.md) for deta
 We refresh data hourly using a Heroku scheduler job to fetch up to date case information from Johns Hopkins. This job 
 runs the `fetch_live_data.py` script.
 
+If you'd like to add data for new countries, please do! Be aware that you will need to add population and hospital
+bed data. Unfortunately we're currently limited by the case data provided by the (amazing) [Johns Hopkins repo](https://github.com/CSSEGISandData/COVID-19)
+: if your country isn't there, we're not going to be able to add it. 
 
 ## Contributing
 We would LOVE you to contribute to this app, which is fast moving and requires continued attention as
