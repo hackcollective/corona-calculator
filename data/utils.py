@@ -1,4 +1,5 @@
 import datetime
+import os
 import pickle
 import shutil
 import subprocess
@@ -16,8 +17,7 @@ from data.constants import READABLE_DATESTRING_FORMAT, S3_ACCESS_KEY, S3_SECRET_
 
 
 def execute_shell_command(command: List[str]):
-    return subprocess.run(command, stdout=subprocess.PIPE, capture_output=True).stdout.decode("utf-8",
-                                                                         )
+    return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
 
 
 def get_full_and_latest_dataframes_from_csv(csv_filepaths: List[Path]):
@@ -97,9 +97,9 @@ def download_data(cleanup=True):
 
 def pull_latest_data(path=REPO_DIRPATH):
     print("Updating the local data storage")
-    cmd = ["cd", path, "&& git pull && echo 'done'"]
-    stdout = execute_shell_command(cmd)
-    print(stdout)
+
+    # For some reason when I used subprocess I lost the STDOUT
+    os.system(f"cd {path} && git pull")
 
     data_object = _get_data_from_repo(path=DAILY_REPORTS_DIRPATH)
 
@@ -196,7 +196,7 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
     return country_data.to_dict(orient="index"), last_modified, full_disease_data
 
 
-def _check_if_aws_credentials_present():
+def check_if_aws_credentials_present():
     if len(constants.S3_ACCESS_KEY) is 0:
         print('No S3 credentials present, using local file storage. '
               'This make some time the first time you run. We will clone '

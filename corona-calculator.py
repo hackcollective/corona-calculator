@@ -7,7 +7,7 @@ import graphing
 import models
 import utils
 from data import constants
-from data.utils import _check_if_aws_credentials_present
+from data.utils import check_if_aws_credentials_present
 from interface import css
 from interface.elements import reported_vs_true_cases
 from utils import COLOR_MAP, generate_html, graph_warning
@@ -101,7 +101,7 @@ class Sidebar:
 
 @st.cache
 def _fetch_country_data():
-    _check_if_aws_credentials_present()
+    check_if_aws_credentials_present()
     timestamp = datetime.datetime.utcnow()
     return data.countries.Countries(timestamp=timestamp)
 
