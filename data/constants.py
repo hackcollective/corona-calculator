@@ -86,6 +86,5 @@ class HospitalizationRate:
 
 class InfectionState(Enum):
     ASYMPTOMATIC_UNDIAGNOSED = "asymptomatic_undiagnosed"
-    ASYMPTOMATIC_DIAGNOSED = "asymptomatic_diagnosed"
     SYMPTOMATIC_UNDIAGNOSED = "symptomatic_undiagnosed"
-    SYMPTOMATIC_DIAGNOSED = "symptomatic_diagnosed"
+    DIAGNOSED = "diagnosed"

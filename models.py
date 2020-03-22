@@ -124,9 +124,8 @@ class AsymptomaticCasesModel:
     """
     Used to estimate total number of true infected persons in 3 categories:
     - `'asymptomatic_undiagnosed'`
-    - `'asymptomatic_diagnosed'` 
     - `'symptomatic_undiagnosed'`
-    - `'symptomatic_diagnosed'`
+    - `'diagnosed'`
 
     Uses number of diagnosed cases and true cases as input.
     """
@@ -147,9 +146,8 @@ class AsymptomaticCasesModel:
         
         ret = {
             InfectionState.ASYMPTOMATIC_UNDIAGNOSED : undiagnosed_cases * self._asymptomatic_rate,
-            InfectionState.ASYMPTOMATIC_DIAGNOSED : 0,
             InfectionState.SYMPTOMATIC_UNDIAGNOSED : undiagnosed_cases * (1 - self._asymptomatic_rate),
-            InfectionState.SYMPTOMATIC_DIAGNOSED : diagnosed_cases
+            InfectionState.DIAGNOSED : diagnosed_cases
         }
 
         return ret
