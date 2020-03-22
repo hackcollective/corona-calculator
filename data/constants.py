@@ -3,6 +3,7 @@ Range estimates for various epidemiology constants. Currently only default value
 For sources, please visit https://www.notion.so/Modelling-d650e1351bf34ceeb97c82bd24ae04cc
 """
 
+from enum import Enum
 import datetime
 
 from data.utils import AGE_DATA, build_country_data
@@ -71,8 +72,20 @@ class ReportingRate:
     # Proportion of true cases diagnosed
     default = 0.14
 
+class AsymptomaticRate:
+    # Proportion of true cases showing no symptoms
+    # The number comes from a study led on passengers of the Diamond Princess Cruise, in Japan
+    # We assume this figure stands true for the rest of the world
+    # https://www.eurosurveillance.org/content/10.2807/1560-7917.ES.2020.25.10.2000180
+    default = 17.9
 
 class HospitalizationRate:
     # Cases requiring hospitalization. We multiply by the ascertainment rate because our source got their estimate
     # from the reported cases, whereas we will be using it with total cases.
     default = 0.19 * ReportingRate.default
+
+class InfectionState(Enum):
+    ASYMPTOMATIC_UNDIAGNOSED = "asymptomatic_undiagnosed"
+    ASYMPTOMATIC_DIAGNOSED = "asymptomatic_diagnosed"
+    SYMPTOMATIC_UNDIAGNOSED = "symptomatic_undiagnosed"
+    SYMPTOMATIC_DIAGNOSED = "symptomatic_diagnosed"
