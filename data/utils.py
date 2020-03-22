@@ -16,7 +16,8 @@ from data.constants import READABLE_DATESTRING_FORMAT, S3_ACCESS_KEY, S3_SECRET_
 
 
 def execute_shell_command(command: List[str]):
-    return subprocess.run(command, stdout=subprocess.PIPE).stdout.decode("utf-8")
+    return subprocess.run(command, stdout=subprocess.PIPE, capture_output=True).stdout.decode("utf-8",
+                                                                         )
 
 
 def get_full_and_latest_dataframes_from_csv(csv_filepaths: List[Path]):
@@ -56,7 +57,7 @@ def get_full_and_latest_dataframes_from_csv(csv_filepaths: List[Path]):
     # sort by date, then country name
     total_df = total_df.sort_values(["Date", "Country/Region"])
 
-    ## Latest date table
+    # Latest date table
     latest_date_df = total_df[total_df["Date"] == max(total_df["Date"])]
 
     # Set country as index
@@ -66,22 +67,53 @@ def get_full_and_latest_dataframes_from_csv(csv_filepaths: List[Path]):
     return total_df, latest_date_df
 
 
-def download_data():
+def _get_data_from_repo(path):
+    # Go to daily reports directory and fetch all CSV files
+    csv_filepaths = list(Path(path).glob("*.csv"))
+
+    # Get the full and latest table
+    full_df, latest_df = get_full_and_latest_dataframes_from_csv(csv_filepaths)
+    data_object = {"full_table": full_df, "latest_table": latest_df}
+
+    return data_object
+
+
+def download_data(cleanup=True):
     """
      Clone the JHU COVID GitHub repo (takes about a minute) and return paths to CSVs.
     """
     cmd = ["git", "clone", DISEASE_DATA_GITHUB_REPO]
     execute_shell_command(cmd)
 
-    # Go to daily reports directory and fetch all CSV files
-    csv_filepaths = list(Path(DAILY_REPORTS_DIRPATH).glob("*.csv"))
+    data_object = _get_data_from_repo(path=DAILY_REPORTS_DIRPATH)
 
-    # Get the full and latest table
-    full_df, latest_df = get_full_and_latest_dataframes_from_csv(csv_filepaths)
-    data_object = {"full_table": full_df, "latest_table": latest_df}
-    # # Remove GitHub repo directory
-    shutil.rmtree(REPO_DIRPATH)
-    print("Cleaned up.")
+    if cleanup:
+        # Remove GitHub repo directory
+        shutil.rmtree(REPO_DIRPATH)
+        print("Cleaned up.")
+
+    return data_object
+
+
+def pull_latest_data(path=REPO_DIRPATH):
+    print("Updating the local data storage")
+    cmd = ["cd", path, "&& git pull && echo 'done'"]
+    stdout = execute_shell_command(cmd)
+    print(stdout)
+
+    data_object = _get_data_from_repo(path=DAILY_REPORTS_DIRPATH)
+
+    return data_object
+
+
+def get_data_locally_or_download(data_path_locally=constants.DATA_DIR):
+    """A helper function for users running locally"""
+    if 'COVID-19' not in [p.stem for p in data_path_locally.parent.iterdir()]:
+        # Don't delete the repo we're cloning if running locally
+        data_object = download_data(cleanup=False)
+    else:
+        # We need to make sure the data is up to date
+        data_object = pull_latest_data(REPO_DIRPATH)
 
     return data_object
 
@@ -133,7 +165,7 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
     # Try to download from S3, else download from JHU
     objects = download_data_from_s3()
     if objects is None:
-        data_dict = download_data()
+        data_dict = get_data_locally_or_download()
         last_modified = datetime.datetime.now().strftime(READABLE_DATESTRING_FORMAT)
     else:
         data_dict_pkl_bytes, last_modified = objects

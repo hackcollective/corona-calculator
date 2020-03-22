@@ -101,12 +101,12 @@ class Sidebar:
 
 @st.cache
 def _fetch_country_data():
+    _check_if_aws_credentials_present()
     timestamp = datetime.datetime.utcnow()
     return data.countries.Countries(timestamp=timestamp)
 
 
 def run_app():
-    _check_if_aws_credentials_present()
     css.hide_menu()
     css.limit_plot_size()
 
