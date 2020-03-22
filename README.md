@@ -57,6 +57,6 @@ You'll need to [fork the repo](https://help.github.com/en/github/collaborating-w
 to make your changes, and then open an PR. We don't have PR guidelines for now - just be sensible and please bear
 with us if we're slow to review as we all have full time jobs!
 
-If you're interested in adding a major feature of change the design of the app please feel free to run it by us
+If you're interested in adding a major feature or change the design of the app please feel free to run it by us
 (open an issue and tag us) before commencing work. Our designer will probably want to give it a once over before
 any coding takes place!
