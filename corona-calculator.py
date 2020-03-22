@@ -79,12 +79,31 @@ class Sidebar:
             unsafe_allow_html=True,
         )
 
-        self.contact_rate = st.sidebar.slider(
-            label="How many people does an infected individual meet on a daily basis?",
-            min_value=constants.AverageDailyContacts.min,
-            max_value=constants.AverageDailyContacts.max,
-            value=constants.AverageDailyContacts.default,
+        st.sidebar.markdown(
+            body=generate_html(
+                text=f"How many people does [...] meet on a daily basis?",
+                line_height=0,
+                font_size="12px",
+            )
+            + "<br>",
+            unsafe_allow_html=True,
         )
+
+        slider_person_descriptions = {
+            constants.InfectionState.ASYMPTOMATIC_UNDIAGNOSED : "an individual with no symptoms",
+            constants.InfectionState.SYMPTOMATIC_UNDIAGNOSED : "an individual with unconfirmed symptoms",
+            constants.InfectionState.DIAGNOSED : "an individual diagnosed with COVID-19"
+        }
+
+        self.contact_rates = {
+            state : st.sidebar.slider(
+                label=description,
+                min_value=constants.AverageDailyContacts.min,
+                max_value=constants.AverageDailyContacts.max,
+                value=constants.AverageDailyContacts.default,
+            ) 
+            for state, description in slider_person_descriptions.items()
+        }
 
         st.sidebar.markdown(
             body=generate_html(
@@ -160,22 +179,33 @@ def run_app():
     fig = graphing.plot_historical_data(historical_data)
     st.write(fig)
 
-    sir_model = models.SIRModel(
+    true_cases_estimator = models.TrueInfectedCasesModel(
+        constants.ReportingRate.default
+    )
+    diagnosed_cases_estimator = models.DiagnosedCasesModel(
+        constants.ReportingRate.default
+    )
+    asymptomatic_cases_estimator = models.AsymptomaticCasesModel(
+        constants.AsymptomaticRate.default
+    )
+
+    contact_rates = sidebar.contact_rates
+
+    sir_model_2 = models.SIRModel2(
         transmission_rate_per_contact=constants.TransmissionRatePerContact.default,
-        contact_rate=sidebar.contact_rate,
+        contact_rates=contact_rates,
+        diagnosed_cases_model=diagnosed_cases_estimator,
+        asymptomatic_cases_model=asymptomatic_cases_estimator,
         recovery_rate=constants.RecoveryRate.default,
         normal_death_rate=constants.MortalityRate.default,
         critical_death_rate=constants.CriticalDeathRate.default,
         hospitalization_rate=constants.HospitalizationRate.default,
-        hospital_capacity=num_hospital_beds,
-    )
-    true_cases_estimator = models.TrueInfectedCasesModel(
-        constants.ReportingRate.default
+        hospital_capacity=num_hospital_beds
     )
 
     df = models.get_predictions(
         cases_estimator=true_cases_estimator,
-        sir_model=sir_model,
+        sir_model=sir_model_2,
         num_diagnosed=number_cases_confirmed,
         num_recovered=country_data["Recovered"],
         num_deaths=country_data["Deaths"],
