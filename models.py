@@ -186,10 +186,10 @@ class SIRModel:
     def predict(self, susceptible, infected, recovered, dead, num_days):
         """
         Run simulation.
-        :param susceptible: Number of susceptible people in population.
-        :param infected: Number of infected people in population.
-        :param recovered: Number of recovered people in population.
-        :param dead: Number of dead people in the population
+        :param susceptible: Starting number of susceptible people in population.
+        :param infected: Starting number of infected people in population.
+        :param recovered: Starting number of recovered people in population.
+        :param dead: Starting number of dead people in the population
         :param num_days: Number of days to forecast.
         :return: List of values for S, I, R over time steps
         """
