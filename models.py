@@ -141,15 +141,16 @@ class AsymptomaticCasesModel:
     def predict(self, diagnosed_cases, true_cases):
         """
         Assumes the number of diagnosed asymptomatic cases is zero.
+        Equivalent to: assumes all diagnosed cases are symptomatic
         :param diagnosed_cases: Reported number of cases
         :param true_cases: Estimated number of true cases
         """
         undiagnosed_cases = true_cases - diagnosed_cases
-        
+        asymptomatic_cases = undiagnosed_cases * self._asymptomatic_rate
+
         ret = {
-            SymptomState.ASYMPTOMATIC_UNDIAGNOSED : undiagnosed_cases * self._asymptomatic_rate,
-            SymptomState.SYMPTOMATIC_UNDIAGNOSED : undiagnosed_cases * (1 - self._asymptomatic_rate),
-            SymptomState.DIAGNOSED : diagnosed_cases
+            SymptomState.ASYMPTOMATIC : asymptomatic_cases,
+            SymptomState.SYMPTOMATIC : true_cases - asymptomatic_cases
         }
 
         return ret

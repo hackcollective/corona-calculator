@@ -81,7 +81,7 @@ class Sidebar:
 
         st.sidebar.markdown(
             body=generate_html(
-                text=f"How many people does [...] meet on a daily basis?",
+                text=f"How many people does an individual [...] meet on a daily basis?",
                 line_height=0,
                 font_size="12px",
             )
@@ -90,9 +90,8 @@ class Sidebar:
         )
 
         slider_person_descriptions = {
-            constants.SymptomState.ASYMPTOMATIC_UNDIAGNOSED : "an individual with no symptoms",
-            constants.SymptomState.SYMPTOMATIC_UNDIAGNOSED : "an individual with unconfirmed symptoms",
-            constants.SymptomState.DIAGNOSED : "an individual diagnosed with COVID-19"
+            constants.SymptomState.ASYMPTOMATIC : "without symptoms",
+            constants.SymptomState.SYMPTOMATIC : "with symptoms",
         }
 
         self.contact_rate = {

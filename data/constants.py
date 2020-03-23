@@ -29,9 +29,8 @@ class AgeData:
 
 
 class SymptomState(Enum):
-    ASYMPTOMATIC_UNDIAGNOSED = "asymptomatic_undiagnosed"
-    SYMPTOMATIC_UNDIAGNOSED = "symptomatic_undiagnosed"
-    DIAGNOSED = "diagnosed"
+    ASYMPTOMATIC = "asymptomatic"
+    SYMPTOMATIC = "symptomatic"
 
 
 """
@@ -66,9 +65,8 @@ class TransmissionRatePerContact:
     # The ratio is reported to be 55%
     # source: https://science.sciencemag.org/content/early/2020/03/13/science.abb3221
     default_per_symptom_state = {
-        SymptomState.ASYMPTOMATIC_UNDIAGNOSED : 0.55 * default,
-        SymptomState.SYMPTOMATIC_UNDIAGNOSED : default,
-        SymptomState.DIAGNOSED : default
+        SymptomState.ASYMPTOMATIC : 0.55 * default,
+        SymptomState.SYMPTOMATIC : default,
     }
 
 
