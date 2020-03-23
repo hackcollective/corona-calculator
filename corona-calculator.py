@@ -95,7 +95,7 @@ class Sidebar:
             constants.InfectionState.DIAGNOSED : "an individual diagnosed with COVID-19"
         }
 
-        self.contact_rates = {
+        self.contact_rate = {
             state : st.sidebar.slider(
                 label=description,
                 min_value=constants.AverageDailyContacts.min,
@@ -189,11 +189,11 @@ def run_app():
         constants.AsymptomaticRate.default
     )
 
-    contact_rates = sidebar.contact_rates
+    contact_rate = sidebar.contact_rate
 
     sir_model_2 = models.SIRModel2(
         transmission_rate_per_contact=constants.TransmissionRatePerContact.default,
-        contact_rates=contact_rates,
+        contact_rate=contact_rate,
         diagnosed_cases_model=diagnosed_cases_estimator,
         asymptomatic_cases_model=asymptomatic_cases_estimator,
         recovery_rate=constants.RecoveryRate.default,
