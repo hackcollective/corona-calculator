@@ -28,7 +28,7 @@ class AgeData:
     data = AGE_DATA
 
 
-class InfectionState(Enum):
+class SymptomState(Enum):
     ASYMPTOMATIC_UNDIAGNOSED = "asymptomatic_undiagnosed"
     SYMPTOMATIC_UNDIAGNOSED = "symptomatic_undiagnosed"
     DIAGNOSED = "diagnosed"
@@ -65,10 +65,10 @@ class TransmissionRatePerContact:
     # The transmission rate of a asymptomatic infected individual is lower by a certain ratio
     # The ratio is reported to be 55%
     # source: https://science.sciencemag.org/content/early/2020/03/13/science.abb3221
-    default_per_infection_state = {
-        InfectionState.ASYMPTOMATIC_UNDIAGNOSED : 0.55 * default,
-        InfectionState.SYMPTOMATIC_UNDIAGNOSED : default,
-        InfectionState.DIAGNOSED : default
+    default_per_symptom_state = {
+        SymptomState.ASYMPTOMATIC_UNDIAGNOSED : 0.55 * default,
+        SymptomState.SYMPTOMATIC_UNDIAGNOSED : default,
+        SymptomState.DIAGNOSED : default
     }
 
 

@@ -5,7 +5,7 @@ from typing import Union
 import pandas as pd
 
 import data.constants as constants
-from data.constants import InfectionState
+from data.constants import SymptomState
 
 _STATUSES_TO_SHOW = [
     "Infected",
@@ -147,9 +147,9 @@ class AsymptomaticCasesModel:
         undiagnosed_cases = true_cases - diagnosed_cases
         
         ret = {
-            InfectionState.ASYMPTOMATIC_UNDIAGNOSED : undiagnosed_cases * self._asymptomatic_rate,
-            InfectionState.SYMPTOMATIC_UNDIAGNOSED : undiagnosed_cases * (1 - self._asymptomatic_rate),
-            InfectionState.DIAGNOSED : diagnosed_cases
+            SymptomState.ASYMPTOMATIC_UNDIAGNOSED : undiagnosed_cases * self._asymptomatic_rate,
+            SymptomState.SYMPTOMATIC_UNDIAGNOSED : undiagnosed_cases * (1 - self._asymptomatic_rate),
+            SymptomState.DIAGNOSED : diagnosed_cases
         }
 
         return ret
@@ -288,9 +288,9 @@ class SIRModel2(SIRModel):
     ):
         """
         :param transmission_rate_per_contact: Prob of contact between infected and susceptible leading to infection,
-            per InfectionState
+            per SymptomState
         :param contact_rate: Mean number of daily contacts between an individual and susceptible people,
-            per InfectionState
+            per SymptomState
         :param recovery_rate: Rate of recovery of infected individuals.
         :param normal_death_rate: Average death rate in normal conditions.
         :param critical_death_rate: Rate of mortality among severe or critical cases that can't get access
@@ -319,38 +319,38 @@ class SIRModel2(SIRModel):
         contact_rate: Union[numbers.Number, dict],
     ):
         """
-        Sets self._infection_rate as a dict {InfectionState : infection_rate}
-        :param transmission_rate_per_contact: as a number or dict {InfectionState : transmission_rate_per_contact}
-        :param contact_rate: as a number or dict {InfectionState : contact_rate} 
+        Sets self._infection_rate as a dict {SymptomState : infection_rate}
+        :param transmission_rate_per_contact: as a number or dict {SymptomState : transmission_rate_per_contact}
+        :param contact_rate: as a number or dict {SymptomState : contact_rate} 
         """
         
         if isinstance(transmission_rate_per_contact, numbers.Number):
             mean_transmission_rate_per_contact = transmission_rate_per_contact 
             transmission_rate_per_contact = {
-                infection_state : mean_transmission_rate_per_contact
-                for infection_state in InfectionState
+                symptom_state : mean_transmission_rate_per_contact
+                for symptom_state in SymptomState
             }
         elif isinstance(transmission_rate_per_contact, dict): 
-            if any([infection_state not in transmission_rate_per_contact for infection_state in InfectionState]):
-                raise KeyError("tranmission_rate_per_contact must contains keys: {}".format(list(InfectionState)))
+            if any([symptom_state not in transmission_rate_per_contact for symptom_state in SymptomState]):
+                raise KeyError("tranmission_rate_per_contact must contains keys: {}".format(list(SymptomState)))
         else:
             raise TypeError("Type of tranmission_rate_per_contact must be in {}".format(Union[numbers.Number, dict]))
 
         if isinstance(contact_rate, numbers.Number):
             mean_contact_rate = contact_rate 
             contact_rate = {
-                infection_state : mean_contact_rate
-                for infection_state in InfectionState
+                symptom_state : mean_contact_rate
+                for symptom_state in SymptomState
             }
         elif isinstance(contact_rate, dict): 
-            if any([infection_state not in contact_rate for infection_state in InfectionState]):
-                raise KeyError("contact_rate must contains keys: {}".format(list(InfectionState)))
+            if any([symptom_state not in contact_rate for symptom_state in SymptomState]):
+                raise KeyError("contact_rate must contains keys: {}".format(list(SymptomState)))
         else:
             raise TypeError("Type of contact_rate must be in {}".format(Union[numbers.Number, dict]))
 
         infection_rate = {
-            infection_state : transmission_rate_per_contact[infection_state] * contact_rate[infection_state]
-            for infection_state in InfectionState
+            symptom_state : transmission_rate_per_contact[symptom_state] * contact_rate[symptom_state]
+            for symptom_state in SymptomState
         }
 
         self._infection_rate = infection_rate
@@ -368,8 +368,8 @@ class SIRModel2(SIRModel):
 
         ret = sum(
             [
-                - self._infection_rate[infection_state] * infections_per_state[infection_state] * S / N \
-                    for infection_state in InfectionState
+                - self._infection_rate[symptom_state] * infections_per_state[symptom_state] * S / N \
+                    for symptom_state in SymptomState
             ]
         ) 
         

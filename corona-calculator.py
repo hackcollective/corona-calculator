@@ -90,9 +90,9 @@ class Sidebar:
         )
 
         slider_person_descriptions = {
-            constants.InfectionState.ASYMPTOMATIC_UNDIAGNOSED : "an individual with no symptoms",
-            constants.InfectionState.SYMPTOMATIC_UNDIAGNOSED : "an individual with unconfirmed symptoms",
-            constants.InfectionState.DIAGNOSED : "an individual diagnosed with COVID-19"
+            constants.SymptomState.ASYMPTOMATIC_UNDIAGNOSED : "an individual with no symptoms",
+            constants.SymptomState.SYMPTOMATIC_UNDIAGNOSED : "an individual with unconfirmed symptoms",
+            constants.SymptomState.DIAGNOSED : "an individual diagnosed with COVID-19"
         }
 
         self.contact_rate = {
@@ -193,7 +193,7 @@ def run_app():
     contact_rate = sidebar.contact_rate
 
     sir_model_2 = models.SIRModel2(
-        transmission_rate_per_contact=constants.TransmissionRatePerContact.default_per_infection_state,
+        transmission_rate_per_contact=constants.TransmissionRatePerContact.default_per_symptom_state,
         contact_rate=contact_rate,
         diagnosed_cases_model=diagnosed_cases_estimator,
         asymptomatic_cases_model=asymptomatic_cases_estimator,
