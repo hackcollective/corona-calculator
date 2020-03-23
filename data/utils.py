@@ -92,14 +92,20 @@ def download_data(cleanup=True):
         shutil.rmtree(REPO_DIRPATH)
         print("Cleaned up.")
 
+    print('Data fetch complete')
+
     return data_object
 
 
 def pull_latest_data(path=REPO_DIRPATH):
     print("Updating the local data storage")
 
+    current_dir = os.path.curdir
+
     # For some reason when I used subprocess I lost the STDOUT
     os.system(f"cd {path} && git pull")
+
+    os.system(f"cd {current_dir}")
 
     data_object = _get_data_from_repo(path=DAILY_REPORTS_DIRPATH)
 
