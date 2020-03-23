@@ -107,7 +107,8 @@ class Sidebar:
 
         st.sidebar.markdown(
             body=generate_html(
-                text=f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%,"
+                text=f"We're using an estimated transmission probability of {transmission_probability * 100:.1f}%. "
+                f"This probability is diminished by 45% for asymptomatic cases, "
                 f" see our <a href='https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc'> methods for details</a>.",
                 line_height=0,
                 font_size="10px",
