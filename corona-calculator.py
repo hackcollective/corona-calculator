@@ -157,9 +157,32 @@ def run_app():
     num_hospital_beds = country_data["Num Hospital Beds"]
 
     st.subheader(f"How has the disease spread in {country}?")
+    st.write(
+        "The number of reported cases radically underestimates the true cases, because people do not show symptoms for "
+        "several days, not everybody gets tested, and the tests take a few days to return results. "
+        "The extent depends upon your country's testing strategy."
+        " This estimate (14% reporting) is from China ([source](https://science.sciencemag.org/content/early/2020/03/13/science.abb3221))."
+    )
+    # Estimate true cases
+    true_cases_estimator = models.TrueInfectedCasesModel(
+        constants.ReportingRate.default
+    )
+    estimated_true_cases = true_cases_estimator.predict(number_cases_confirmed)
+
+    reported_vs_true_cases(int(number_cases_confirmed), estimated_true_cases)
+
+    st.markdown(
+        f"Given the prevalence of the infection in your country, the probability of being infected at this time is "
+        f"**{estimated_true_cases / population:.3%}**. Even if you show no symptoms, the probability of being infected is "
+        f"**{models.get_probability_of_infection_give_asymptomatic(population, estimated_true_cases, constants.AsymptomaticRate.default):.3%}**. "
+        f"Note that these probabilities are on a country-wide basis and so may not apply to your situation."
+    )
+
+    # Plot historical data
     fig = graphing.plot_historical_data(historical_data)
     st.write(fig)
 
+    # Predict infection spread
     sir_model = models.SIRModel(
         transmission_rate_per_contact=constants.TransmissionRatePerContact.default,
         contact_rate=sidebar.contact_rate,
@@ -169,10 +192,6 @@ def run_app():
         hospitalization_rate=constants.HospitalizationRate.default,
         hospital_capacity=num_hospital_beds,
     )
-    true_cases_estimator = models.TrueInfectedCasesModel(
-        constants.ReportingRate.default
-    )
-
     df = models.get_predictions(
         cases_estimator=true_cases_estimator,
         sir_model=sir_model,
@@ -180,18 +199,6 @@ def run_app():
         num_recovered=country_data["Recovered"],
         num_deaths=country_data["Deaths"],
         area_population=population,
-    )
-
-    reported_vs_true_cases(
-        int(number_cases_confirmed),
-        true_cases_estimator.predict(number_cases_confirmed),
-    )
-
-    st.write(
-        "The number of reported cases radically underestimates the true cases, because people do not show symptoms for "
-        "several days, not everybody gets tested, and the tests take a few days to return results. "
-        "The extent depends upon your country's testing strategy."
-        " This estimate (14% reporting) is from China ([source](https://science.sciencemag.org/content/early/2020/03/13/science.abb3221))."
     )
 
     st.subheader("How will my actions affect the spread?")
