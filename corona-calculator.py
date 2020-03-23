@@ -2,10 +2,12 @@ import datetime
 
 import streamlit as st
 
+import data.countries
 import graphing
 import models
 import utils
 from data import constants
+from data.utils import check_if_aws_credentials_present
 from interface import css
 from interface.elements import reported_vs_true_cases
 from utils import COLOR_MAP, generate_html, graph_warning
@@ -99,8 +101,9 @@ class Sidebar:
 
 @st.cache
 def _fetch_country_data():
+    check_if_aws_credentials_present()
     timestamp = datetime.datetime.utcnow()
-    return constants.Countries(timestamp=timestamp)
+    return data.countries.Countries(timestamp=timestamp)
 
 
 def run_app():
@@ -278,4 +281,5 @@ def run_app():
 
 
 if __name__ == "__main__":
+
     run_app()

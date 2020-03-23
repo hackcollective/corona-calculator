@@ -11,27 +11,9 @@ import boto3
 import pandas as pd
 from botocore.exceptions import ClientError
 
-from data.preprocessing import preprocess_bed_data
-
-_READABLE_DATESTRING_FORMAT = "%A %d %B %Y, %H:%M %Z"
-
-_S3_ACCESS_KEY = os.environ.get("AWSAccessKeyId", "").replace("\r", "")
-_S3_SECRET_KEY = os.environ.get("AWSSecretKey", "").replace("\r", "")
-_S3_BUCKET_NAME = "coronavirus-calculator-data"
-_S3_DISEASE_DATA_OBJ_NAME = "full_and_latest_disease_data_dict_v2"
-
-
-DISEASE_DATA_GITHUB_REPO = "https://github.com/CSSEGISandData/COVID-19.git"
-REPO_DIRPATH = "COVID-19"
-DAILY_REPORTS_DIRPATH = "COVID-19/csse_covid_19_data/csse_covid_19_daily_reports"
-
-_DATA_DIR = Path(__file__).parent
-_DEMOGRAPHICS_DATA_PATH = _DATA_DIR / "demographics.csv"
-_BED_DATA_PATH = _DATA_DIR / "world_bank_bed_data.csv"
-_AGE_DATA_PATH = _DATA_DIR / "age_data.csv"
-DEMOGRAPHIC_DATA = pd.read_csv(_DEMOGRAPHICS_DATA_PATH, index_col="Country/Region")
-BED_DATA = preprocess_bed_data(_BED_DATA_PATH)
-AGE_DATA = pd.read_csv(_AGE_DATA_PATH, index_col="Age Group")
+from data import constants
+from data.constants import READABLE_DATESTRING_FORMAT, S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET_NAME, \
+    S3_DISEASE_DATA_OBJ_NAME, DISEASE_DATA_GITHUB_REPO, REPO_DIRPATH, DAILY_REPORTS_DIRPATH, DEMOGRAPHIC_DATA, BED_DATA
 
 
 def execute_shell_command(command: List[str]):
@@ -75,7 +57,7 @@ def get_full_and_latest_dataframes_from_csv(csv_filepaths: List[Path]):
     # sort by date, then country name
     total_df = total_df.sort_values(["Date", "Country/Region"])
 
-    ## Latest date table
+    # Latest date table
     latest_date_df = total_df[total_df["Date"] == max(total_df["Date"])]
 
     # Set country as index
@@ -85,22 +67,59 @@ def get_full_and_latest_dataframes_from_csv(csv_filepaths: List[Path]):
     return total_df, latest_date_df
 
 
-def download_data():
+def _get_data_from_repo(path):
+    # Go to daily reports directory and fetch all CSV files
+    csv_filepaths = list(Path(path).glob("*.csv"))
+
+    # Get the full and latest table
+    full_df, latest_df = get_full_and_latest_dataframes_from_csv(csv_filepaths)
+    data_object = {"full_table": full_df, "latest_table": latest_df}
+
+    return data_object
+
+
+def download_data(cleanup=True):
     """
      Clone the JHU COVID GitHub repo (takes about a minute) and return paths to CSVs.
     """
     cmd = ["git", "clone", DISEASE_DATA_GITHUB_REPO]
     execute_shell_command(cmd)
 
-    # Go to daily reports directory and fetch all CSV files
-    csv_filepaths = list(Path(DAILY_REPORTS_DIRPATH).glob("*.csv"))
+    data_object = _get_data_from_repo(path=DAILY_REPORTS_DIRPATH)
 
-    # Get the full and latest table
-    full_df, latest_df = get_full_and_latest_dataframes_from_csv(csv_filepaths)
-    data_object = {"full_table": full_df, "latest_table": latest_df}
-    # # Remove GitHub repo directory
-    shutil.rmtree(REPO_DIRPATH)
-    print("Cleaned up.")
+    if cleanup:
+        # Remove GitHub repo directory
+        shutil.rmtree(REPO_DIRPATH)
+        print("Cleaned up.")
+
+    print('Data fetch complete')
+
+    return data_object
+
+
+def pull_latest_data(path=REPO_DIRPATH):
+    print("Updating the local data storage")
+
+    current_dir = os.path.curdir
+
+    # For some reason when I used subprocess I lost the STDOUT
+    os.system(f"cd {path} && git pull")
+
+    os.system(f"cd {current_dir}")
+
+    data_object = _get_data_from_repo(path=DAILY_REPORTS_DIRPATH)
+
+    return data_object
+
+
+def get_data_locally_or_download(data_path_locally=constants.DATA_DIR):
+    """A helper function for users running locally"""
+    if 'COVID-19' not in [p.stem for p in data_path_locally.parent.iterdir()]:
+        # Don't delete the repo we're cloning if running locally
+        data_object = download_data(cleanup=False)
+    else:
+        # We need to make sure the data is up to date
+        data_object = pull_latest_data(REPO_DIRPATH)
 
     return data_object
 
@@ -108,12 +127,12 @@ def download_data():
 def _configure_s3_client():
     # Upload the file
     s3_client = boto3.client(
-        "s3", aws_access_key_id=_S3_ACCESS_KEY, aws_secret_access_key=_S3_SECRET_KEY
+        "s3", aws_access_key_id=S3_ACCESS_KEY, aws_secret_access_key=S3_SECRET_KEY
     )
     return s3_client
 
 
-def upload_data_to_s3(data: bytes, object_name: str = _S3_DISEASE_DATA_OBJ_NAME):
+def upload_data_to_s3(data: bytes, object_name: str = S3_DISEASE_DATA_OBJ_NAME):
     """
     Upload a file to an S3 bucket
     :param data: Bytes to upload.
@@ -123,14 +142,14 @@ def upload_data_to_s3(data: bytes, object_name: str = _S3_DISEASE_DATA_OBJ_NAME)
     buf = BytesIO(data)
     s3_client = _configure_s3_client()
     try:
-        s3_client.put_object(Body=buf, Bucket=_S3_BUCKET_NAME, Key=object_name)
+        s3_client.put_object(Body=buf, Bucket=S3_BUCKET_NAME, Key=object_name)
     except ClientError as e:
         print(e)
         return False
     return True
 
 
-def download_data_from_s3(object_name: str = _S3_DISEASE_DATA_OBJ_NAME):
+def download_data_from_s3(object_name: str = S3_DISEASE_DATA_OBJ_NAME):
     """
     Download a file from S3 bucket.
     :param object_name: Name of object to download.
@@ -138,13 +157,13 @@ def download_data_from_s3(object_name: str = _S3_DISEASE_DATA_OBJ_NAME):
     """
     s3_client = _configure_s3_client()
     try:
-        download = s3_client.get_object(Key=object_name, Bucket=_S3_BUCKET_NAME)
+        download = s3_client.get_object(Key=object_name, Bucket=S3_BUCKET_NAME)
     except ClientError:
         return None
     content = download["Body"].read()
 
     # e.g. Sunday 30 November 2014
-    last_modified = download["LastModified"].strftime(_READABLE_DATESTRING_FORMAT)
+    last_modified = download["LastModified"].strftime(READABLE_DATESTRING_FORMAT)
     return content, last_modified
 
 
@@ -152,8 +171,8 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
     # Try to download from S3, else download from JHU
     objects = download_data_from_s3()
     if objects is None:
-        data_dict = download_data()
-        last_modified = datetime.datetime.now().strftime(_READABLE_DATESTRING_FORMAT)
+        data_dict = get_data_locally_or_download()
+        last_modified = datetime.datetime.now().strftime(READABLE_DATESTRING_FORMAT)
     else:
         data_dict_pkl_bytes, last_modified = objects
         data_dict = pickle.loads(data_dict_pkl_bytes)
@@ -181,3 +200,12 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
     )
 
     return country_data.to_dict(orient="index"), last_modified, full_disease_data
+
+
+def check_if_aws_credentials_present():
+    if len(constants.S3_ACCESS_KEY) is 0:
+        print('No S3 credentials present, using local file storage. '
+              'This make some time the first time you run. We will clone '
+              'the John Hopkins data repo (COVID-19) into this one.')
+    else:
+        print('S3 credentials found, using AWS.')
