@@ -192,7 +192,7 @@ def run_app():
     contact_rate = sidebar.contact_rate
 
     sir_model_2 = models.SIRModel2(
-        transmission_rate_per_contact=constants.TransmissionRatePerContact.default,
+        transmission_rate_per_contact=constants.TransmissionRatePerContact.default_per_infection_state,
         contact_rate=contact_rate,
         diagnosed_cases_model=diagnosed_cases_estimator,
         asymptomatic_cases_model=asymptomatic_cases_estimator,

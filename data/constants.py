@@ -28,6 +28,12 @@ class AgeData:
     data = AGE_DATA
 
 
+class InfectionState(Enum):
+    ASYMPTOMATIC_UNDIAGNOSED = "asymptomatic_undiagnosed"
+    SYMPTOMATIC_UNDIAGNOSED = "symptomatic_undiagnosed"
+    DIAGNOSED = "diagnosed"
+
+
 """
 SIR model constants
 """
@@ -55,6 +61,15 @@ class TransmissionRatePerContact:
     # Probability of a contact between carrier and susceptible leading to infection.
     # Found using binomial distribution in Wuhan scenario: 14 contacts per day, 10 infectious days, 2.5 average people infected.
     default = 0.018
+    
+    # The transmission rate of a asymptomatic infected individual is lower by a certain ratio
+    # The ratio is reported to be 55%
+    # source: https://science.sciencemag.org/content/early/2020/03/13/science.abb3221
+    default_per_infection_state = {
+        InfectionState.ASYMPTOMATIC_UNDIAGNOSED : 0.55 * default,
+        InfectionState.SYMPTOMATIC_UNDIAGNOSED : default,
+        InfectionState.DIAGNOSED : default
+    }
 
 
 class AverageDailyContacts:
@@ -83,8 +98,3 @@ class HospitalizationRate:
     # Cases requiring hospitalization. We multiply by the ascertainment rate because our source got their estimate
     # from the reported cases, whereas we will be using it with total cases.
     default = 0.19 * ReportingRate.default
-
-class InfectionState(Enum):
-    ASYMPTOMATIC_UNDIAGNOSED = "asymptomatic_undiagnosed"
-    SYMPTOMATIC_UNDIAGNOSED = "symptomatic_undiagnosed"
-    DIAGNOSED = "diagnosed"
