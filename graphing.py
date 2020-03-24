@@ -7,7 +7,7 @@ from utils import COLOR_MAP
 TEMPLATE = "plotly_white"
 
 def _set_title(fig):
-    fig.layout.update(title=dict(y=0.95, x=0, xanchor='left', yanchor='top'), titlefont=dict(size=13))
+    fig.layout.update(title=dict(y=0.95, x=0, xanchor='left', yanchor='top'), titlefont=dict(size=14))
 
 def _set_plot_font(fig):
     fig.layout.update(font=dict(family="Arial"))
