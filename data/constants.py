@@ -66,6 +66,14 @@ class AverageDailyContacts:
     default = 15
 
 
+class AsymptomaticRate:
+    # Proportion of true cases showing no symptoms
+    # The number comes from a study led on passengers of the Diamond Princess Cruise, in Japan
+    # We assume this figure stands true for the rest of the world
+    # https://www.eurosurveillance.org/content/10.2807/1560-7917.ES.2020.25.10.2000180
+    default = 0.179
+
+
 """
 Health care constants
 """
