@@ -12,8 +12,18 @@ import pandas as pd
 from botocore.exceptions import ClientError
 
 from data import constants
-from data.constants import READABLE_DATESTRING_FORMAT, S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET_NAME, \
-    S3_DISEASE_DATA_OBJ_NAME, DISEASE_DATA_GITHUB_REPO, REPO_DIRPATH, DAILY_REPORTS_DIRPATH, DEMOGRAPHIC_DATA, BED_DATA
+from data.constants import (
+    READABLE_DATESTRING_FORMAT,
+    S3_ACCESS_KEY,
+    S3_SECRET_KEY,
+    S3_BUCKET_NAME,
+    S3_DISEASE_DATA_OBJ_NAME,
+    DISEASE_DATA_GITHUB_REPO,
+    REPO_DIRPATH,
+    DAILY_REPORTS_DIRPATH,
+    DEMOGRAPHIC_DATA,
+    BED_DATA,
+)
 
 
 def execute_shell_command(command: List[str]):
@@ -33,6 +43,8 @@ def get_full_and_latest_dataframes_from_csv(csv_filepaths: List[Path]):
         year = int(stem_split[2])
 
         curr_df = pd.read_csv(fpath)
+        if "Country_Region" in curr_df.columns:
+            curr_df.rename({"Country_Region": "Country/Region"}, axis=1, inplace=True)
         country_stats_df = curr_df.groupby("Country/Region").agg(
             {"Confirmed": "sum", "Deaths": "sum", "Recovered": "sum"}
         )
@@ -92,7 +104,7 @@ def download_data(cleanup=True):
         shutil.rmtree(REPO_DIRPATH)
         print("Cleaned up.")
 
-    print('Data fetch complete')
+    print("Data fetch complete")
 
     return data_object
 
@@ -114,7 +126,7 @@ def pull_latest_data(path=REPO_DIRPATH):
 
 def get_data_locally_or_download(data_path_locally=constants.DATA_DIR):
     """A helper function for users running locally"""
-    if 'COVID-19' not in [p.stem for p in data_path_locally.parent.iterdir()]:
+    if "COVID-19" not in [p.stem for p in data_path_locally.parent.iterdir()]:
         # Don't delete the repo we're cloning if running locally
         data_object = download_data(cleanup=False)
     else:
@@ -204,8 +216,10 @@ def build_country_data(demographic_data=DEMOGRAPHIC_DATA, bed_data=BED_DATA):
 
 def check_if_aws_credentials_present():
     if len(constants.S3_ACCESS_KEY) is 0:
-        print('No S3 credentials present, using local file storage. '
-              'This make some time the first time you run. We will clone '
-              'the John Hopkins data repo (COVID-19) into this one.')
+        print(
+            "No S3 credentials present, using local file storage. "
+            "This make some time the first time you run. We will clone "
+            "the John Hopkins data repo (COVID-19) into this one."
+        )
     else:
-        print('S3 credentials found, using AWS.')
+        print("S3 credentials found, using AWS.")
