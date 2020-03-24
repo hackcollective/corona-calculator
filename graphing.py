@@ -9,6 +9,9 @@ TEMPLATE = "plotly_white"
 def _set_title(fig):
     fig.layout.update(title=dict(y=0.95, x=0, xanchor='left', yanchor='top'), titlefont=dict(size=13))
 
+def _set_plot_font(fig):
+    fig.layout.update(font=dict(family="Arial"))
+
 def _set_legends(fig):
     fig.layout.update(legend=dict(x=-0.1, y=1.2))
     fig.layout.update(legend_orientation="h")
@@ -98,6 +101,7 @@ def infection_graph(df, y_max, contact_rate):
     fig.layout.update(title=dict(text=f"Disease propagation with people meeting <b>{int(contact_rate)} person{plural(contact_rate)}</b> a day"))
     _set_legends(fig)
     _set_title(fig)
+    _set_plot_font(fig)
 
     return fig
 
@@ -135,6 +139,7 @@ def age_segregated_mortality(df, contact_rate):
     )
     _set_legends(fig)
     _set_title(fig)
+    _set_plot_font(fig)
 
     fig.layout.update(legend=dict(y=1.05))
     return fig
@@ -181,5 +186,6 @@ def num_beds_occupancy_comparison_chart(num_beds_available, max_num_beds_needed,
     )
     fig.update_traces(textposition="outside", cliponaxis=False)
     _set_title(fig)
+    _set_plot_font(fig)
 
     return fig
