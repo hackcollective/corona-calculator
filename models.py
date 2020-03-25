@@ -277,7 +277,7 @@ class SIRModel:
             "Need Hospitalization": H[:-index_to_clip],
         }
 
-class SIRModel2(SIRModel):
+class AsymptomaticSIRModel(SIRModel):
     def __init__(
         self,
         transmission_rate_per_contact: Union[numbers.Number, dict],
