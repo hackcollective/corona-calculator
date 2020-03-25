@@ -190,10 +190,8 @@ class SIRModel:
         self._hospital_capacity = hospital_capacity
 
     def _init_infection_rate(self, transmission_rate_per_contact, contact_rate):
-        
         self._infection_rate = transmission_rate_per_contact * contact_rate
         
-        return None
 
     def _get_delta_s(self, S, I, N):
         """
@@ -202,9 +200,7 @@ class SIRModel:
         :param N: Total population. 
         """
 
-        ret = - self._infection_rate * I * S / N
-        
-        return ret
+        return - self._infection_rate * I * S / N
         
     def predict(self, susceptible, infected, recovered, dead, num_days):
         """
