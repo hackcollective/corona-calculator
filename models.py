@@ -276,8 +276,8 @@ class SIRModel:
 class AsymptomaticSIRModel(SIRModel):
     def __init__(
         self,
-        transmission_rate_per_contact: Union[numbers.Number, dict],
-        contact_rate: Union[numbers.Number, dict],
+        transmission_rate_per_contact: dict,
+        contact_rate: dict,
         recovery_rate,
         normal_death_rate,
         critical_death_rate,
@@ -285,66 +285,29 @@ class AsymptomaticSIRModel(SIRModel):
         hospital_capacity,
         asymptomatic_cases_model,
     ):
-        """
-        :param transmission_rate_per_contact: Prob of contact between infected and susceptible leading to infection,
-            per SymptomState
-        :param contact_rate: Mean number of daily contacts between an individual and susceptible people,
-            per SymptomState
-        :param recovery_rate: Rate of recovery of infected individuals.
-        :param normal_death_rate: Average death rate in normal conditions.
-        :param critical_death_rate: Rate of mortality among severe or critical cases that can't get access
-            to necessary medical facilities.
-        :param hospitalization_rate: Proportion of illnesses who need are severely ill and need acute medical care.
-        :param hospital_capacity: Max capacity of medical system in area.
-        :param asymptomatic_cases_model: instance of AsymptomaticCasesModel
-        """
-        self._init_infection_rate(transmission_rate_per_contact, contact_rate)
-        self._recovery_rate = recovery_rate
-        # Death rate is amortized over the recovery period
-        # since the chances of dying per day are mortality rate / number of days with infection
-        self._normal_death_rate = normal_death_rate * recovery_rate
-        # Death rate of sever cases with no access to medical care.
-        self._critical_death_rate = critical_death_rate * recovery_rate
-        self._hospitalization_rate = hospitalization_rate
-        self._hospital_capacity = hospital_capacity
+        super().__init__(
+            transmission_rate_per_contact,
+            contact_rate,
+            recovery_rate,
+            normal_death_rate,
+            critical_death_rate,
+            hospitalization_rate,
+            hospital_capacity
+        )
 
         self._asymptomatic_cases_model = asymptomatic_cases_model
 
     def _init_infection_rate(
         self, 
-        transmission_rate_per_contact: Union[numbers.Number, dict],
-        contact_rate: Union[numbers.Number, dict],
+        transmission_rate_per_contact: dict,
+        contact_rate: dict,
     ):
         """
         Sets self._infection_rate as a dict {SymptomState : infection_rate}
-        :param transmission_rate_per_contact: as a number or dict {SymptomState : transmission_rate_per_contact}
-        :param contact_rate: as a number or dict {SymptomState : contact_rate} 
+        :param transmission_rate_per_contact: as a dict {SymptomState : transmission_rate_per_contact}
+        :param contact_rate: as a dict {SymptomState : contact_rate} 
         """
         
-        if isinstance(transmission_rate_per_contact, numbers.Number):
-            mean_transmission_rate_per_contact = transmission_rate_per_contact 
-            transmission_rate_per_contact = {
-                symptom_state : mean_transmission_rate_per_contact
-                for symptom_state in SymptomState
-            }
-        elif isinstance(transmission_rate_per_contact, dict): 
-            if any([symptom_state not in transmission_rate_per_contact for symptom_state in SymptomState]):
-                raise KeyError("tranmission_rate_per_contact must contains keys: {}".format(list(SymptomState)))
-        else:
-            raise TypeError("Type of tranmission_rate_per_contact must be in {}".format(Union[numbers.Number, dict]))
-
-        if isinstance(contact_rate, numbers.Number):
-            mean_contact_rate = contact_rate 
-            contact_rate = {
-                symptom_state : mean_contact_rate
-                for symptom_state in SymptomState
-            }
-        elif isinstance(contact_rate, dict): 
-            if any([symptom_state not in contact_rate for symptom_state in SymptomState]):
-                raise KeyError("contact_rate must contains keys: {}".format(list(SymptomState)))
-        else:
-            raise TypeError("Type of contact_rate must be in {}".format(Union[numbers.Number, dict]))
-
         infection_rate = {
             symptom_state : transmission_rate_per_contact[symptom_state] * contact_rate[symptom_state]
             for symptom_state in SymptomState
