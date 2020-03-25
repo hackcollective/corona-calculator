@@ -59,6 +59,23 @@ def get_predictions(
     return df
 
 
+def get_probability_of_infection_give_asymptomatic(
+    population, num_infected, asymptomatic_ratio
+):
+    """
+    Get the probability of being infected if you show no symptoms. Use Bayes:
+    P(I | A) = P(I) * P(A | I) / (P(A | I)*P(I) + P(A | I')*P(I'))
+    :param population: Total population.
+    :param num_infected: Number of infections in the population.
+    :param asymptomatic_ratio: Proportion of infected people who are asymptomatic. Equivalent to P(A | I).
+    """
+    p_i = num_infected / population
+    p = (p_i * asymptomatic_ratio) / (
+        asymptomatic_ratio * p_i + 1.0 * (1 - p_i)
+    )
+    return p
+
+
 def get_status_by_age_group(death_prediction: int, recovered_prediction: int):
     """
     Get outcomes segmented by age.
