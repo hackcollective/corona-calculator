@@ -125,20 +125,6 @@ class TrueInfectedCasesModel:
     def predict(self, diagnosed_cases):
         return diagnosed_cases / self._ascertainment_rate
 
-class DiagnosedCasesModel:
-    """
-    Used to estimate total number of number of diagnosed cases based on true infected persons.
-    """
-
-    def __init__(self, ascertainment_rate):
-        """
-        :param ascertainment_rate: Ratio of diagnosed to true number of infected persons.
-        """
-        self._ascertainment_rate = ascertainment_rate
-
-    def predict(self, true_cases):
-        return true_cases * self._ascertainment_rate 
-
 class AsymptomaticCasesModel:
     """
     Used to estimate total number of true infected persons in 3 categories:
@@ -155,22 +141,22 @@ class AsymptomaticCasesModel:
         """
         self._asymptomatic_rate = asymptomatic_rate
 
-    def predict(self, diagnosed_cases, true_cases):
+    def predict(self, true_cases):
         """
         Assumes the number of diagnosed asymptomatic cases is zero.
         Equivalent to: assumes all diagnosed cases are symptomatic
         :param diagnosed_cases: Reported number of cases
         :param true_cases: Estimated number of true cases
         """
-        undiagnosed_cases = true_cases - diagnosed_cases
-        asymptomatic_cases = undiagnosed_cases * self._asymptomatic_rate
+        asymptomatic_cases = true_cases * self._asymptomatic_rate
+        symptomatic_cases = true_cases - asymptomatic_cases
 
-        ret = {
+        cases = {
             SymptomState.ASYMPTOMATIC : asymptomatic_cases,
-            SymptomState.SYMPTOMATIC : true_cases - asymptomatic_cases
+            SymptomState.SYMPTOMATIC : symptomatic_cases
         }
 
-        return ret
+        return cases
 
 class SIRModel:
     def __init__(
@@ -301,7 +287,6 @@ class SIRModel2(SIRModel):
         critical_death_rate,
         hospitalization_rate,
         hospital_capacity,
-        diagnosed_cases_model,
         asymptomatic_cases_model,
     ):
         """
@@ -315,7 +300,6 @@ class SIRModel2(SIRModel):
             to necessary medical facilities.
         :param hospitalization_rate: Proportion of illnesses who need are severely ill and need acute medical care.
         :param hospital_capacity: Max capacity of medical system in area.
-        :param diagnosed_cases_model: instance of DiagnosedCasesModel
         :param asymptomatic_cases_model: instance of AsymptomaticCasesModel
         """
         self._init_infection_rate(transmission_rate_per_contact, contact_rate)
@@ -328,7 +312,6 @@ class SIRModel2(SIRModel):
         self._hospitalization_rate = hospitalization_rate
         self._hospital_capacity = hospital_capacity
 
-        self._diagnosed_cases_model = diagnosed_cases_model
         self._asymptomatic_cases_model = asymptomatic_cases_model
 
     def _init_infection_rate(
@@ -377,11 +360,8 @@ class SIRModel2(SIRModel):
 
     def _get_delta_s(self, S, I, N):
         
-        I_diagnosed = self._diagnosed_cases_model.predict(I)
-
         infections_per_state = self._asymptomatic_cases_model.predict(
             true_cases = I,
-            diagnosed_cases = I_diagnosed,
         )
 
         ret = sum(

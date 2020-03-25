@@ -207,9 +207,6 @@ def run_app():
     true_cases_estimator = models.TrueInfectedCasesModel(
         constants.ReportingRate.default
     )
-    diagnosed_cases_estimator = models.DiagnosedCasesModel(
-        constants.ReportingRate.default
-    )
     asymptomatic_cases_estimator = models.AsymptomaticCasesModel(
         constants.AsymptomaticRate.default
     )
@@ -219,7 +216,6 @@ def run_app():
     sir_model_2 = models.SIRModel2(
         transmission_rate_per_contact=constants.TransmissionRatePerContact.default_per_symptom_state,
         contact_rate=contact_rate,
-        diagnosed_cases_model=diagnosed_cases_estimator,
         asymptomatic_cases_model=asymptomatic_cases_estimator,
         recovery_rate=constants.RecoveryRate.default,
         normal_death_rate=constants.MortalityRate.default,
