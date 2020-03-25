@@ -1,8 +1,11 @@
 import itertools
+import numbers
+from typing import Union
 
 import pandas as pd
 
 import data.constants as constants
+from data.constants import SymptomState
 
 _STATUSES_TO_SHOW = [
     "Infected",
@@ -122,6 +125,38 @@ class TrueInfectedCasesModel:
     def predict(self, diagnosed_cases):
         return diagnosed_cases / self._ascertainment_rate
 
+class AsymptomaticCasesModel:
+    """
+    Used to estimate total number of true infected persons in 3 categories:
+    - `'asymptomatic_undiagnosed'`
+    - `'symptomatic_undiagnosed'`
+    - `'diagnosed'`
+
+    Uses number of diagnosed cases and true cases as input.
+    """
+
+    def __init__(self, asymptomatic_rate):
+        """
+        :param asymptomatic_rate: Ratio of asymptomatic infected persons to true number of infected persons.
+        """
+        self._asymptomatic_rate = asymptomatic_rate
+
+    def predict(self, true_cases):
+        """
+        Assumes the number of diagnosed asymptomatic cases is zero.
+        Equivalent to: assumes all diagnosed cases are symptomatic
+        :param diagnosed_cases: Reported number of cases
+        :param true_cases: Estimated number of true cases
+        """
+        asymptomatic_cases = true_cases * self._asymptomatic_rate
+        symptomatic_cases = true_cases - asymptomatic_cases
+
+        cases = {
+            SymptomState.ASYMPTOMATIC : asymptomatic_cases,
+            SymptomState.SYMPTOMATIC : symptomatic_cases
+        }
+
+        return cases
 
 class SIRModel:
     def __init__(
@@ -144,7 +179,7 @@ class SIRModel:
         :param hospitalization_rate: Proportion of illnesses who need are severely ill and need acute medical care.
         :param hospital_capacity: Max capacity of medical system in area.
         """
-        self._infection_rate = transmission_rate_per_contact * contact_rate
+        self._init_infection_rate(transmission_rate_per_contact, contact_rate)
         self._recovery_rate = recovery_rate
         # Death rate is amortized over the recovery period
         # since the chances of dying per day are mortality rate / number of days with infection
@@ -154,13 +189,26 @@ class SIRModel:
         self._hospitalization_rate = hospitalization_rate
         self._hospital_capacity = hospital_capacity
 
+    def _init_infection_rate(self, transmission_rate_per_contact, contact_rate):
+        self._infection_rate = transmission_rate_per_contact * contact_rate
+        
+
+    def _get_delta_s(self, S, I, N):
+        """
+        :param S: Number of susceptible people in population.
+        :param I: Number of infected people in population.
+        :param N: Total population. 
+        """
+
+        return - self._infection_rate * I * S / N
+        
     def predict(self, susceptible, infected, recovered, dead, num_days):
         """
         Run simulation.
-        :param susceptible: Number of susceptible people in population.
-        :param infected: Number of infected people in population.
-        :param recovered: Number of recovered people in population.
-        :param dead: Number of dead people in the population
+        :param susceptible: Starting number of susceptible people in population.
+        :param infected: Starting number of infected people in population.
+        :param recovered: Starting number of recovered people in population.
+        :param dead: Starting number of dead people in the population
         :param num_days: Number of days to forecast.
         :return: List of values for S, I, R over time steps
         """
@@ -189,10 +237,12 @@ class SIRModel:
 
             # Forecast
 
-            s_t = S[-1] - self._infection_rate * I[-1] * S[-1] / population
+            delta_s_t = self._get_delta_s(S[-1], I[-1], population)
+
+            s_t = S[-1] + delta_s_t 
             i_t = (
                 I[-1]
-                + self._infection_rate * I[-1] * S[-1] / population
+                - delta_s_t
                 - (weighted_death_rate + self._recovery_rate) * I[-1]
             )
             r_t = R[-1] + self._recovery_rate * I[-1]
@@ -222,3 +272,62 @@ class SIRModel:
             "Dead": D[:-index_to_clip],
             "Need Hospitalization": H[:-index_to_clip],
         }
+
+class AsymptomaticSIRModel(SIRModel):
+    def __init__(
+        self,
+        transmission_rate_per_contact: dict,
+        contact_rate: dict,
+        recovery_rate,
+        normal_death_rate,
+        critical_death_rate,
+        hospitalization_rate,
+        hospital_capacity,
+        asymptomatic_cases_model,
+    ):
+        super().__init__(
+            transmission_rate_per_contact,
+            contact_rate,
+            recovery_rate,
+            normal_death_rate,
+            critical_death_rate,
+            hospitalization_rate,
+            hospital_capacity
+        )
+
+        self._asymptomatic_cases_model = asymptomatic_cases_model
+
+    def _init_infection_rate(
+        self, 
+        transmission_rate_per_contact: dict,
+        contact_rate: dict,
+    ):
+        """
+        Sets self._infection_rate as a dict {SymptomState : infection_rate}
+        :param transmission_rate_per_contact: as a dict {SymptomState : transmission_rate_per_contact}
+        :param contact_rate: as a dict {SymptomState : contact_rate} 
+        """
+        
+        infection_rate = {
+            symptom_state : transmission_rate_per_contact[symptom_state] * contact_rate[symptom_state]
+            for symptom_state in SymptomState
+        }
+
+        self._infection_rate = infection_rate
+
+        return None
+
+    def _get_delta_s(self, S, I, N):
+        
+        infections_per_state = self._asymptomatic_cases_model.predict(
+            true_cases = I,
+        )
+
+        ret = sum(
+            [
+                - self._infection_rate[symptom_state] * infections_per_state[symptom_state] * S / N \
+                    for symptom_state in SymptomState
+            ]
+        ) 
+        
+        return ret

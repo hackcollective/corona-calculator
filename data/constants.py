@@ -5,6 +5,7 @@ For sources, please visit https://www.notion.so/Modelling-d650e1351bf34ceeb97c82
 
 import os
 from pathlib import Path
+from enum import Enum
 
 import pandas as pd
 
@@ -29,6 +30,11 @@ AGE_DATA = pd.read_csv(AGE_DATA_PATH, index_col="Age Group")
 
 class AgeData:
     data = AGE_DATA
+
+
+class SymptomState(Enum):
+    ASYMPTOMATIC = "asymptomatic"
+    SYMPTOMATIC = "symptomatic"
 
 
 """
@@ -58,6 +64,14 @@ class TransmissionRatePerContact:
     # Probability of a contact between carrier and susceptible leading to infection.
     # Found using binomial distribution in Wuhan scenario: 14 contacts per day, 10 infectious days, 2.5 average people infected.
     default = 0.018
+    
+    # The transmission rate of a asymptomatic infected individual is lower by a certain ratio
+    # The ratio is reported to be 55%
+    # source: https://science.sciencemag.org/content/early/2020/03/13/science.abb3221
+    default_per_symptom_state = {
+        SymptomState.ASYMPTOMATIC : 0.55 * default,
+        SymptomState.SYMPTOMATIC : default,
+    }
 
 
 class AverageDailyContacts:
@@ -83,6 +97,12 @@ class ReportingRate:
     # Proportion of true cases diagnosed
     default = 0.14
 
+class AsymptomaticRate:
+    # Proportion of true cases showing no symptoms
+    # The number comes from a study led on passengers of the Diamond Princess Cruise, in Japan
+    # We assume this figure stands true for the rest of the world
+    # https://www.eurosurveillance.org/content/10.2807/1560-7917.ES.2020.25.10.2000180
+    default = 0.179
 
 class HospitalizationRate:
     # Cases requiring hospitalization. We multiply by the ascertainment rate because our source got their estimate
