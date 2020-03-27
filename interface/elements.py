@@ -12,7 +12,7 @@ def reported_vs_true_cases(num_cases_confirmed, num_cases_estimated):
         f"<td style='{_cell_style}'> Estimated True Cases </td>"
         "</tr>"
         f"<tr style='border: 2px solid {_border_color}'> "
-        f"<td style='border-right: 2px solid {_border_color}; border-spacing: 10px; {_number_format + 'font-color:red'}' > {num_cases_confirmed}</td> "
+        f"<td style='border-right: 2px solid {_border_color}; border-spacing: 10px; {_number_format + 'font-color:red'}' > {int(num_cases_confirmed):,}</td> "
         f"<td style='{_number_format + 'color:red'}'> {int(num_cases_estimated):,} </td>"
         "</tr>"
         "</table>"
