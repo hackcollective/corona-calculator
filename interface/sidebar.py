@@ -78,12 +78,12 @@ class Sidebar:
         )
 
         slider_person_descriptions = {
-            constants.SymptomState.ASYMPTOMATIC : "without symptoms",
-            constants.SymptomState.SYMPTOMATIC : "with symptoms",
+            constants.SymptomState.ASYMPTOMATIC: "without symptoms",
+            constants.SymptomState.SYMPTOMATIC: "with symptoms",
         }
 
         self.contact_rate = {
-            state : st.sidebar.slider(
+            state: st.sidebar.slider(
                 label=description,
                 min_value=constants.AverageDailyContacts.min,
                 max_value=constants.AverageDailyContacts.max,

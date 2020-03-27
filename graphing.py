@@ -3,22 +3,28 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 from utils import COLOR_MAP
+from data import constants
 
 TEMPLATE = "plotly_white"
+
 
 def _set_title(fig):
     fig.layout.update(title=dict(y=0.95, x=0, xanchor='left', yanchor='top'), titlefont=dict(size=14))
 
+
 def _set_plot_font(fig):
     fig.layout.update(font=dict(family="Arial"))
+
 
 def _set_legends(fig):
     fig.layout.update(legend=dict(x=-0.1, y=1.2))
     fig.layout.update(legend_orientation="h")
 
+
 def plural(x):
     """Return 's' if x > 1"""
     return 's' if int(x) > 1 else ''
+
 
 def plot_historical_data(df):
     # Convert wide to long
@@ -55,6 +61,10 @@ def plot_true_versus_confirmed(confirmed, predicted):
 
 
 def infection_graph(df, y_max, contact_rate):
+
+    # This throws a key error and I don't understand why
+    asymptomatic_contact_rate = contact_rate[constants.SymptomState.ASYMPTOMATIC]
+    symptomatic_contact_rate = contact_rate[constants.SymptomState.SYMPTOMATIC]
 
     # We cannot explicitly set graph width here, have to do it as injected css: see interface.css
     fig = go.Figure(layout=dict(template=TEMPLATE))
@@ -98,7 +108,8 @@ def infection_graph(df, y_max, contact_rate):
     )
     fig.update_yaxes(range=[0, y_max])
     fig.layout.update(xaxis_title="Number of days from today")
-    fig.layout.update(title=dict(text=f"Disease propagation with people meeting <b>{int(contact_rate)} person{plural(contact_rate)}</b> a day"))
+    fig.layout.update(title=dict(text=f"Disease propagation with symptomatic people meeting <b>{int(symptomatic_contact_rate)} "
+                                      f"</b> and asymptomatic meeting <b>{int(asymptomatic_contact_rate)}</b> people a day"))
     _set_legends(fig)
     _set_title(fig)
     _set_plot_font(fig)
