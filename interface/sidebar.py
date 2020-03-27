@@ -87,7 +87,7 @@ class Sidebar:
                 label=description,
                 min_value=constants.AverageDailyContacts.min,
                 max_value=constants.AverageDailyContacts.max,
-                value=constants.AverageDailyContacts.default,
+                value=constants.AverageDailyContacts.default[state],
             )
             for state, description in slider_person_descriptions.items()
         }
