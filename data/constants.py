@@ -110,3 +110,7 @@ class HospitalizationRate:
     default = 0.19 * ReportingRate.default
 
 
+NOTION_MODELLING_DOC = (
+    "https://www.notion.so/coronahack/Modelling-d650e1351bf34ceeb97c82bd24ae04cc"
+)
+MEDIUM_BLOGPOST = "https://medium.com/@archydeberker/should-i-go-to-brunch-an-interactive-tool-for-covid-19-curve-flattening-6ab6a914af0"

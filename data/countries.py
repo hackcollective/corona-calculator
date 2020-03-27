@@ -1,6 +1,8 @@
 import datetime
 
-from data.utils import build_country_data
+import streamlit as st
+
+from data.utils import build_country_data, check_if_aws_credentials_present
 
 
 class Countries:
@@ -16,3 +18,10 @@ class Countries:
     def stale(self):
         delta = datetime.datetime.utcnow() - self.timestamp
         return delta > datetime.timedelta(hours=1)
+
+
+@st.cache
+def _fetch_country_data():
+    check_if_aws_credentials_present()
+    timestamp = datetime.datetime.utcnow()
+    return data.countries.Countries(timestamp=timestamp)
