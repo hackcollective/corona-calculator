@@ -91,16 +91,13 @@ def run_app():
     fig = graphing.plot_historical_data(historical_data)
     st.write(fig)
 
-    true_cases_estimator = models.TrueInfectedCasesModel(
-        constants.ReportingRate.default
-    )
     asymptomatic_cases_estimator = models.AsymptomaticCasesModel(
         constants.AsymptomaticRate.default
     )
 
     contact_rate = sidebar.contact_rate
 
-    sir_model_2 = models.AsymptomaticSIRModel(
+    asymptomatic_sir_model = models.AsymptomaticSIRModel(
         transmission_rate_per_contact=constants.TransmissionRatePerContact.default_per_symptom_state,
         contact_rate=contact_rate,
         asymptomatic_cases_model=asymptomatic_cases_estimator,
@@ -113,7 +110,7 @@ def run_app():
 
     df = models.get_predictions(
         cases_estimator=true_cases_estimator,
-        sir_model=sir_model_2,
+        sir_model=asymptomatic_sir_model,
         num_diagnosed=number_cases_confirmed,
         num_recovered=country_data["Recovered"],
         num_deaths=country_data["Deaths"],

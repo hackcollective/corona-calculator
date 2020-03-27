@@ -1,6 +1,4 @@
 import itertools
-import numbers
-from typing import Union
 
 import pandas as pd
 
@@ -307,15 +305,13 @@ class AsymptomaticSIRModel(SIRModel):
         :param transmission_rate_per_contact: as a dict {SymptomState : transmission_rate_per_contact}
         :param contact_rate: as a dict {SymptomState : contact_rate} 
         """
-        
+
         infection_rate = {
             symptom_state : transmission_rate_per_contact[symptom_state] * contact_rate[symptom_state]
             for symptom_state in SymptomState
         }
 
         self._infection_rate = infection_rate
-
-        return None
 
     def _get_delta_s(self, S, I, N):
         
