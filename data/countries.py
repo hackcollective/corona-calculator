@@ -21,7 +21,7 @@ class Countries:
 
 
 @st.cache
-def _fetch_country_data():
+def fetch_country_data():
     check_if_aws_credentials_present()
     timestamp = datetime.datetime.utcnow()
-    return data.countries.Countries(timestamp=timestamp)
+    return Countries(timestamp=timestamp)

@@ -5,7 +5,7 @@ import models
 import utils
 from data import constants
 from data.constants import NOTION_MODELLING_DOC, MEDIUM_BLOGPOST
-from data.countries import _fetch_country_data
+from data.countries import fetch_country_data
 from interface import css
 from interface.elements import reported_vs_true_cases
 from interface.sidebar import Sidebar
@@ -17,11 +17,11 @@ def run_app():
     css.limit_plot_size()
 
     # Get cached country data
-    countries = _fetch_country_data()
+    countries = fetch_country_data()
 
     if countries.stale:
         st.caching.clear_cache()
-        countries = _fetch_country_data()
+        countries = fetch_country_data()
 
     st.markdown(
         body=generate_html(text=f"Corona Calculator", bold=True, tag="h1"),
