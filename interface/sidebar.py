@@ -59,7 +59,9 @@ class Sidebar:
         st.sidebar.markdown(
             body=generate_html(
                 text=f"Change the degree of social distancing to see the effect upon disease "
-                f"spread and access to hospital beds.",
+                f"spread and access to hospital beds. Since many cases of coronavirus do not "
+                f"show symptoms, social distancing is important even for those who do not "
+                f"appear to be infected!",
                 line_height=0,
                 font_size="12px",
             )
@@ -69,7 +71,7 @@ class Sidebar:
 
         st.sidebar.markdown(
             body=generate_html(
-                text=f"How many people does an individual [...] meet on a daily basis?",
+                text=f"How many people come into contact with each person who:",
                 line_height=0,
                 font_size="12px",
             )
@@ -78,8 +80,8 @@ class Sidebar:
         )
 
         slider_person_descriptions = {
-            constants.SymptomState.ASYMPTOMATIC: "without symptoms",
-            constants.SymptomState.SYMPTOMATIC: "with symptoms",
+            constants.SymptomState.ASYMPTOMATIC: "has no symptoms",
+            constants.SymptomState.SYMPTOMATIC: "has symptoms",
         }
 
         self.contact_rate = {
