@@ -71,7 +71,7 @@ class Sidebar:
 
         st.sidebar.markdown(
             body=generate_html(
-                text=f"How many people come into contact with each person who:",
+                text=f"How many people, on average, does one come into contact with if they:",
                 line_height=0,
                 font_size="12px",
             )
@@ -80,8 +80,8 @@ class Sidebar:
         )
 
         slider_person_descriptions = {
-            constants.SymptomState.ASYMPTOMATIC: "has no symptoms",
-            constants.SymptomState.SYMPTOMATIC: "has symptoms",
+            constants.SymptomState.ASYMPTOMATIC: "have no symptoms",
+            constants.SymptomState.SYMPTOMATIC: "have symptoms",
         }
 
         self.contact_rate = {
